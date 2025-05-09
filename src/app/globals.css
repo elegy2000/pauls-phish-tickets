@@ -26,3 +26,12 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Add custom styling for ticket images */
+.ticket-image-container {
+  z-index: 10;
+}
+
+#lightbox-overlay {
+  z-index: 9999;
+}

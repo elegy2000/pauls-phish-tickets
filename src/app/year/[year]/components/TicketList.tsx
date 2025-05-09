@@ -45,8 +45,11 @@ export default function TicketList({ tickets, yearValue }: TicketListProps) {
             aspectRatio: '10/7', 
             backgroundColor: '#f3f4f6',
             overflow: 'hidden',
-            cursor: 'pointer'
-          }}>
+            cursor: 'pointer',
+            userSelect: 'none'
+          }}
+          className="ticket-image-wrapper"
+          >
             <TicketImage imageUrl={ticket.imageUrl || '/images/default-show.jpg'} venue={ticket.venue} />
           </div>
           
