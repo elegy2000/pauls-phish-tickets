@@ -25,18 +25,9 @@ export default function TicketList({ tickets, yearValue }: TicketListProps) {
       marginBottom: '2rem' 
     }}>
       {tickets.map((ticket, index) => (
-        <Link 
-          key={index} 
-          href={ticket.net_link || '#'} 
-          target="_blank"
-          rel="noopener noreferrer"
+        <div 
+          key={index}
           style={{
-            display: 'block',
-            textDecoration: 'none',
-            color: 'inherit'
-          }}
-        >
-          <div style={{
             backgroundColor: 'white',
             borderRadius: '0.5rem',
             overflow: 'hidden',
@@ -46,23 +37,39 @@ export default function TicketList({ tickets, yearValue }: TicketListProps) {
             height: '100%',
             display: 'flex',
             flexDirection: 'column'
+          }}
+        >
+          {/* Image Section - Does not link to phish.net */}
+          <div style={{ 
+            position: 'relative',
+            aspectRatio: '10/7', 
+            backgroundColor: '#f3f4f6',
+            overflow: 'hidden'
           }}>
+            <TicketImage imageUrl={ticket.imageUrl || '/placeholder-ticket.jpg'} venue={ticket.venue} />
             <div style={{ 
-              position: 'relative',
-              aspectRatio: '10/7', 
-              backgroundColor: '#f3f4f6',
-              overflow: 'hidden'
-            }}>
-              <TicketImage imageUrl={ticket.imageUrl || '/placeholder-ticket.jpg'} venue={ticket.venue} />
-              <div style={{ 
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                background: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.7) 100%)'
-              }} />
-            </div>
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.7) 100%)'
+            }} />
+          </div>
+          
+          {/* Details Section - Links to phish.net */}
+          <Link 
+            href={ticket.net_link || '#'} 
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              textDecoration: 'none',
+              color: 'inherit',
+              display: 'flex',
+              flexDirection: 'column',
+              flexGrow: 1
+            }}
+          >
             <div style={{ 
               position: 'relative',
               padding: '1.5rem',
@@ -116,8 +123,8 @@ export default function TicketList({ tickets, yearValue }: TicketListProps) {
                 </div>
               )}
             </div>
-          </div>
-        </Link>
+          </Link>
+        </div>
       ))}
     </div>
   );
