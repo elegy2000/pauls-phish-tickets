@@ -44,17 +44,10 @@ export default function TicketList({ tickets, yearValue }: TicketListProps) {
             position: 'relative',
             aspectRatio: '10/7', 
             backgroundColor: '#f3f4f6',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            cursor: 'pointer'
           }}>
-            <TicketImage imageUrl={ticket.imageUrl || '/placeholder-ticket.jpg'} venue={ticket.venue} />
-            <div style={{ 
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.7) 100%)'
-            }} />
+            <TicketImage imageUrl={ticket.imageUrl || '/images/default-show.jpg'} venue={ticket.venue} />
           </div>
           
           {/* Details Section - Links to phish.net */}

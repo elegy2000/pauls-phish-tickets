@@ -19,14 +19,22 @@ export const TicketImage = ({ imageUrl, venue }: { imageUrl: string | null | und
     console.log('Normalized URL:', imgSrc);
   }, [imageUrl, imgSrc]);
 
-  const openLightbox = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleOpenLightbox = () => {
+    console.log('Opening lightbox');
     setShowLightbox(true);
+    // Prevent scrolling when lightbox is open
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = 'hidden';
+    }
   };
   
-  const closeLightbox = () => {
+  const handleCloseLightbox = () => {
+    console.log('Closing lightbox');
     setShowLightbox(false);
+    // Restore scrolling when lightbox is closed
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = '';
+    }
   };
 
   return (
@@ -45,7 +53,7 @@ export const TicketImage = ({ imageUrl, venue }: { imageUrl: string | null | und
           overflow: 'hidden',
           cursor: 'pointer'
         }}
-        onClick={openLightbox}
+        onClick={handleOpenLightbox}
       >
         <img 
           src={imgSrc}
@@ -53,7 +61,7 @@ export const TicketImage = ({ imageUrl, venue }: { imageUrl: string | null | und
           style={{
             width: '100%',
             height: '100%',
-            objectFit: 'cover',
+            objectFit: 'contain',
             borderRadius: '4px'
           }}
           onError={(e) => {
@@ -80,7 +88,7 @@ export const TicketImage = ({ imageUrl, venue }: { imageUrl: string | null | und
             zIndex: 9999,
             padding: '2rem'
           }}
-          onClick={closeLightbox}
+          onClick={handleCloseLightbox}
         >
           <button
             style={{
@@ -99,7 +107,10 @@ export const TicketImage = ({ imageUrl, venue }: { imageUrl: string | null | und
               cursor: 'pointer',
               zIndex: 10000
             }}
-            onClick={closeLightbox}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCloseLightbox();
+            }}
           >
             ✕
           </button>
