@@ -3,5 +3,11 @@
   "outputDirectory": ".next",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/year/:year", "destination": "/year/:year" },
+    { "source": "/phish", "destination": "/phish" },
+    { "source": "/tour/:tourId", "destination": "/tour/:tourId" }
+  ]
 } 
