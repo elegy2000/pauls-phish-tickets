@@ -2,26 +2,37 @@
   "name": "temp-next",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "scrape-phish": "ts-node src/scripts/run-scraper.ts",
+    "scrape": "node src/scripts/scraper.js",
+    "direct-scrape": "node src/scripts/direct-scraper.js",
+    "fetch-data": "node --loader ts-node/esm scripts/fetch-phish-data.ts"
   },
   "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "next": "15.3.0"
+    "axios": "^1.8.4",
+    "csv-parse": "^5.6.0",
+    "dotenv": "^16.5.0",
+    "next": "15.3.0",
+    "react": "^18",
+    "react-dom": "^18"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
-    "eslint": "^9",
+    "@tailwindcss/postcss": "^4.1.3",
+    "@types/node": "^20.17.30",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/webpack": "^5.28.5",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^8",
     "eslint-config-next": "15.3.0",
-    "@eslint/eslintrc": "^3"
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   }
 }

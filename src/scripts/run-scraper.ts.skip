@@ -1,0 +1,11 @@
+#!/usr/bin/env ts-node
+// This file is temporarily renamed to exclude it from the build process
+import { runScraper } from '../utils/phishScraper.js';
+
+// Run the scraper
+runScraper()
+  .then(() => console.log('Scraper completed successfully'))
+  .catch((error: Error) => {
+    console.error('Error running scraper:', error);
+    process.exit(1);
+  }); 
