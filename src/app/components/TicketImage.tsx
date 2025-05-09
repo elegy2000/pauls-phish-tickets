@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const PLACEHOLDER_IMAGE = '/placeholder-ticket.jpg';
+const PLACEHOLDER_IMAGE = '/images/default-show.jpg';
 
 function normalizeImageUrl(url: string | null | undefined): string {
   if (!url) return PLACEHOLDER_IMAGE;
@@ -12,6 +12,11 @@ function normalizeImageUrl(url: string | null | undefined): string {
 
 export const TicketImage = ({ imageUrl, venue }: { imageUrl: string | null | undefined, venue: string }) => {
   const [imgSrc, setImgSrc] = useState<string>(() => normalizeImageUrl(imageUrl));
+  
+  useEffect(() => {
+    console.log('Image URL:', imageUrl);
+    console.log('Normalized URL:', imgSrc);
+  }, [imageUrl, imgSrc]);
 
   return (
     <div style={{
@@ -35,7 +40,8 @@ export const TicketImage = ({ imageUrl, venue }: { imageUrl: string | null | und
           objectFit: 'cover',
           borderRadius: '4px'
         }}
-        onError={() => {
+        onError={(e) => {
+          console.error('Image failed to load:', imgSrc);
           if (imgSrc !== PLACEHOLDER_IMAGE) {
             setImgSrc(PLACEHOLDER_IMAGE);
           }
