@@ -1,3 +1,25 @@
+# Paul's Phish Tickets Archive
+
+This is an archive of Paul's collection of Phish concert tickets.
+
+## Deployment
+
+This site is deployed on Vercel: https://pauls-phish-tickets.vercel.app
+
+## Technology Stack
+
+- Next.js
+- React
+- TypeScript
+- Vercel
+
+## Features
+
+- Browse tickets by year
+- View ticket details
+- Search functionality
+- Admin interface for managing tickets
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
