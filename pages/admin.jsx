@@ -363,7 +363,7 @@ const AdminPage = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="city_state">City/State:</label>
+                  <label htmlFor="city_state">City, State:</label>
                   <input 
                     type="text" 
                     id="city_state" 
