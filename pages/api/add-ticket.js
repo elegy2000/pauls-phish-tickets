@@ -14,7 +14,20 @@ export default async function handler(req, res) {
   }
 
   const ticket = req.body;
-  if (!ticket || !ticket.year || !ticket.date || !ticket.venue || !ticket.city_state || !ticket.imageUrl || !ticket.net_link) {
+  console.log('Received ticket:', ticket);
+  console.log('Type of ticket.year:', typeof ticket.year, 'Value:', ticket.year);
+  console.log('Type of ticket.date:', typeof ticket.date, 'Value:', ticket.date);
+  console.log('Type of ticket.venue:', typeof ticket.venue, 'Value:', ticket.venue);
+  console.log('Type of ticket.city_state:', typeof ticket.city_state, 'Value:', ticket.city_state);
+
+  // Construct imageUrl if imageFileName is provided
+  if (ticket.imageFileName && ticket.imageFileName.trim() !== '') {
+    ticket.imageUrl = `https://hykzrxjtkpssrfmcerky.supabase.co/storage/v1/object/public/ticket-images/${ticket.imageFileName.trim()}`;
+  } else {
+    ticket.imageUrl = '';
+  }
+
+  if (!ticket || !ticket.year || !ticket.date || !ticket.venue || !ticket.city_state) {
     return res.status(400).json({ success: false, message: 'Missing ticket fields' });
   }
 

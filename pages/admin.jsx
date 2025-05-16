@@ -17,7 +17,7 @@ const AdminPage = () => {
     date: '',
     venue: '',
     city_state: '',
-    imageUrl: '',
+    imageFileName: '',
     net_link: ''
   });
 
@@ -135,7 +135,7 @@ const AdminPage = () => {
           date: '',
           venue: '',
           city_state: '',
-          imageUrl: '',
+          imageFileName: '',
           net_link: ''
         });
         
@@ -374,12 +374,12 @@ const AdminPage = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="imageUrl">Image URL (optional):</label>
+                  <label htmlFor="imageFileName">Image file name (include ext.) (optional):</label>
                   <input 
                     type="text" 
-                    id="imageUrl" 
-                    name="imageUrl" 
-                    value={newTicket.imageUrl}
+                    id="imageFileName" 
+                    name="imageFileName" 
+                    value={newTicket.imageFileName || ''}
                     onChange={handleInputChange}
                   />
                 </div>
