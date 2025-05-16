@@ -31,9 +31,19 @@ export default async function handler(req, res) {
     return res.status(400).json({ success: false, message: 'Missing ticket fields' });
   }
 
+  // Prepare object for Supabase insert (match table columns exactly)
+  const supabaseTicket = {
+    year: Number(ticket.year),
+    date: ticket.date,
+    venue: ticket.venue,
+    city_state: ticket.city_state,
+    imageurl: ticket.imageUrl, // lowercase for Supabase
+    net_link: ticket.net_link
+  };
+
   try {
     // Add to Supabase
-    const { data, error } = await supabase.from('ticket_stubs').insert([ticket]).select();
+    const { data, error } = await supabase.from('ticket_stubs').insert([supabaseTicket]).select();
     if (error) {
       console.error('Error inserting ticket into Supabase:', error);
       return res.status(500).json({ success: false, message: 'Error inserting ticket into Supabase' });
