@@ -1,0 +1,53 @@
+{
+  "name": "pauls-phish-tickets",
+  "version": "1.0.0",
+  "description": "Paul's Phish Tickets Archive",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "deploy": "node scripts/deploy-gh-pages.js",
+    "prepare-deploy-package": "node scripts/prepare-deploy-package.js",
+    "create-deploy-package": "bash scripts/create-deploy-package.sh",
+    "fetch-phish-data": "ts-node scripts/fetch-phish-data.ts",
+    "update-site-data": "ts-node scripts/update-site-data.ts",
+    "fetch-tour-csv": "ts-node scripts/fetch-tour-csv.ts",
+    "test-api": "ts-node scripts/test-api.ts",
+    "fetch-phish-csv": "ts-node scripts/fetch-phish-csv.ts",
+    "scrape-phish-data": "ts-node scripts/scrape-phish-data.ts",
+    "scrape-phish-shows": "ts-node scripts/scrape-phish-shows.ts",
+    "create-sample-csv": "ts-node scripts/create-sample-csv.ts",
+    "comprehensive-scrape": "ts-node scripts/comprehensive-scraper.ts",
+    "simple-scrape": "ts-node scripts/simple-phish-scraper.ts",
+    "tour-scrape": "ts-node scripts/tour-scraper.ts",
+    "tour-debug": "ts-node scripts/tour-debug.ts",
+    "tour-scrape-fixed": "ts-node scripts/tour-scraper-fixed.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.4",
+    "axios": "^1.9.0",
+    "body-parser": "^2.2.0",
+    "cheerio": "^1.0.0-rc.12",
+    "cookie": "^0.5.0",
+    "cors": "^2.8.5",
+    "csv-parse": "^5.6.0",
+    "csv-parser": "^3.2.0",
+    "csv-writer": "^1.6.0",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "fs-extra": "^11.3.0",
+    "multer": "^1.4.5-lts.1",
+    "next": "^14.0.0",
+    "papaparse": "^5.5.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-dropzone": "^14.3.8"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.8",
+    "@types/react": "19.1.2",
+    "typescript": "5.8.3"
+  }
+}

@@ -1,0 +1,43 @@
+import fs from 'fs';
+import path from 'path';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.SUPABASE_URL || 'https://hykzrxjtkpssrfmcerky.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'sbp_9e43403238de8faed4a3d1d85b3bc72dbc4d52c9';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+const JSON_FILE_PATH = path.join(process.cwd(), 'public/data/tickets.json');
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, message: 'Method not allowed' });
+  }
+
+  const ticket = req.body;
+  if (!ticket || !ticket.year || !ticket.date || !ticket.venue || !ticket.city_state || !ticket.imageUrl || !ticket.net_link) {
+    return res.status(400).json({ success: false, message: 'Missing ticket fields' });
+  }
+
+  try {
+    // Add to Supabase
+    const { data, error } = await supabase.from('ticket_stubs').insert([ticket]).select();
+    if (error) {
+      console.error('Error inserting ticket into Supabase:', error);
+      return res.status(500).json({ success: false, message: 'Error inserting ticket into Supabase' });
+    }
+
+    // Add to local JSON
+    const jsonData = JSON.parse(fs.readFileSync(JSON_FILE_PATH, 'utf8'));
+    jsonData.tickets.push(ticket);
+    if (!jsonData.years.includes(ticket.year)) {
+      jsonData.years.push(ticket.year);
+      jsonData.years.sort((a, b) => b - a);
+    }
+    fs.writeFileSync(JSON_FILE_PATH, JSON.stringify(jsonData, null, 2));
+
+    res.status(200).json({ success: true, ticket });
+  } catch (err) {
+    console.error('Error adding ticket:', err);
+    res.status(500).json({ success: false, message: 'Failed to add ticket' });
+  }
+} 

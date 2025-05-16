@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "GitHub MCP": {
+      "url": "localhost:3001",
+      "type": "github"
+    },
+    "Supabase MCP": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_9e43403238de8faed4a3d1d85b3bc72dbc4d52c9"
+      ]
+    }
+  }
+} 
