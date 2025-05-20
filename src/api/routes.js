@@ -21,40 +21,10 @@ router.post('/upload', upload.single('csvFile'), async (req, res) => {
 
     console.log('File received:', req.file.originalname, 'size:', req.file.size);
     const csvData = req.file.buffer.toString();
-    // Overwrite the main CSV file with the uploaded content
-    const csvFilePath = path.join(process.cwd(), 'data/phish_tours.csv');
-    fs.writeFileSync(csvFilePath, csvData);
-    console.log('CSV file written to:', csvFilePath);
-    // Verify CSV exists and is not empty
-    try {
-      const stats = fs.statSync(csvFilePath);
-      if (stats.size === 0) {
-        console.error('CSV file is empty after upload!');
-        return res.status(500).json({ success: false, message: 'CSV file is empty after upload!' });
-      }
-    } catch (err) {
-      console.error('CSV file missing after upload!', err);
-      return res.status(500).json({ success: false, message: 'CSV file missing after upload!' });
-    }
+
+    // Process and upload to Supabase only
     const result = await handleCsvUpload(csvData);
-    // Clear require cache for tickets.json if it exists
-    const ticketsJsonPath = path.join(process.cwd(), 'public/data/tickets.json');
-    if (require.cache[ticketsJsonPath]) {
-      delete require.cache[ticketsJsonPath];
-    }
-    console.log('tickets.json written to:', ticketsJsonPath);
-    // Verify tickets.json exists and is not empty
-    try {
-      const stats = fs.statSync(ticketsJsonPath);
-      if (stats.size === 0) {
-        console.error('tickets.json is empty after upload!');
-        return res.status(500).json({ success: false, message: 'tickets.json is empty after upload!' });
-      }
-    } catch (err) {
-      console.error('tickets.json missing after upload!', err);
-      return res.status(500).json({ success: false, message: 'tickets.json missing after upload!' });
-    }
-    
+
     if (result.success) {
       res.json(result);
     } else {
