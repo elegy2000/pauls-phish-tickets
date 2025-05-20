@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Completed
 - [x] Frontend not displaying newly added tickets
   - Fixed by: Updating index.js to fetch data directly from Supabase
+  - Fixed by: Switching from getStaticProps to getServerSideProps for real-time updates
   - Fixed by: Removing local JSON file dependencies
   - Added: Show count display for each year
   - Date: May 20, 2024
@@ -24,6 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed by: Updating csvHandler.js to fetch data directly from Supabase
   - Fixed by: Removing local JSON file operations
   - Fixed by: Properly extracting year from date field
+  - Date: May 20, 2024
+
+- [x] Environment variable configuration
+  - Fixed by: Standardizing environment variable names across all files
+  - Fixed by: Updating add-ticket.js to use NEXT_PUBLIC_SUPABASE_URL
+  - Fixed by: Making image URLs dynamic using Supabase URL from environment
   - Date: May 20, 2024
 
 - [x] Fix add-ticket API endpoint errors
@@ -55,12 +62,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Migrated from local image storage to Supabase Storage
 - Updated ticket data structure for Supabase compatibility
 - Modified add-ticket endpoint to use Supabase exclusively
+- Switched homepage to use getServerSideProps for real-time updates
 
 ### Removed
 - Local images directory
 - Hardcoded Supabase credentials from code
 - Local JSON file operations from add-ticket endpoint
 - All local JSON file dependencies across the application
+- Static page generation in favor of server-side rendering
 
 ## Notes
 - When marking tasks as completed, include:
