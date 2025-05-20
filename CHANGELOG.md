@@ -10,25 +10,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Current Issues
 - CSV upload functionality not working
   - Error: "Method not allowed" and "Error inserting tickets into Supabase"
-  - Attempted fixes:
-    * Added better error handling and logging
-    * Updated CSV parsing to handle multiple column name formats
-    * Removed next-connect dependency in favor of native Next.js API routes
-    * Enhanced error reporting with detailed Supabase error messages
-    * Added batch processing information to error output
-    * Improved frontend error display with structured messages
-    * Added Supabase connection testing and detailed logging
-    * Added favicon to resolve 404 error
+  - Fixed by:
+    * Added environment variables for authentication
+    * Enhanced CSV validation with detailed error messages
+    * Improved error handling throughout the upload process
+    * Updated cookie settings for better compatibility
+    * Enabled Row Level Security (RLS) on ticket_stubs table
   - Next steps:
-    * Verify Supabase environment variables in Vercel
-    * Test CSV upload with enhanced logging
-    * Monitor Supabase connection status
+    * Test CSV upload with new validation
+    * Monitor error messages for any remaining issues
 
 ### In Progress
-- [ ] Debug and fix CSV upload functionality
+- [ ] Test CSV upload with enhanced validation
 - [ ] Implement image upload/retrieval with Supabase Storage
 
 ### Completed
+- [x] Configure environment variables
+  - Added: ADMIN_USERNAME and ADMIN_PASSWORD for authentication
+  - Updated: SUPABASE_SERVICE_ROLE_KEY
+  - Added: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
+  - Date: May 21, 2024
+  - Commit: eb90254
+
+- [x] Enhance CSV validation and error handling
+  - Added: Line-by-line validation with detailed error messages
+  - Added: Year and date format validation (YYYY and YYYY-MM-DD)
+  - Added: Required field validation with specific error messages
+  - Added: CSV header validation
+  - Date: May 21, 2024
+  - Commit: eb90254
+
 - [x] Add Supabase connection diagnostics
   - Added: Connection testing before operations
   - Added: Detailed configuration logging
@@ -79,6 +90,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [x] Set up auto-deployment from GitHub to Vercel
   - Fixed by: Reconnecting GitHub repository in Vercel dashboard
   - Date: May 20, 2024
+
+- [x] Enable Row Level Security (RLS) on Supabase tables
+  - Added: RLS policies for ticket_stubs table
+  - Added: Public read-only access policy
+  - Added: Service role write access policy
+  - Fixed: Security warning about disabled RLS
+  - Date: May 21, 2024
+  - Commit: pending
 
 ### Migration Tasks
 - [x] Migrate ticket images to Supabase Storage
