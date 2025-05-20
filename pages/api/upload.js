@@ -9,7 +9,12 @@ export const config = {
 
 // Configure multer for memory storage
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = multer({ 
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
 
 // Create middleware handler for multer
 function runMiddleware(req, res, fn) {
@@ -34,6 +39,29 @@ function setCorsHeaders(res) {
   );
 }
 
+// Validate environment variables
+function validateEnvironment() {
+  const requiredVars = {
+    'NEXT_PUBLIC_SUPABASE_URL': process.env.NEXT_PUBLIC_SUPABASE_URL,
+    'SUPABASE_SERVICE_ROLE_KEY': process.env.SUPABASE_SERVICE_ROLE_KEY,
+    'NEXT_PUBLIC_SUPABASE_ANON_KEY': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  };
+
+  console.log('Environment check:', {
+    hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+    hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+    hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  });
+
+  const missingVars = Object.entries(requiredVars)
+    .filter(([_, value]) => !value)
+    .map(([name]) => name);
+
+  if (missingVars.length > 0) {
+    throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+  }
+}
+
 export default async function handler(req, res) {
   // Set CORS headers
   setCorsHeaders(res);
@@ -53,6 +81,9 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Validate environment before proceeding
+    validateEnvironment();
+
     console.log('Request received:', {
       method: req.method,
       headers: req.headers
@@ -105,6 +136,25 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     console.error('Error in upload endpoint:', error);
+    
+    // Handle multer errors
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        success: false,
+        message: 'File too large',
+        error: 'Maximum file size is 5MB'
+      });
+    }
+
+    // Handle environment validation errors
+    if (error.message.includes('Missing required environment variables')) {
+      return res.status(500).json({
+        success: false,
+        message: 'Server configuration error',
+        error: error.message
+      });
+    }
+
     res.status(500).json({ 
       success: false, 
       message: 'Internal server error', 
