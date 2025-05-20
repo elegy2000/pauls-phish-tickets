@@ -1,4 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+// Test auto-deployment trigger
 export default function handler(req, res) {
   // Log request details
   console.log('API Route Hit:', {
