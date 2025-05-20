@@ -25,12 +25,36 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // Required headers for the CSV file
 const requiredHeaders = ['year', 'date', 'venue', 'city_state'];
 
+// Function to validate a single ticket record
+const validateTicket = (ticket) => {
+  const errors = [];
+  
+  // Check required fields
+  if (!ticket.year) errors.push('Missing year');
+  if (!ticket.date) errors.push('Missing date');
+  if (!ticket.venue) errors.push('Missing venue');
+  if (!ticket.city_state) errors.push('Missing city_state');
+  
+  // Validate year format
+  if (ticket.year && (!Number.isInteger(Number(ticket.year)) || ticket.year.length !== 4)) {
+    errors.push('Invalid year format (should be YYYY)');
+  }
+  
+  // Validate date format (YYYY-MM-DD)
+  if (ticket.date && !/^\d{4}-\d{2}-\d{2}$/.test(ticket.date)) {
+    errors.push('Invalid date format (should be YYYY-MM-DD)');
+  }
+  
+  return errors;
+};
+
 // Function to convert CSV to JSON
 const convertCsvToJson = (csvData) => {
   return new Promise((resolve, reject) => {
     const results = [];
     let headerSeen = false;
     let headers = [];
+    let lineNumber = 0;
     
     // Create a readable stream from the CSV string
     const stream = Readable.from([csvData]);
@@ -58,53 +82,17 @@ const convertCsvToJson = (csvData) => {
         }
       }))
       .on('data', (data) => {
+        lineNumber++;
         // Convert all keys to lowercase for consistency
-        const normalizedData = {};
-        Object.entries(data).forEach(([key, value]) => {
-          normalizedData[key.toLowerCase()] = value;
-        });
-        
-        console.log('Processing row:', normalizedData);
-        
-        // Validate required fields
-        const missingFields = [];
-        if (!normalizedData.year) missingFields.push('year');
-        if (!normalizedData.date) missingFields.push('date');
-        if (!normalizedData.venue) missingFields.push('venue');
-        if (!normalizedData.city_state && !normalizedData.citystate && !normalizedData['city, st']) {
-          missingFields.push('city_state');
-        }
+        const ticket = Object.keys(data).reduce((acc, key) => {
+          acc[key.toLowerCase()] = data[key];
+          return acc;
+        }, {});
 
-        if (missingFields.length > 0) {
-          console.warn(`Invalid row - missing fields: ${missingFields.join(', ')}. Row data:`, normalizedData);
-          return; // Skip invalid rows
-        }
-
-        // Validate date format
-        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-        if (!dateRegex.test(normalizedData.date)) {
-          console.warn(`Invalid date format in row. Expected YYYY-MM-DD, got: ${normalizedData.date}`);
-          return; // Skip invalid rows
-        }
-
-        // Handle various field name formats
-        const imageUrl = normalizedData.imageurl || normalizedData.image_url || normalizedData.imageUrl || '';
-        const netLink = normalizedData.net_link || normalizedData.netlink || normalizedData.netLink || normalizedData['.net link'] || '';
-        const cityState = normalizedData.city_state || normalizedData.citystate || normalizedData['city, st'] || '';
-
-        const ticket = {
-          year: parseInt(normalizedData.year),
-          date: normalizedData.date,
-          venue: normalizedData.venue,
-          city_state: cityState,
-          imageurl: imageUrl,
-          net_link: netLink
-        };
-
-        // Validate the parsed data
-        if (isNaN(ticket.year)) {
-          console.warn('Invalid year format:', normalizedData.year);
-          return;
+        // Validate the ticket
+        const validationErrors = validateTicket(ticket);
+        if (validationErrors.length > 0) {
+          throw new Error(`Validation errors on line ${lineNumber}: ${validationErrors.join(', ')}`);
         }
 
         results.push(ticket);
@@ -147,6 +135,9 @@ const handleCsvUpload = async (csvData) => {
       return { success: false, message: 'No CSV data provided' };
     }
 
+    console.log('Starting CSV upload process');
+    console.log('CSV data preview:', csvData.substring(0, 200));
+
     // Test Supabase connection before proceeding
     try {
       const { data: testData, error: testError } = await supabase
@@ -176,9 +167,6 @@ const handleCsvUpload = async (csvData) => {
         error: testError.message
       };
     }
-
-    console.log('Starting CSV upload process');
-    console.log('CSV data preview:', csvData.substring(0, 200));
 
     let tickets;
     try {

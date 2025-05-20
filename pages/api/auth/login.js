@@ -7,14 +7,21 @@ export default async function handler(req, res) {
 
   const { username, password } = req.body;
 
-  // Replace these with your actual admin credentials
-  // In production, use environment variables and proper password hashing
-  if (username === 'admin' && password === 'your-secure-password') {
-    // Set a session cookie
+  // Get credentials from environment variables
+  const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+  if (!ADMIN_PASSWORD) {
+    console.error('ADMIN_PASSWORD environment variable is not set');
+    return res.status(500).json({ error: 'Server configuration error' });
+  }
+
+  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    // Set a session cookie with SameSite attribute
     res.setHeader('Set-Cookie', serialize('admin_session', 'authenticated', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax', // Changed from 'strict' to 'lax' for better compatibility
       maxAge: 3600, // 1 hour
       path: '/',
     }));
