@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
@@ -13,7 +11,6 @@ console.log('API Route: add-ticket.js - Environment Check:', {
 });
 
 const supabase = createClient(supabaseUrl, supabaseKey);
-const JSON_FILE_PATH = path.join(process.cwd(), 'public/data/tickets.json');
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -26,41 +23,31 @@ export default async function handler(req, res) {
     const ticket = req.body;
     
     // Validate required fields
-    if (!ticket.show || !ticket.date) {
-      console.error('Validation failed:', { show: !!ticket.show, date: !!ticket.date });
+    if (!ticket.year || !ticket.date || !ticket.venue || !ticket.city_state) {
+      console.error('Validation failed:', { 
+        year: !!ticket.year, 
+        date: !!ticket.date,
+        venue: !!ticket.venue,
+        city_state: !!ticket.city_state 
+      });
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
 
-    // Test Supabase connection
-    try {
-      const { data: testData, error: testError } = await supabase
-        .from('ticket_stubs')
-        .select('count(*)')
-        .limit(1);
-
-      if (testError) {
-        console.error('Supabase connection test failed:', testError);
-        return res.status(500).json({ 
-          success: false, 
-          message: 'Database connection failed',
-          error: testError.message 
-        });
-      }
-      console.log('Supabase connection test successful:', testData);
-    } catch (testErr) {
-      console.error('Supabase connection test threw error:', testErr);
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Database connection error',
-        error: testErr.message 
-      });
-    }
+    // Prepare ticket data for Supabase
+    const supabaseTicket = {
+      year: Number(ticket.year),
+      date: ticket.date,
+      venue: ticket.venue,
+      city_state: ticket.city_state,
+      imageurl: ticket.imageFileName ? `https://hykzrxjtkpssrfmcerky.supabase.co/storage/v1/object/public/ticket-images/${ticket.imageFileName.trim()}` : '',
+      net_link: ticket.net_link || ''
+    };
 
     // Insert into Supabase
     try {
       const { data, error } = await supabase
         .from('ticket_stubs')
-        .insert([ticket])
+        .insert([supabaseTicket])
         .select();
 
       if (error) {
@@ -72,6 +59,12 @@ export default async function handler(req, res) {
         });
       }
       console.log('Supabase insert successful:', data);
+      
+      return res.status(200).json({ 
+        success: true, 
+        message: 'Ticket added successfully',
+        ticket: data[0]
+      });
     } catch (insertErr) {
       console.error('Supabase insert threw error:', insertErr);
       return res.status(500).json({ 
@@ -80,23 +73,6 @@ export default async function handler(req, res) {
         error: insertErr.message 
       });
     }
-
-    // Update local JSON file
-    try {
-      const tickets = JSON.parse(fs.readFileSync(JSON_FILE_PATH, 'utf8'));
-      tickets.push(ticket);
-      fs.writeFileSync(JSON_FILE_PATH, JSON.stringify(tickets, null, 2));
-      console.log('Local JSON file updated successfully');
-    } catch (fsErr) {
-      console.error('Failed to update local JSON:', fsErr);
-      // Don't fail the request if local JSON update fails
-    }
-
-    return res.status(200).json({ 
-      success: true, 
-      message: 'Ticket added successfully' 
-    });
-
   } catch (error) {
     console.error('Unexpected error in add-ticket:', error);
     return res.status(500).json({ 
