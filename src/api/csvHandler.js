@@ -134,6 +134,13 @@ const handleCsvUpload = async (csvData) => {
       return { success: false, message: 'No CSV data provided' };
     }
 
+    // Log Supabase connection status
+    console.log('Supabase client configuration:', {
+      url: supabaseUrl ? 'configured' : 'missing',
+      key: supabaseKey ? 'configured' : 'missing',
+      client: supabase ? 'initialized' : 'failed'
+    });
+
     console.log('Starting CSV upload process');
     console.log('CSV data preview:', csvData.substring(0, 200));
 
@@ -147,6 +154,36 @@ const handleCsvUpload = async (csvData) => {
     console.log(`Attempting to insert ${tickets.length} tickets`);
     console.log('First ticket sample:', tickets[0]);
 
+    // Test Supabase connection
+    try {
+      const { data: testData, error: testError } = await supabase
+        .from('ticket_stubs')
+        .select('count')
+        .limit(1);
+
+      if (testError) {
+        console.error('Supabase connection test failed:', testError);
+        return {
+          success: false,
+          message: 'Failed to connect to Supabase',
+          error: testError.message,
+          details: {
+            code: testError.code,
+            hint: testError.hint,
+            details: testError.details
+          }
+        };
+      }
+      console.log('Supabase connection test successful');
+    } catch (testError) {
+      console.error('Supabase connection test threw error:', testError);
+      return {
+        success: false,
+        message: 'Failed to connect to Supabase',
+        error: testError.message
+      };
+    }
+
     // Clear the Supabase table
     const { error: deleteError } = await supabase
       .from('ticket_stubs')
@@ -159,9 +196,15 @@ const handleCsvUpload = async (csvData) => {
         success: false, 
         message: 'Error clearing Supabase table', 
         error: deleteError.message,
-        details: deleteError
+        details: {
+          code: deleteError.code,
+          hint: deleteError.hint,
+          details: deleteError.details
+        }
       };
     }
+
+    console.log('Successfully cleared existing records');
 
     // Insert tickets in batches of 50
     const batchSize = 50;
