@@ -56,40 +56,32 @@ export default function TourPage() {
     fetchTourData();
   }, [tourId]);
 
-  if (!tourId) {
-    return <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Loading...</div>;
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', padding: '2rem' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <p>Loading tour data...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error || !tour) {
     return (
       <div style={{ minHeight: '100vh', padding: '2rem' }}>
-        <div style={{ 
-          maxWidth: '800px', 
-          margin: '0 auto',
-          textAlign: 'center',
-          padding: '3rem 2rem',
-          backgroundColor: 'white',
-          borderRadius: '0.5rem',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-        }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#ef4444', marginBottom: '1rem' }}>Error</h1>
-          <p style={{ color: '#6b7280', marginBottom: '2rem' }}>
-            {error || 'Failed to load tour information. The requested tour may not exist.'}
-          </p>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <Link 
             href="/"
             style={{
               display: 'inline-block',
-              padding: '0.75rem 1.5rem',
-              backgroundColor: '#2563eb',
-              color: 'white',
-              borderRadius: '0.5rem',
-              textDecoration: 'none',
-              fontWeight: '500'
+              marginBottom: '1.5rem',
+              color: '#2563eb',
+              textDecoration: 'none'
             }}
           >
-            Return to Home
+            ← Back to Tours
           </Link>
+          <p style={{ color: 'red' }}>{error || 'Tour not found'}</p>
         </div>
       </div>
     );
@@ -128,7 +120,7 @@ export default function TourPage() {
                 <span style={{ fontWeight: 'bold' }}>Shows:</span> {tour.shows}
               </p>
               <p style={{ marginBottom: '0.5rem' }}>
-                <span style={{ fontWeight: 'bold' }}>Venues:</span> {tour.venues.join(', ')}
+                <span style={{ fontWeight: 'bold' }}>Venues:</span> {tour.venues ? tour.venues.join(', ') : 'N/A'}
               </p>
             </div>
             
@@ -153,11 +145,7 @@ export default function TourPage() {
           </div>
         </div>
 
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-            <p style={{ color: '#6b7280' }}>Loading tickets...</p>
-          </div>
-        ) : tickets && tickets.length > 0 ? (
+        {tickets && tickets.length > 0 ? (
           <div>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
               Tour Tickets
