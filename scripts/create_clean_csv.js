@@ -110,7 +110,7 @@ tourFiles.forEach(file => {
                         date: formatDate(show.date),
                         venue: cleanVenueName(show.venue),
                         location: cleanLocation(show.location),
-                        imageUrl: getImagePath(show),
+                        imageurl: getImagePath(show),
                         netLink: show.netLink
                     });
                 }
@@ -132,7 +132,7 @@ sortedShows.forEach(show => {
     const venue = show.venue.includes(',') ? `"${show.venue}"` : show.venue;
     const location = show.location.includes(',') ? `"${show.location}"` : show.location;
     
-    csvContent += `${show.year},${show.date},${venue},${location},${show.imageUrl},${show.netLink}\n`;
+    csvContent += `${show.year},${show.date},${venue},${location},${show.imageurl},${show.netLink}\n`;
 });
 
 // Write to CSV file

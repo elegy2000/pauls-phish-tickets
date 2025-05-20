@@ -131,7 +131,7 @@ const CsvHandler = () => {
           </ul>
           <p>Optional columns:</p>
           <ul>
-            <li><strong>imageurl</strong> (or image_url) - URL to ticket image</li>
+            <li><strong>imageurl</strong> - URL to ticket image</li>
             <li><strong>net_link</strong> - Link to show information</li>
           </ul>
           <p className="note">Note: Maximum file size is 5MB</p>

@@ -5,7 +5,7 @@ interface Show {
   date: string;
   venue: string;
   location: string;
-  imageUrl: string;
+  imageurl: string;
   netLink: string;
   tour?: string;
 }

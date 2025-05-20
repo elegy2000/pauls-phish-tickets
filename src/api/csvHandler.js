@@ -4,23 +4,23 @@ const { Readable } = require('stream');
 
 // Use consistent environment variable names
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Validate environment variables
-if (!supabaseUrl || !supabaseKey) {
+if (!supabaseUrl || !supabaseServiceKey) {
   console.error('Missing required Supabase environment variables:', {
     url: !!supabaseUrl,
-    key: !!supabaseKey
+    serviceKey: !!supabaseServiceKey
   });
   throw new Error('Missing required Supabase environment variables. Check your environment configuration.');
 }
 
 console.log('Initializing Supabase client with:', {
   urlExists: !!supabaseUrl,
-  keyPrefix: supabaseKey ? supabaseKey.substring(0, 5) : 'missing'
+  serviceKeyPrefix: supabaseServiceKey ? supabaseServiceKey.substring(0, 5) : 'missing'
 });
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // Required headers for the CSV file
 const requiredHeaders = ['year', 'date', 'venue', 'city_state'];
@@ -48,84 +48,88 @@ const validateTicket = (ticket) => {
   return errors;
 };
 
-// Function to convert CSV to JSON
+// Function to convert CSV data to JSON
 const convertCsvToJson = (csvData) => {
   return new Promise((resolve, reject) => {
-    const results = [];
-    let headerSeen = false;
-    let headers = [];
+    const tickets = [];
+    const errors = [];
+    let headerValidated = false;
     let lineNumber = 0;
-    
-    // Create a readable stream from the CSV string
-    const stream = Readable.from([csvData]);
-    
-    stream
+
+    const stream = Readable.from(csvData)
       .pipe(csv({
-        mapValues: ({ header, value }) => {
-          if (!headerSeen) {
-            console.log('CSV Headers:', header);
-            headers = header.map(h => h.toLowerCase());
-            
-            // Validate required headers
-            const missingHeaders = requiredHeaders.filter(h => 
-              !headers.includes(h) && 
-              !headers.includes(h.replace('_', '')) && 
-              !headers.includes(h.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase())
-            );
-            
-            if (missingHeaders.length > 0) {
-              throw new Error(`Missing required headers: ${missingHeaders.join(', ')}`);
-            }
-            headerSeen = true;
-          }
-          return value.trim();
-        }
-      }))
-      .on('data', (data) => {
-        lineNumber++;
-        // Convert all keys to lowercase for consistency
-        const ticket = Object.keys(data).reduce((acc, key) => {
-          acc[key.toLowerCase()] = data[key];
-          return acc;
-        }, {});
+        mapHeaders: ({ header }) => header.trim().toLowerCase()
+      }));
 
-        // Validate the ticket
-        const validationErrors = validateTicket(ticket);
-        if (validationErrors.length > 0) {
-          throw new Error(`Validation errors on line ${lineNumber}: ${validationErrors.join(', ')}`);
-        }
+    stream.on('headers', (headers) => {
+      lineNumber = 1;
+      const missingHeaders = requiredHeaders.filter(
+        required => !headers.map(h => h.trim().toLowerCase()).includes(required)
+      );
 
-        results.push(ticket);
-      })
-      .on('end', () => {
-        if (results.length === 0) {
-          reject(new Error('No valid tickets found in CSV file. Please check the data format.'));
-          return;
-        }
-        console.log(`Parsed ${results.length} valid tickets`);
-        resolve(results);
-      })
-      .on('error', (error) => {
-        console.error('CSV parsing error:', error);
-        reject(error);
+      if (missingHeaders.length > 0) {
+        reject(new Error(
+          `Missing required headers: ${missingHeaders.join(', ')}. ` +
+          `Required headers are: ${requiredHeaders.join(', ')}`
+        ));
+      }
+      headerValidated = true;
+    });
+
+    stream.on('data', (row) => {
+      lineNumber++;
+      // Clean up the data
+      Object.keys(row).forEach(key => {
+        row[key] = row[key].trim();
       });
+
+      const validationErrors = validateTicket(row);
+      if (validationErrors.length > 0) {
+        errors.push(`Line ${lineNumber}: ${validationErrors.join(', ')}`);
+      } else {
+        tickets.push({
+          year: Number(row.year),
+          date: row.date,
+          venue: row.venue,
+          city_state: row.city_state,
+          imageurl: row.imageurl || row.image_url || '',
+          net_link: row.net_link || ''
+        });
+      }
+    });
+
+    stream.on('end', () => {
+      if (errors.length > 0) {
+        reject(new Error(`Validation errors found:\n${errors.join('\n')}`));
+      } else {
+        resolve(tickets);
+      }
+    });
+
+    stream.on('error', (error) => {
+      reject(new Error(`Error parsing CSV: ${error.message}`));
+    });
   });
 };
 
-// Function to convert JSON to CSV string
-const convertJsonToCsv = async (tickets) => {
-  const header = 'year,date,venue,city_state,imageurl,net_link\n';
+// Function to convert JSON to CSV
+const convertJsonToCsv = (tickets) => {
+  if (!tickets || tickets.length === 0) {
+    return 'year,date,venue,city_state,image_url,net_link\n';
+  }
+
+  const headers = ['year', 'date', 'venue', 'city_state', 'image_url', 'net_link'];
   const rows = tickets.map(ticket => {
-    return [
-      ticket.year,
-      ticket.date,
-      `"${ticket.venue.replace(/"/g, '""')}"`,
-      `"${ticket.city_state.replace(/"/g, '""')}"`,
-      `"${(ticket.imageurl || '').replace(/"/g, '""')}"`,
-      `"${(ticket.net_link || '').replace(/"/g, '""')}"`
-    ].join(',');
+    return headers.map(header => {
+      const value = ticket[header] || '';
+      // Escape quotes and wrap in quotes if contains comma
+      return value.toString().includes(',') ? 
+        `"${value.replace(/"/g, '""')}"` : 
+        value;
+    }).join(',');
   });
-  return header + rows.join('\n');
+
+  return [headers.join(','), ...rows].join('\n');
 };
 
 // Function to handle CSV upload
@@ -217,14 +221,25 @@ const handleCsvUpload = async (csvData) => {
     const batchSize = 50;
     for (let i = 0; i < tickets.length; i += batchSize) {
       const batch = tickets.slice(i, i + batchSize);
-      console.log(`Inserting batch ${i/batchSize + 1} with first record:`, batch[0]);
+      console.log(`Inserting batch ${i/batchSize + 1} of ${Math.ceil(tickets.length/batchSize)}:`, {
+        batchSize: batch.length,
+        firstRecord: batch[0],
+        lastRecord: batch[batch.length - 1]
+      });
       
       const { error: insertError } = await supabase
         .from('ticket_stubs')
         .insert(batch);
 
       if (insertError) {
-        console.error(`Error inserting batch ${i/batchSize + 1}:`, insertError);
+        console.error(`Error inserting batch ${i/batchSize + 1}:`, {
+          error: insertError,
+          errorCode: insertError.code,
+          errorMessage: insertError.message,
+          errorDetails: insertError.details,
+          batchSize: batch.length,
+          sampleRecord: batch[0]
+        });
         return { 
           success: false, 
           message: 'Error inserting tickets into Supabase', 
@@ -239,6 +254,8 @@ const handleCsvUpload = async (csvData) => {
           }
         };
       }
+      
+      console.log(`Successfully inserted batch ${i/batchSize + 1}`);
     }
 
     return { 

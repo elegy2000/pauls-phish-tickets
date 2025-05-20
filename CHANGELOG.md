@@ -25,6 +25,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Implement image upload/retrieval with Supabase Storage
 
 ### Completed
+- [x] Fix imageUrl/imageurl inconsistency issues
+  - Fixed by: Updating all code to consistently use lowercase 'imageurl'
+  - Fixed by: Optimizing RLS policy for better performance
+  - Fixed by: Updating database column name to match
+  - Affected files: convertCsvToJson.js, index.js, [tourId].js, update-csv.js, update-site-data.ts, and more
+  - Date: May 22, 2024
+  - Status: Resolved upload errors and RLS performance warnings
+
 - [x] Configure environment variables
   - Added: ADMIN_USERNAME and ADMIN_PASSWORD for authentication
   - Updated: SUPABASE_SERVICE_ROLE_KEY

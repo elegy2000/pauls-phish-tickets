@@ -34,7 +34,7 @@ try {
       date: record.date,
       venue: record.venue,
       city_state: record.city_state,
-      imageUrl: record.imageUrl || '/images/default-show.jpg',
+      imageurl: record.imageurl || '/images/default-show.jpg',
       netLink: record.net_link || ''
     };
   });

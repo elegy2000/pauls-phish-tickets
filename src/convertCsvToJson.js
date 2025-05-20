@@ -16,7 +16,7 @@ fs.createReadStream(csvFilePath)
       date: data.Date,
       venue: data.VENUE,
       city_state: data['CITY, ST'],
-      imageUrl: data.imageUrl,
+      imageurl: data.imageurl || data.imageUrl || data.image_url || '',
       net_link: data['.net link']
     };
     results.push(ticket);

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function TourPage() {
   const router = useRouter();
@@ -124,21 +125,15 @@ export default function TourPage() {
               </p>
             </div>
             
-            {tour.imageUrl && (
-              <div>
-                <img 
-                  src={tour.imageUrl} 
-                  alt={`${tour.year} tour`}
-                  style={{
-                    maxWidth: '300px',
-                    height: 'auto',
-                    borderRadius: '0.5rem',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                  }}
-                  onError={(e) => {
-                    e.target.src = '/placeholder-ticket.jpg';
-                    e.target.onerror = null;
-                  }}
+            {tour.imageurl && (
+              <div className="tour-image">
+                <Image
+                  src={tour.imageurl}
+                  alt={`${tour.venue} ticket stub`}
+                  width={300}
+                  height={200}
+                  layout="responsive"
+                  objectFit="contain"
                 />
               </div>
             )}
@@ -168,20 +163,15 @@ export default function TourPage() {
                     backgroundColor: 'white'
                   }}
                 >
-                  {ticket.imageUrl && (
-                    <div style={{ height: '200px', overflow: 'hidden', position: 'relative' }}>
-                      <img
-                        src={ticket.imageUrl}
-                        alt={`Ticket for ${ticket.date} at ${ticket.venue}`}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover'
-                        }}
-                        onError={(e) => {
-                          e.target.src = '/placeholder-ticket.jpg';
-                          e.target.onerror = null;
-                        }}
+                  {ticket.imageurl && (
+                    <div className="ticket-image">
+                      <Image
+                        src={ticket.imageurl}
+                        alt={`${ticket.venue} ticket stub`}
+                        width={300}
+                        height={200}
+                        layout="responsive"
+                        objectFit="contain"
                       />
                     </div>
                   )}
