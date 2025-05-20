@@ -25,6 +25,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Implement image upload/retrieval with Supabase Storage
 
 ### Completed
+- [x] Add date format conversion script and improve CSV handling
+  - Added: date_converter.js script to standardize date formats
+  - Fixed: Date format conversion from "Month DD, YYYY" to "YYYY-MM-DD"
+  - Added: Robust error handling for date conversion
+  - Added: Automatic CSV header case sensitivity handling
+  - Date: May 23, 2024
+  - Status: Ready for testing with the upload system
+
 - [x] Fix imageUrl/imageurl inconsistency issues
   - Fixed by: Updating all code to consistently use lowercase 'imageurl'
   - Fixed by: Optimizing RLS policy for better performance
