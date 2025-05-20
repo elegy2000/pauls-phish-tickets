@@ -16,16 +16,20 @@ const CsvHandler = () => {
       setUploadStatus('Uploading...');
       setError('');
       
-      const response = await axios.post('/api/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
       });
 
-      if (response.data.success) {
+      const data = await response.json();
+
+      if (data.success) {
         setUploadStatus('File uploaded successfully!');
+        // Clear the file input
+        event.target.value = '';
       } else {
-        setError(response.data.message);
+        setError(data.message || 'Error uploading file. Please try again.');
+        console.error('Upload error details:', data);
       }
     } catch (err) {
       setError('Error uploading file. Please try again.');
@@ -35,12 +39,17 @@ const CsvHandler = () => {
 
   const handleDownload = async () => {
     try {
-      const response = await axios.get('/api/download', {
-        responseType: 'blob',
+      const response = await fetch('/api/download', {
+        method: 'GET',
       });
 
-      // Create a download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Download failed');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', 'phish_tours.csv');
@@ -59,6 +68,15 @@ const CsvHandler = () => {
       
       <div className="upload-section">
         <h3>Upload CSV</h3>
+        <p className="instructions">
+          Please ensure your CSV file has the following columns:<br/>
+          - year<br/>
+          - date<br/>
+          - venue<br/>
+          - city_state<br/>
+          - imageUrl (or imageurl or image_url)<br/>
+          - net_link (or netLink or netlink)
+        </p>
         <input
           type="file"
           accept=".csv"
@@ -91,8 +109,20 @@ const CsvHandler = () => {
           border-radius: 8px;
         }
 
+        .instructions {
+          margin: 10px 0;
+          padding: 10px;
+          background-color: #f5f5f5;
+          border-radius: 4px;
+          font-size: 0.9em;
+        }
+
         .file-input {
           margin: 10px 0;
+          width: 100%;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
         }
 
         .download-button {
@@ -111,11 +141,16 @@ const CsvHandler = () => {
         .status {
           color: #0070f3;
           margin-top: 10px;
+          font-weight: bold;
         }
 
         .error {
           color: #ff0000;
           margin-top: 10px;
+          padding: 10px;
+          background-color: #fff5f5;
+          border: 1px solid #ff0000;
+          border-radius: 4px;
         }
       `}</style>
     </div>
