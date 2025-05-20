@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Debug logging for environment variables
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
       date: ticket.date,
       venue: ticket.venue,
       city_state: ticket.city_state,
-      imageurl: ticket.imageFileName ? `https://hykzrxjtkpssrfmcerky.supabase.co/storage/v1/object/public/ticket-images/${ticket.imageFileName.trim()}` : '',
+      imageurl: ticket.imageFileName ? `${supabaseUrl}/storage/v1/object/public/ticket-images/${ticket.imageFileName.trim()}` : '',
       net_link: ticket.net_link || ''
     };
 

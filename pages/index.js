@@ -7,7 +7,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   try {
     // Fetch tickets from Supabase
     const { data: tickets, error } = await supabase
@@ -33,12 +33,10 @@ export async function getStaticProps() {
         tickets,
         years,
         error: null
-      },
-      // Revalidate every hour
-      revalidate: 3600
+      }
     };
   } catch (error) {
-    console.error('Error in getStaticProps:', error);
+    console.error('Error in getServerSideProps:', error);
     return {
       props: {
         tickets: [],
