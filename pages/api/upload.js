@@ -1,11 +1,17 @@
 import multer from 'multer';
 import { handleCsvUpload } from '../../src/api/csvHandler';
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 // Configure multer for memory storage
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Set up middleware handler for multer
+// Create middleware handler for multer
 function runMiddleware(req, res, fn) {
   return new Promise((resolve, reject) => {
     fn(req, res, (result) => {
@@ -16,13 +22,6 @@ function runMiddleware(req, res, fn) {
     });
   });
 }
-
-// Disable the built-in bodyParser
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -37,8 +36,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
 
+    console.log('Received file:', req.file.originalname);
     const csvData = req.file.buffer.toString();
+    console.log('CSV Data preview:', csvData.substring(0, 200)); // Log first 200 chars
+    
     const result = await handleCsvUpload(csvData);
+    console.log('Upload result:', result);
     
     if (result.success) {
       res.json(result);
@@ -47,6 +50,6 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     console.error('Error in upload endpoint:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
   }
 } 

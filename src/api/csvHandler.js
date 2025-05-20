@@ -6,6 +6,12 @@ const { createClient } = require('@supabase/supabase-js');
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+console.log('Initializing Supabase client with:', {
+  urlExists: !!supabaseUrl,
+  keyPrefix: supabaseKey ? supabaseKey.substring(0, 5) : 'missing'
+});
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const CSV_FILE_PATH = process.env.VERCEL ? '/tmp/phish_tours.csv' : path.join(process.cwd(), 'data/phish_tours.csv');
@@ -16,25 +22,30 @@ const convertCsvToJson = (csvData) => {
     const results = [];
     const parser = csv()
       .on('data', (data) => {
+        // Validate required fields
+        if (!data.year || !data.date || !data.venue || !data.city_state) {
+          console.warn('Invalid row:', data);
+          return; // Skip invalid rows
+        }
+
         const ticket = {
           year: parseInt(data.year),
           date: data.date,
           venue: data.venue,
           city_state: data.city_state,
-          imageUrl: data.imageUrl,
-          net_link: data.net_link
+          imageurl: data.imageUrl || '', // Note: column name might be imageUrl or imageurl
+          net_link: data.net_link || ''
         };
         results.push(ticket);
       })
       .on('end', () => {
-        const years = [...new Set(results.map(ticket => ticket.year))].sort((a, b) => b - a);
-        const finalData = {
-          years,
-          tickets: results
-        };
-        resolve(finalData);
+        console.log(`Parsed ${results.length} valid tickets`);
+        resolve(results);
       })
-      .on('error', reject);
+      .on('error', (error) => {
+        console.error('CSV parsing error:', error);
+        reject(error);
+      });
 
     parser.write(csvData);
     parser.end();
@@ -71,26 +82,58 @@ const convertJsonToCsv = async (tickets) => {
 // Function to handle CSV upload
 const handleCsvUpload = async (csvData) => {
   try {
-    const jsonData = await convertCsvToJson(csvData);
+    console.log('Starting CSV upload process');
+    const tickets = await convertCsvToJson(csvData);
+    
+    if (!tickets || tickets.length === 0) {
+      console.error('No valid tickets found in CSV');
+      return { success: false, message: 'No valid tickets found in CSV' };
+    }
+
+    console.log(`Attempting to insert ${tickets.length} tickets`);
 
     // Clear the Supabase table
-    const { error: deleteError } = await supabase.from('ticket_stubs').delete().neq('id', 0);
+    const { error: deleteError } = await supabase
+      .from('ticket_stubs')
+      .delete()
+      .neq('id', 0);
+
     if (deleteError) {
       console.error('Error clearing Supabase table:', deleteError);
-      return { success: false, message: 'Error clearing Supabase table' };
+      return { success: false, message: 'Error clearing Supabase table', error: deleteError.message };
     }
 
-    // Insert all tickets
-    const { error: insertError } = await supabase.from('ticket_stubs').insert(jsonData.tickets);
-    if (insertError) {
-      console.error('Error inserting tickets into Supabase:', insertError);
-      return { success: false, message: 'Error inserting tickets into Supabase' };
+    // Insert tickets in batches of 50
+    const batchSize = 50;
+    for (let i = 0; i < tickets.length; i += batchSize) {
+      const batch = tickets.slice(i, i + batchSize);
+      const { error: insertError } = await supabase
+        .from('ticket_stubs')
+        .insert(batch);
+
+      if (insertError) {
+        console.error(`Error inserting batch ${i/batchSize + 1}:`, insertError);
+        return { 
+          success: false, 
+          message: 'Error inserting tickets into Supabase', 
+          error: insertError.message,
+          failedAt: i
+        };
+      }
+      console.log(`Successfully inserted batch ${i/batchSize + 1}`);
     }
 
-    return { success: true, message: 'CSV uploaded and Supabase updated successfully' };
+    return { 
+      success: true, 
+      message: `Successfully uploaded ${tickets.length} tickets` 
+    };
   } catch (error) {
-    console.error('Error processing CSV:', error);
-    return { success: false, message: 'Error processing CSV file' };
+    console.error('Error in handleCsvUpload:', error);
+    return { 
+      success: false, 
+      message: 'Error processing CSV file',
+      error: error.message
+    };
   }
 };
 
