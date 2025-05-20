@@ -3,6 +3,12 @@ import { useRouter } from 'next/router';
 import CsvHandler from '../src/components/CsvHandler';
 import Link from 'next/link';
 import ImageUploader from '../src/components/ImageUploader';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const AdminPage = () => {
   const router = useRouter();
@@ -37,19 +43,23 @@ const AdminPage = () => {
   }, []);
 
   useEffect(() => {
-    // Load ticket data directly from the public folder
+    // Load ticket data from Supabase
     const loadTickets = async () => {
       if (!isAuthenticated) return;
       
       try {
         setIsLoading(true);
-        // Fetch data directly from the public file
-        const response = await fetch('/data/tickets.json');
-        if (!response.ok) {
-          throw new Error('Failed to fetch ticket data');
+        // Fetch data from Supabase
+        const { data: tickets, error } = await supabase
+          .from('ticket_stubs')
+          .select('*')
+          .order('date', { ascending: false });
+
+        if (error) {
+          throw error;
         }
-        const data = await response.json();
-        setTickets(data.tickets || []);
+
+        setTickets(tickets || []);
       } catch (err) {
         console.error('Error loading tickets:', err);
         setDataError('Failed to load ticket data.');
@@ -551,4 +561,39 @@ const AdminPage = () => {
   );
 };
 
-export default AdminPage; 
+export default AdminPage;
+
+export async function getServerSideProps() {
+  try {
+    // Fetch tickets from Supabase
+    const { data: tickets, error } = await supabase
+      .from('ticket_stubs')
+      .select('*')
+      .order('date', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching tickets:', error);
+      return {
+        props: {
+          tickets: [],
+          error: error.message
+        }
+      };
+    }
+
+    return {
+      props: {
+        tickets,
+        error: null
+      }
+    };
+  } catch (error) {
+    console.error('Error in getServerSideProps:', error);
+    return {
+      props: {
+        tickets: [],
+        error: error.message
+      }
+    };
+  }
+} 
