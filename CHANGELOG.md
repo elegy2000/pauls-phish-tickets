@@ -8,12 +8,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Current Issues
-- None currently
+- CSV upload functionality not working
+  - Error: "Method not allowed" and "Error inserting tickets into Supabase"
+  - Attempted fixes:
+    * Added better error handling and logging
+    * Updated CSV parsing to handle multiple column name formats
+    * Removed next-connect dependency in favor of native Next.js API routes
+  - Next steps:
+    * Verify CSV format matches expected schema
+    * Debug Supabase connection in production environment
+    * Add more detailed error logging
 
 ### In Progress
+- [ ] Debug and fix CSV upload functionality
 - [ ] Implement image upload/retrieval with Supabase Storage
 
 ### Completed
+- [x] Improve error handling in CSV upload
+  - Added: Detailed error logging throughout the process
+  - Added: Support for multiple column name formats
+  - Added: Batch processing for large datasets
+  - Date: May 21, 2024
+
 - [x] Frontend not displaying newly added tickets
   - Fixed by: Updating index.js to fetch data directly from Supabase
   - Fixed by: Switching from getStaticProps to getServerSideProps for real-time updates

@@ -28,11 +28,34 @@ const CsvHandler = () => {
         // Clear the file input
         event.target.value = '';
       } else {
-        setError(data.message || 'Error uploading file. Please try again.');
+        let errorMessage = data.message || 'Error uploading file.';
+        
+        // Add error details if available
+        if (data.error) {
+          errorMessage += `\nError: ${data.error}`;
+        }
+        
+        // Add Supabase specific error details
+        if (data.details) {
+          if (data.details.code) {
+            errorMessage += `\nCode: ${data.details.code}`;
+          }
+          if (data.details.hint) {
+            errorMessage += `\nHint: ${data.details.hint}`;
+          }
+          if (data.details.details) {
+            errorMessage += `\nDetails: ${data.details.details}`;
+          }
+          if (data.details.batchIndex !== undefined) {
+            errorMessage += `\nFailed at batch: ${Math.floor(data.details.batchIndex / data.details.batchSize) + 1}`;
+          }
+        }
+        
+        setError(errorMessage);
         console.error('Upload error details:', data);
       }
     } catch (err) {
-      setError('Error uploading file. Please try again.');
+      setError(`Error uploading file: ${err.message}`);
       console.error('Upload error:', err);
     }
   };
@@ -151,6 +174,7 @@ const CsvHandler = () => {
           background-color: #fff5f5;
           border: 1px solid #ff0000;
           border-radius: 4px;
+          white-space: pre-line;
         }
       `}</style>
     </div>

@@ -26,6 +26,12 @@ const convertCsvToJson = (csvData) => {
       mapValues: ({ header, value }) => {
         if (!headerSeen) {
           console.log('CSV Headers:', header);
+          // Validate required headers
+          const requiredHeaders = ['year', 'date', 'venue', 'city_state'];
+          const missingHeaders = requiredHeaders.filter(h => !header.includes(h));
+          if (missingHeaders.length > 0) {
+            throw new Error(`Missing required headers: ${missingHeaders.join(', ')}`);
+          }
           headerSeen = true;
         }
         return value.trim();
@@ -42,7 +48,14 @@ const convertCsvToJson = (csvData) => {
       if (!data.city_state) missingFields.push('city_state');
 
       if (missingFields.length > 0) {
-        console.warn('Invalid row - missing fields:', missingFields, 'Data:', data);
+        console.warn(`Invalid row - missing fields: ${missingFields.join(', ')}. Row data:`, data);
+        return; // Skip invalid rows
+      }
+
+      // Validate date format
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(data.date)) {
+        console.warn(`Invalid date format in row. Expected YYYY-MM-DD, got: ${data.date}`);
         return; // Skip invalid rows
       }
 
@@ -154,6 +167,8 @@ const handleCsvUpload = async (csvData) => {
     const batchSize = 50;
     for (let i = 0; i < tickets.length; i += batchSize) {
       const batch = tickets.slice(i, i + batchSize);
+      console.log(`Inserting batch ${i/batchSize + 1} with first record:`, batch[0]);
+      
       const { error: insertError } = await supabase
         .from('ticket_stubs')
         .insert(batch);
@@ -164,9 +179,14 @@ const handleCsvUpload = async (csvData) => {
           success: false, 
           message: 'Error inserting tickets into Supabase', 
           error: insertError.message,
-          details: insertError,
-          failedAt: i,
-          sampleData: batch[0]
+          details: {
+            code: insertError.code,
+            hint: insertError.hint,
+            details: insertError.details,
+            batchIndex: i,
+            batchSize,
+            sampleRecord: batch[0]
+          }
         };
       }
       console.log(`Successfully inserted batch ${i/batchSize + 1}`);
