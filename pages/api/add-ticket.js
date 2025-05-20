@@ -2,8 +2,14 @@ import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL || 'https://hykzrxjtkpssrfmcerky.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'sbp_9e43403238de8faed4a3d1d85b3bc72dbc4d52c9';
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Log the environment variables (without revealing full key)
+console.log('Supabase URL:', supabaseUrl);
+console.log('Supabase Key exists:', !!supabaseKey);
+console.log('Supabase Key prefix:', supabaseKey?.substring(0, 10) + '...');
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const JSON_FILE_PATH = path.join(process.cwd(), 'public/data/tickets.json');
@@ -42,12 +48,30 @@ export default async function handler(req, res) {
   };
 
   try {
-    // Add to Supabase
-    const { data, error } = await supabase.from('ticket_stubs').insert([supabaseTicket]).select();
+    console.log('Attempting to insert ticket into Supabase:', supabaseTicket);
+    
+    // Add to Supabase with detailed error logging
+    const { data, error } = await supabase
+      .from('ticket_stubs')
+      .insert([supabaseTicket])
+      .select();
+
     if (error) {
-      console.error('Error inserting ticket into Supabase:', error);
-      return res.status(500).json({ success: false, message: 'Error inserting ticket into Supabase' });
+      console.error('Detailed Supabase error:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+      return res.status(500).json({ 
+        success: false, 
+        message: `Error inserting ticket into Supabase: ${error.message}`,
+        details: error.details,
+        code: error.code
+      });
     }
+
+    console.log('Successfully inserted ticket into Supabase:', data);
 
     // Add to local JSON
     const jsonData = JSON.parse(fs.readFileSync(JSON_FILE_PATH, 'utf8'));
@@ -60,7 +84,11 @@ export default async function handler(req, res) {
 
     res.status(200).json({ success: true, ticket });
   } catch (err) {
-    console.error('Error adding ticket:', err);
-    res.status(500).json({ success: false, message: 'Failed to add ticket' });
+    console.error('Unexpected error:', err);
+    res.status(500).json({ 
+      success: false, 
+      message: `Failed to add ticket: ${err.message}`,
+      error: err.toString()
+    });
   }
 } 

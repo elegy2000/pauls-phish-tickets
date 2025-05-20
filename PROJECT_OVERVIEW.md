@@ -11,8 +11,22 @@
 
 ---
 
+## Recent Migration (June 2024)
+
+- **All ticket images have been migrated from the local `public/images/` directory to Supabase Storage.**
+- **A mapping file (`scripts/supabase_image_mapping.json`) was generated to map local image filenames to their new Supabase public URLs.**
+- **A script (`scripts/update_ticket_image_urls.js`) was created and run to update all `imageUrl` fields in `public/data/tickets.json` to use the new Supabase URLs.**
+- **The local `public/images/` directory was deleted and removed from git to reduce project and deployment size.**
+- **All changes were committed and pushed to GitHub, triggering a new Vercel deployment.**
+- **Vercel deployment size issues are now resolved.**
+
+---
+
 ## To-Do List
 
+- [x] Migrate ticket images to Supabase Storage
+- [x] Update ticket data to use Supabase image URLs
+- [x] Remove local images directory and commit changes
 - [ ] Integrate Supabase with Vercel in this project
 - [ ] Get Vercel and Supabase MPCs (Managed Project Configurations) to work with Cursor (previous attempts were unsuccessful)
 - [ ] Implement CSV download/upload functionality using Supabase Storage
@@ -33,6 +47,7 @@ This project is a web application for displaying a collection of Phish concert t
 - Ticket data and images are uploaded and managed directly in Supabase (Postgres for structured ticket data, Supabase Storage for images and CSVs).
 - The frontend app (on Vercel) reads and writes ticket data live from Supabase, enabling real-time updates and edits from the deployed site.
 - Code changes are managed in GitHub, with CI/CD integration to Vercel for automatic deployments.
+- **Local images are no longer used or included in the repository.**
 
 ---
 
@@ -48,6 +63,7 @@ This project is a web application for displaying a collection of Phish concert t
 - The frontend (Next.js/React on Vercel) communicates directly with Supabase for all data operations, using Supabase's client libraries and APIs.
 - GitHub remains the source of truth for code, with Vercel handling deployments and previews.
 - This cloud-native approach enables real-time updates, persistent storage, and a seamless workflow for both users and developers.
+- **All image URLs in ticket data now point to Supabase Storage.**
 
 ---
 
