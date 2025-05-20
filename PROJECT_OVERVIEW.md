@@ -8,6 +8,7 @@
 - **Backend (Database & Storage):** Supabase (Postgres database for ticket data, Supabase Storage for images/CSVs)
 - **Code Versioning:** GitHub (integrated with Vercel for CI/CD)
 - **Development Environment:** Cursor (AI code editor)
+- **Documentation:** PROJECT_OVERVIEW.md (project structure) and CHANGELOG.md (issues & progress tracking)
 
 ---
 
@@ -93,4 +94,4 @@ Vercel's serverless functions are stateless and ephemeral, so persistent file st
 
 ---
 
-*This document can be updated as the project evolves. Ask the AI to "update PROJECT_OVERVIEW.md" with new information as needed.* 
+*This document provides a high-level overview of the project structure and architecture. For detailed progress tracking, issue resolution, and changelog, see CHANGELOG.md.* 
