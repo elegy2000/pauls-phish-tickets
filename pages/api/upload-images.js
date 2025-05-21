@@ -1,6 +1,6 @@
-import multer from 'multer';
+import { createClient } from '@supabase/supabase-js';
+import formidable from 'formidable';
 import fs from 'fs';
-import path from 'path';
 
 export const config = {
   api: {
@@ -8,29 +8,18 @@ export const config = {
   },
 };
 
-const imagesDir = path.join(process.cwd(), 'public', 'images');
-if (!fs.existsSync(imagesDir)) {
-  fs.mkdirSync(imagesDir, { recursive: true });
-}
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const bucket = 'ticket-images';
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, imagesDir);
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-const upload = multer({ storage });
-
-function runMiddleware(req, res, fn) {
+function parseForm(req) {
   return new Promise((resolve, reject) => {
-    fn(req, res, (result) => {
-      if (result instanceof Error) {
-        return reject(result);
-      }
-      return resolve(result);
+    const form = new formidable.IncomingForm({ multiples: true });
+    form.parse(req, (err, fields, files) => {
+      if (err) reject(err);
+      else resolve({ fields, files });
     });
   });
 }
@@ -40,14 +29,30 @@ export default async function handler(req, res) {
     return res.status(405).json({ success: false, message: 'Method not allowed' });
   }
   try {
-    await runMiddleware(req, res, upload.array('images'));
-    if (!req.files || req.files.length === 0) {
+    const { files } = await parseForm(req);
+    let images = files.images;
+    if (!images) {
       return res.status(400).json({ success: false, message: 'No images uploaded' });
     }
-    const uploadedFiles = req.files.map((file) => file.originalname);
-    res.status(200).json({ success: true, message: 'Images uploaded successfully', files: uploadedFiles });
+    if (!Array.isArray(images)) images = [images];
+
+    const uploaded = [];
+    for (const file of images) {
+      const fileData = await fs.promises.readFile(file.filepath);
+      const fileName = `${Date.now()}-${file.originalFilename}`;
+      const { error } = await supabase.storage.from(bucket).upload(fileName, fileData, {
+        upsert: true,
+        contentType: file.mimetype,
+      });
+      if (error) {
+        return res.status(500).json({ success: false, message: 'Error uploading to Supabase', error: error.message });
+      }
+      const { data } = supabase.storage.from(bucket).getPublicUrl(fileName);
+      uploaded.push({ fileName, url: data.publicUrl });
+    }
+    res.status(200).json({ success: true, message: 'Images uploaded successfully', files: uploaded });
   } catch (error) {
     console.error('Error uploading images:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
   }
 } 

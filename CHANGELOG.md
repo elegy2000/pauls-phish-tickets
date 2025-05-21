@@ -16,13 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     * Improved error handling throughout the upload process
     * Updated cookie settings for better compatibility
     * Enabled Row Level Security (RLS) on ticket_stubs table
+    * **[May 20, 2024] Fixed RLS policy to allow inserts from API/service for CSV upload (see below)**
   - Next steps:
     * Test CSV upload with new validation
     * Monitor error messages for any remaining issues
 
 ### In Progress
 - [ ] Test CSV upload with enhanced validation
-- [ ] Implement image upload/retrieval with Supabase Storage
 
 ### Completed
 - [x] Add date format conversion script and improve CSV handling
@@ -115,13 +115,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Date: May 21, 2024
   - Commit: pending
 
+- [x] Fix Supabase RLS policy to allow CSV uploads
+  - Fixed by: Adding a permissive RLS policy (WITH CHECK (true)) to allow inserts from API/service
+  - Date: May 20, 2024
+  - Status: CSV upload now works end-to-end
+
+- [x] Implement image upload/retrieval with Supabase Storage
+  - Added: `/api/upload-images` API route now uploads images directly to Supabase Storage (`ticket-images` bucket) instead of the local filesystem
+  - Enables: Cloud-native image management compatible with Vercel deployment (no local file writes)
+  - Date: June 3, 2024
+  - Status: Ready for testing and production use
+
 ### Migration Tasks
 - [x] Migrate ticket images to Supabase Storage
 - [x] Update ticket data to use Supabase image URLs
 - [x] Remove local images directory
 - [x] Implement CSV functionality with Supabase Storage
 - [x] Update frontend for Supabase database operations
-- [ ] Implement image upload/retrieval with Supabase Storage
+- [x] Implement image upload/retrieval with Supabase Storage
 
 ## [1.0.0] - 2024-05-20
 
