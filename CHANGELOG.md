@@ -126,6 +126,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Date: June 3, 2024
   - Status: Ready for testing and production use
 
+### June 2024
+- [x] Normalize all image URL references to 'imageUrl' (camelCase)
+  - Updated all code, scripts, and data processing to use 'imageUrl' (camelCase) for ticket image URLs
+  - All CSVs, JSON files, and code now use 'imageUrl' for consistency
+  - Fixed: Previous issues with image loading and mismatched property names (e.g., 'imageurl', 'image_url')
+  - Ensures seamless image display and upload functionality across the app
+  - Date: June 2024
+  - Status: Complete
+
+- [ ] Images not displaying despite being present in Supabase Storage
+  - Images (e.g., 2021-07-30.jpg) exist in the 'ticket-images' bucket and match the expected filenames
+  - Frontend does not render these images, even though the data and filenames appear correct
+  - Ongoing bug, under investigation
+
 ### Migration Tasks
 - [x] Migrate ticket images to Supabase Storage
 - [x] Update ticket data to use Supabase image URLs
