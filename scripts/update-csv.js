@@ -31,9 +31,9 @@ function hasImage(dateStr) {
 // Function to get image path for a show
 function getImagePath(dateStr) {
   if (hasImage(dateStr)) {
-    return `/images/ticket-stubs/${dateToImageFilename(dateStr)}.jpg`;
+    return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticket-images/${dateToImageFilename(dateStr)}.jpg`;
   }
-  return '/images/default-show.jpg';
+  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticket-images/default-show.jpg`;
 }
 
 // Function to standardize venue name
@@ -216,7 +216,7 @@ if (fs.existsSync(ticketsPath)) {
         year: year.toString(),
         date: fullDate,
         venue: standardizeVenue(show.venue, show.city_state),
-        location: show.imageurl || '',
+        location: show.imageUrl || '',
         netLink: show.net_link || ''
       };
     });
@@ -239,16 +239,16 @@ const uniqueShows = allShows.filter((show, index, self) =>
 uniqueShows.sort((a, b) => new Date(a.date) - new Date(b.date));
 
 // Create CSV content
-const csvHeader = 'YEAR,Date,VENUE,"CITY, ST",imageurl,.net link\n';
+const csvHeader = 'YEAR,Date,VENUE,"CITY, ST",imageUrl,.net link\n';
 const csvRows = uniqueShows.map(show => {
   const date = new Date(show.date);
   const year = date.getFullYear().toString();
   const venue = standardizeVenue(show.venue, show.city_state || '');
   const cityState = show.location;
-  const imageurl = getImagePath(show.date);
+  const imageUrl = getImagePath(show.date);
   const netLink = show.netLink || '';
 
-  return `${year},"${show.date}","${venue}","${cityState}","${imageurl}","${netLink}"`;
+  return `${year},"${show.date}","${venue}","${cityState}","${imageUrl}","${netLink}"`;
 }).join('\n');
 
 const csvContent = csvHeader + csvRows;

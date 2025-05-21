@@ -86,7 +86,7 @@ function isValidShow(show) {
 function getImagePath(show) {
     // For now, use default image
     // TODO: Add logic to check for actual ticket stub images
-    return '/images/default-ticket.jpg';
+    return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticket-images/default-ticket.jpg`;
 }
 
 // Read all tour JSON files
@@ -110,7 +110,7 @@ tourFiles.forEach(file => {
                         date: formatDate(show.date),
                         venue: cleanVenueName(show.venue),
                         location: cleanLocation(show.location),
-                        imageurl: getImagePath(show),
+                        imageUrl: getImagePath(show),
                         netLink: show.netLink
                     });
                 }
@@ -126,13 +126,13 @@ const sortedShows = Array.from(allShows.values())
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 
 // Create CSV content
-let csvContent = 'YEAR,DATE,VENUE,CITY/STATE,IMAGE URL,NET LINK\n';
+let csvContent = 'YEAR,DATE,VENUE,CITY/STATE,imageUrl,NET LINK\n';
 sortedShows.forEach(show => {
     // Escape fields that might contain commas
     const venue = show.venue.includes(',') ? `"${show.venue}"` : show.venue;
     const location = show.location.includes(',') ? `"${show.location}"` : show.location;
     
-    csvContent += `${show.year},${show.date},${venue},${location},${show.imageurl},${show.netLink}\n`;
+    csvContent += `${show.year},${show.date},${venue},${location},${show.imageUrl},${show.netLink}\n`;
 });
 
 // Write to CSV file

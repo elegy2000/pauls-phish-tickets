@@ -90,7 +90,7 @@ function cleanTourData(tourData) {
             venue: show.venue,
             city: city,
             state: state,
-            image_url: `/images/${cleanString(show.date)}-${cleanString(show.venue)}.jpg`,
+            image_url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticket-images/${cleanString(show.date)}-${cleanString(show.venue)}.jpg`,
             setlist_link: show.netLink
         };
     });

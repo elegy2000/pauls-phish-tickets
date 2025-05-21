@@ -22,9 +22,9 @@ function hasImage(show) {
 function getImagePath(show) {
     if (hasImage(show)) {
         const imageDate = dateToImageFormat(show.date);
-        return `/images/${imageDate}-${show.venue.toLowerCase().replace(/\s+/g, '-')}.jpg`;
+        return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticket-images/${imageDate}-${show.venue.toLowerCase().replace(/\s+/g, '-')}.jpg`;
     }
-    return '/images/default-ticket.jpg';
+    return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticket-images/default-ticket.jpg`;
 }
 
 // Read all tour JSON files
@@ -60,7 +60,7 @@ tourFiles.forEach(file => {
 allShows.sort((a, b) => new Date(a.date) - new Date(b.date));
 
 // Create CSV content
-let csvContent = 'YEAR,DATE,VENUE,CITY/STATE,IMAGE URL,NET LINK\n';
+let csvContent = 'YEAR,DATE,VENUE,CITY/STATE,imageUrl,NET LINK\n';
 allShows.forEach(show => {
     const year = new Date(show.date).getFullYear();
     const imagePath = getImagePath(show);

@@ -34,7 +34,7 @@ try {
       date: record.date,
       venue: record.venue,
       city_state: record.city_state,
-      imageurl: record.imageurl || '/images/default-show.jpg',
+      imageUrl: record.imageUrl || `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticket-images/default-show.jpg`,
       netLink: record.net_link || ''
     };
   });

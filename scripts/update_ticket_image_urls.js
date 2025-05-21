@@ -15,12 +15,10 @@ let updatedCount = 0;
 
 if (Array.isArray(tickets.tickets)) {
   tickets.tickets.forEach(ticket => {
-    if (ticket.imageurl && ticket.imageurl.startsWith('/images/')) {
-      const filename = ticket.imageurl.replace('/images/', '');
-      if (mapping[filename]) {
-        ticket.imageurl = mapping[filename];
-        updatedCount++;
-      }
+    if (ticket.imageUrl && ticket.imageUrl.startsWith('/images/')) {
+      const filename = ticket.imageUrl.replace('/images/', '');
+      ticket.imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticket-images/${filename}`;
+      updatedCount++;
     }
   });
   fs.writeFileSync(ticketsPath, JSON.stringify(tickets, null, 2));

@@ -135,4 +135,39 @@ The CSV file has the following columns:
 
 ## File Uploads
 
-This application supports file uploads through GitHub integration. When running on Vercel's serverless environment, all file uploads are stored in the GitHub repository to ensure data persistence. 
+This application supports file uploads through GitHub integration. When running on Vercel's serverless environment, all file uploads are stored in the GitHub repository to ensure data persistence.
+
+# Ticket Images Storage
+
+All ticket images are stored in the Supabase storage bucket named `ticket-images`. The application does not use any local `images` directory for ticket images.
+
+## Required Environment Variables
+
+- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
+- `SUPABASE_SERVICE_ROLE_KEY`: Service role key for uploads (server-side)
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Anon key for public access (client-side)
+
+## Supabase Storage Policy
+
+Ensure the following policy is set for the `ticket-images` bucket to allow uploads (adjust for your security needs):
+
+```
+-- Allow upload for all (public)
+CREATE POLICY "Allow upload for all" ON storage.objects
+FOR INSERT
+TO public
+USING (bucket_id = 'ticket-images');
+```
+
+If you want only authenticated users to upload, adjust the `TO` clause accordingly.
+
+## Image URLs
+
+All image URLs are constructed as:
+```
+${NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticket-images/<filename>
+```
+
+## No Local Images
+
+Do not use or reference a local `public/images` directory for ticket images. All uploads and reads should go through Supabase. 

@@ -20,6 +20,7 @@
 - **The local `public/images/` directory was deleted and removed from git to reduce project and deployment size.**
 - **All changes were committed and pushed to GitHub, triggering a new Vercel deployment.**
 - **Vercel deployment size issues are now resolved.**
+- **[May 20, 2024] Fixed Supabase Row Level Security (RLS) policy to allow API/service inserts for CSV upload.**
 
 ---
 
@@ -36,6 +37,7 @@
 - [ ] Add single ticket + image add form (writes to Supabase)
 - [ ] Test and document the new workflow
 - [ ] Set up and verify custom domain on Vercel
+- [ ] Work on image upload functionality with Supabase Storage (tomorrow's task)
 
 ---
 
@@ -58,6 +60,7 @@ This project is a web application for displaying a collection of Phish concert t
 - We have chosen Supabase as our primary backend solution.
 - Ticket data is stored in a Postgres database (managed by Supabase), providing structured, queryable, and scalable storage.
 - Images and CSV files are stored in Supabase Storage, allowing for persistent, cloud-based file management.
+- [May 20, 2024] Updated RLS policy on ticket_stubs table to allow inserts from API/service, enabling successful CSV uploads from the web app.
 
 **New Path Forward:**
 - Move away from local CSV/JSON file workflows. All ticket data and images are now managed in Supabase, enabling live editing and uploads from the web app.
