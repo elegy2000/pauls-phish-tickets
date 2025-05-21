@@ -110,7 +110,7 @@ tourFiles.forEach(file => {
                         date: formatDate(show.date),
                         venue: cleanVenueName(show.venue),
                         location: cleanLocation(show.location),
-                        imageUrl: getImagePath(show),
+                        imageurl: getImagePath(show),
                         netLink: show.netLink
                     });
                 }
@@ -126,13 +126,13 @@ const sortedShows = Array.from(allShows.values())
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 
 // Create CSV content
-let csvContent = 'YEAR,DATE,VENUE,CITY/STATE,imageUrl,NET LINK\n';
+let csvContent = 'YEAR,DATE,VENUE,CITY/STATE,imageurl,NET LINK\n';
 sortedShows.forEach(show => {
     // Escape fields that might contain commas
     const venue = show.venue.includes(',') ? `"${show.venue}"` : show.venue;
     const location = show.location.includes(',') ? `"${show.location}"` : show.location;
     
-    csvContent += `${show.year},${show.date},${venue},${location},${show.imageUrl},${show.netLink}\n`;
+    csvContent += `${show.year},${show.date},${venue},${location},${show.imageurl},${show.netLink}\n`;
 });
 
 // Write to CSV file

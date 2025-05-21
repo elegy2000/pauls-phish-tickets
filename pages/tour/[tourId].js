@@ -125,10 +125,10 @@ export default function TourPage() {
               </p>
             </div>
             
-            {tour.imageUrl && (
+            {tour.imageurl && (
               <div className="tour-image">
                 <Image
-                  src={tour.imageUrl}
+                  src={tour.imageurl}
                   alt={`${tour.venue} ticket stub`}
                   width={300}
                   height={200}
@@ -163,10 +163,10 @@ export default function TourPage() {
                     backgroundColor: 'white'
                   }}
                 >
-                  {ticket.imageUrl && (
+                  {ticket.imageurl && (
                     <div className="ticket-image">
                       <Image
-                        src={ticket.imageUrl}
+                        src={ticket.imageurl}
                         alt={`${ticket.venue} ticket stub`}
                         width={300}
                         height={200}

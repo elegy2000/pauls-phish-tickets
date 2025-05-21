@@ -60,11 +60,11 @@ tourFiles.forEach(file => {
 allShows.sort((a, b) => new Date(a.date) - new Date(b.date));
 
 // Create CSV content
-let csvContent = 'YEAR,DATE,VENUE,CITY/STATE,imageUrl,NET LINK\n';
+let csvContent = 'YEAR,DATE,VENUE,CITY/STATE,imageurl,NET LINK\n';
 allShows.forEach(show => {
     const year = new Date(show.date).getFullYear();
-    const imagePath = getImagePath(show);
-    csvContent += `${year},${show.date},${show.venue},${show.location},${imagePath},${show.netLink}\n`;
+    const imageurl = getImagePath(show);
+    csvContent += `${year},${show.date},${show.venue},${show.location},${imageurl},${show.netLink}\n`;
 });
 
 // Write to CSV file

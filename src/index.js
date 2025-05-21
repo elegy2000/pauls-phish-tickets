@@ -15,7 +15,7 @@ const csvWriter = createCsvWriter({
     { id: 'date', title: 'Date' },
     { id: 'venue', title: 'VENUE' },
     { id: 'location', title: 'CITY, ST' },
-    { id: 'imageUrl', title: 'imageUrl' },
+    { id: 'imageurl', title: 'imageurl' },
     { id: 'netLink', title: '.net link' }
   ]
 });
@@ -184,7 +184,7 @@ async function parseTourPage(tourUrl, tourYear) {
         date: formattedDate,
         venue: venue,
         location: location,
-        imageUrl: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticket-images/default-show.jpg`,
+        imageurl: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticket-images/default-show.jpg`,
         netLink: `${BASE_URL}${href}`
       });
       

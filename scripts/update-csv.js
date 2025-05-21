@@ -239,16 +239,16 @@ const uniqueShows = allShows.filter((show, index, self) =>
 uniqueShows.sort((a, b) => new Date(a.date) - new Date(b.date));
 
 // Create CSV content
-const csvHeader = 'YEAR,Date,VENUE,"CITY, ST",imageUrl,.net link\n';
+const csvHeader = 'YEAR,Date,VENUE,"CITY, ST",imageurl,.net link\n';
 const csvRows = uniqueShows.map(show => {
   const date = new Date(show.date);
   const year = date.getFullYear().toString();
   const venue = standardizeVenue(show.venue, show.city_state || '');
   const cityState = show.location;
-  const imageUrl = getImagePath(show.date);
+  const imageurl = getImagePath(show.date);
   const netLink = show.netLink || '';
 
-  return `${year},"${show.date}","${venue}","${cityState}","${imageUrl}","${netLink}"`;
+  return `${year},"${show.date}","${venue}","${cityState}","${imageurl}","${netLink}"`;
 }).join('\n');
 
 const csvContent = csvHeader + csvRows;

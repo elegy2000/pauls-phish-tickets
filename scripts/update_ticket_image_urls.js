@@ -15,9 +15,9 @@ let updatedCount = 0;
 
 if (Array.isArray(tickets.tickets)) {
   tickets.tickets.forEach(ticket => {
-    if (ticket.imageUrl && ticket.imageUrl.startsWith('/images/')) {
-      const filename = ticket.imageUrl.replace('/images/', '');
-      ticket.imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticket-images/${filename}`;
+    if (ticket.imageurl && ticket.imageurl.startsWith('/images/')) {
+      const filename = ticket.imageurl.replace('/images/', '');
+      ticket.imageurl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticket-images/${filename}`;
       updatedCount++;
     }
   });

@@ -124,17 +124,17 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
                   boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
                 }}
               >
-                {ticket.imageUrl && (
+                {ticket.imageurl && (
                   <div 
                     style={{ 
                       height: '200px', 
                       overflow: 'hidden',
                       cursor: 'pointer'
                     }}
-                    onClick={() => setLightboxImage(ticket.imageUrl)}
+                    onClick={() => setLightboxImage(ticket.imageurl)}
                   >
                     <img
-                      src={ticket.imageUrl}
+                      src={ticket.imageurl}
                       alt={`Ticket for ${ticket.date} at ${ticket.venue}`}
                       style={{
                         width: '100%',
