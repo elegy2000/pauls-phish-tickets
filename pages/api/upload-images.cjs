@@ -2,7 +2,7 @@ const { createClient } = require('@supabase/supabase-js');
 const formidable = require('formidable');
 const fs = require('fs');
 
-export const config = {
+module.exports.config = {
   api: {
     bodyParser: false,
   },
@@ -24,7 +24,7 @@ function parseForm(req) {
   });
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, message: 'Method not allowed' });
   }
@@ -38,9 +38,9 @@ export default async function handler(req, res) {
 
     const uploaded = [];
     for (const file of images) {
-      const fileData = await fs.promises.readFile(file.filepath);
+      const buffer = await fs.promises.readFile(file.filepath);
       const fileName = `${Date.now()}-${file.originalFilename}`;
-      const { error } = await supabase.storage.from(bucket).upload(fileName, fileData, {
+      const { error } = await supabase.storage.from(bucket).upload(fileName, buffer, {
         upsert: true,
         contentType: file.mimetype,
       });
@@ -55,4 +55,4 @@ export default async function handler(req, res) {
     console.error('Error uploading images:', error);
     res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
   }
-} 
+}; 
