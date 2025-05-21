@@ -2,7 +2,7 @@ const { createClient } = require('@supabase/supabase-js');
 const formidable = require('formidable');
 const fs = require('fs');
 
-module.exports.config = {
+export const config = {
   api: {
     bodyParser: false,
   },
@@ -24,7 +24,7 @@ function parseForm(req) {
   });
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, message: 'Method not allowed' });
   }
@@ -55,4 +55,4 @@ module.exports = async function handler(req, res) {
     console.error('Error uploading images:', error);
     res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
   }
-}; 
+} 
