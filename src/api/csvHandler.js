@@ -115,17 +115,17 @@ const convertCsvToJson = (csvData) => {
 // Function to convert JSON to CSV
 const convertJsonToCsv = (tickets) => {
   if (!tickets || tickets.length === 0) {
-    return 'year,date,venue,city_state,imageUrl,net_link\n';
+    return 'year,date,venue,city_state,imageurl,net_link\n';
   }
 
-  const headers = ['year', 'date', 'venue', 'city_state', 'imageUrl', 'net_link'];
+  const headers = ['year', 'date', 'venue', 'city_state', 'imageurl', 'net_link'];
   const rows = tickets.map(ticket => {
     return [
       ticket.year || '',
       ticket.date || '',
       ticket.venue || '',
       ticket.city_state || '',
-      ticket.imageUrl || '',
+      ticket.imageurl || '',
       ticket.net_link || ''
     ].map(value =>
       value.toString().includes(',') ? `"${value.replace(/"/g, '""')}"` : value
