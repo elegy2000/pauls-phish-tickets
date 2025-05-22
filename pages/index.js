@@ -9,6 +9,10 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export async function getServerSideProps() {
   try {
+    // TEMP: Log Supabase URL and anon key for debugging
+    console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+    console.log('Supabase Anon Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
     // Fetch all years and show counts directly from Supabase
     const { data: yearData, error: yearError } = await supabase
       .from('ticket_stubs')
