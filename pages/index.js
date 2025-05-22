@@ -25,8 +25,12 @@ export async function getServerSideProps() {
       };
     }
 
-    // Get unique years for filtering
-    const years = [...new Set(tickets.map(ticket => new Date(ticket.date).getFullYear()))].sort((a, b) => b - a);
+    // Get unique years for filtering, robust to invalid dates
+    const validTickets = tickets.filter(ticket => {
+      const d = new Date(ticket.date);
+      return !isNaN(d);
+    });
+    const years = [...new Set(validTickets.map(ticket => new Date(ticket.date).getFullYear()))].sort((a, b) => b - a);
 
     return {
       props: {
