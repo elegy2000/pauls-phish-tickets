@@ -120,6 +120,18 @@ const CsvHandler = () => {
       
       <div className="upload-section">
         <h3>Upload CSV</h3>
+        <div className="csv-warning" style={{
+          backgroundColor: '#fff3cd',
+          border: '1px solid #ffeeba',
+          color: '#856404',
+          borderRadius: '4px',
+          padding: '10px 15px',
+          marginBottom: '15px',
+          fontWeight: 'bold'
+        }}>
+          ⚠️ Uploading a CSV will <u>REPLACE ALL</u> existing tickets in the database.<br />
+          Please <span style={{textDecoration: 'underline'}}>download a backup CSV first</span> if you want to keep the current data.
+        </div>
         <div className="instructions">
           <h4>Required CSV Format:</h4>
           <p>Your CSV file must include the following columns:</p>
