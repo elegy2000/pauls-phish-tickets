@@ -108,7 +108,16 @@ const convertCsvToJson = (csvData) => {
       if (errors.length > 0) {
         reject(new Error(`Validation errors found:\n${errors.join('\n')}`));
       } else {
-        resolve(tickets);
+        // Deduplicate tickets by date (only keep the first occurrence of each date)
+        const seenDates = new Set();
+        const dedupedTickets = [];
+        for (const ticket of tickets) {
+          if (!seenDates.has(ticket.date)) {
+            dedupedTickets.push(ticket);
+            seenDates.add(ticket.date);
+          }
+        }
+        resolve(dedupedTickets);
       }
     });
 
