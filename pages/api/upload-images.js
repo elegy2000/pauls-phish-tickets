@@ -30,9 +30,10 @@ export default async function handler(req, res) {
   }
   try {
     const { files } = await parseForm(req);
+    console.log('Received files:', files); // Debug log
     let images = files.images;
     if (!images) {
-      return res.status(400).json({ success: false, message: 'No images uploaded' });
+      return res.status(400).json({ success: false, message: 'No images uploaded', debug: { files } });
     }
     if (!Array.isArray(images)) images = [images];
 
@@ -41,7 +42,7 @@ export default async function handler(req, res) {
       // Support both 'filepath' (v2+) and 'path' (v1.x)
       const filePath = file.filepath || file.path;
       if (!filePath) {
-        return res.status(400).json({ success: false, message: 'File path missing in upload. Please try again.' });
+        return res.status(400).json({ success: false, message: 'File path missing in upload. Please try again.', debug: { file } });
       }
       const buffer = await fs.promises.readFile(filePath);
       const fileName = `${Date.now()}-${file.originalFilename || file.name}`;
@@ -50,7 +51,7 @@ export default async function handler(req, res) {
         contentType: file.mimetype || file.type,
       });
       if (error) {
-        return res.status(500).json({ success: false, message: 'Error uploading to Supabase', error: error.message });
+        return res.status(500).json({ success: false, message: 'Error uploading to Supabase', error: error.message, debug: { file } });
       }
       const { data } = supabase.storage.from(bucket).getPublicUrl(fileName);
       uploaded.push({ fileName, url: data.publicUrl });
@@ -58,6 +59,6 @@ export default async function handler(req, res) {
     res.status(200).json({ success: true, message: 'Images uploaded successfully', files: uploaded });
   } catch (error) {
     console.error('Error uploading images:', error);
-    res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
+    res.status(500).json({ success: false, message: 'Internal server error', error: error.message, stack: error.stack });
   }
 } 
