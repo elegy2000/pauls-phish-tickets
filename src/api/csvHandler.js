@@ -297,7 +297,8 @@ const handleCsvDownload = async () => {
     const { data: tickets, error } = await supabase
       .from('ticket_stubs')
       .select('*')
-      .order('date', { ascending: false });
+      .order('date', { ascending: false })
+      .range(0, 9999);
 
     if (error) {
       console.error('Error fetching tickets from Supabase:', error);
