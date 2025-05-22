@@ -38,11 +38,16 @@ export default async function handler(req, res) {
 
     const uploaded = [];
     for (const file of images) {
-      const buffer = await fs.promises.readFile(file.filepath);
-      const fileName = `${Date.now()}-${file.originalFilename}`;
+      // Support both 'filepath' (v2+) and 'path' (v1.x)
+      const filePath = file.filepath || file.path;
+      if (!filePath) {
+        return res.status(400).json({ success: false, message: 'File path missing in upload. Please try again.' });
+      }
+      const buffer = await fs.promises.readFile(filePath);
+      const fileName = `${Date.now()}-${file.originalFilename || file.name}`;
       const { error } = await supabase.storage.from(bucket).upload(fileName, buffer, {
         upsert: true,
-        contentType: file.mimetype,
+        contentType: file.mimetype || file.type,
       });
       if (error) {
         return res.status(500).json({ success: false, message: 'Error uploading to Supabase', error: error.message });
