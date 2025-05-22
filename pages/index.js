@@ -13,30 +13,34 @@ export async function getServerSideProps() {
     console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
     console.log('Supabase Anon Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
-    // Fetch all years and show counts directly from Supabase
-    const { data: yearData, error: yearError } = await supabase
-      .from('ticket_stubs')
-      .select('year')
-      .order('year', { ascending: false })
-      .range(0, 9999);
-
-    if (yearError) {
-      console.error('Error fetching years:', yearError);
-      return {
-        props: {
-          years: [],
-          yearCounts: {},
-          error: yearError.message
-        }
-      };
+    // Fetch all years and show counts directly from Supabase in batches of 1000
+    let allYearData = [];
+    let batchIndex = 0;
+    const batchSize = 1000;
+    while (true) {
+      const { data: yearData, error: yearError } = await supabase
+        .from('ticket_stubs')
+        .select('year')
+        .order('year', { ascending: false })
+        .range(batchIndex * batchSize, (batchIndex + 1) * batchSize - 1);
+      if (yearError) {
+        console.error('Error fetching years:', yearError);
+        return {
+          props: {
+            years: [],
+            yearCounts: {},
+            error: yearError.message
+          }
+        };
+      }
+      if (!yearData || yearData.length === 0) break;
+      allYearData = allYearData.concat(yearData);
+      if (yearData.length < batchSize) break;
+      batchIndex++;
     }
-
-    // Debug: Log raw yearData to Vercel logs
-    console.log('Raw yearData from Supabase:', yearData);
-
     // Count shows per year, robust to string/number/whitespace
     const yearCounts = {};
-    yearData.forEach(ticket => {
+    allYearData.forEach(ticket => {
       let year = ticket.year;
       if (typeof year === 'string') year = year.trim();
       year = Number(year);
@@ -45,7 +49,6 @@ export async function getServerSideProps() {
       }
     });
     const years = Object.keys(yearCounts).map(Number).sort((a, b) => b - a);
-
     return {
       props: {
         years,

@@ -49,17 +49,25 @@ const AdminPage = () => {
       
       try {
         setIsLoading(true);
-        // Fetch data from Supabase
-        const { data: tickets, error } = await supabase
-          .from('ticket_stubs')
-          .select('*')
-          .order('date', { ascending: false });
-
-        if (error) {
-          throw error;
+        // Fetch data from Supabase in batches of 1000
+        let allTickets = [];
+        let batchIndex = 0;
+        const batchSize = 1000;
+        while (true) {
+          const { data: tickets, error } = await supabase
+            .from('ticket_stubs')
+            .select('*')
+            .order('date', { ascending: false })
+            .range(batchIndex * batchSize, (batchIndex + 1) * batchSize - 1);
+          if (error) {
+            throw error;
+          }
+          if (!tickets || tickets.length === 0) break;
+          allTickets = allTickets.concat(tickets);
+          if (tickets.length < batchSize) break;
+          batchIndex++;
         }
-
-        setTickets(tickets || []);
+        setTickets(allTickets || []);
       } catch (err) {
         console.error('Error loading tickets:', err);
         setDataError('Failed to load ticket data.');
@@ -565,25 +573,33 @@ export default AdminPage;
 
 export async function getServerSideProps() {
   try {
-    // Fetch tickets from Supabase
-    const { data: tickets, error } = await supabase
-      .from('ticket_stubs')
-      .select('*')
-      .order('date', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching tickets:', error);
-      return {
-        props: {
-          tickets: [],
-          error: error.message
-        }
-      };
+    // Fetch tickets from Supabase in batches of 1000
+    let allTickets = [];
+    let batchIndex = 0;
+    const batchSize = 1000;
+    while (true) {
+      const { data: tickets, error } = await supabase
+        .from('ticket_stubs')
+        .select('*')
+        .order('date', { ascending: false })
+        .range(batchIndex * batchSize, (batchIndex + 1) * batchSize - 1);
+      if (error) {
+        console.error('Error fetching tickets:', error);
+        return {
+          props: {
+            tickets: [],
+            error: error.message
+          }
+        };
+      }
+      if (!tickets || tickets.length === 0) break;
+      allTickets = allTickets.concat(tickets);
+      if (tickets.length < batchSize) break;
+      batchIndex++;
     }
-
     return {
       props: {
-        tickets,
+        tickets: allTickets,
         error: null
       }
     };

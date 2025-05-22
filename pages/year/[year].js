@@ -12,21 +12,29 @@ export async function getServerSideProps({ params }) {
   try {
     const { year } = params;
     
-    // Fetch tickets from Supabase for this year
-    const { data: tickets, error } = await supabase
-      .from('ticket_stubs')
-      .select('*')
-      .eq('year', year)
-      .order('date', { ascending: true });
-
-    if (error) {
-      throw error;
+    // Fetch tickets from Supabase for this year in batches of 1000
+    let allTickets = [];
+    let batchIndex = 0;
+    const batchSize = 1000;
+    while (true) {
+      const { data: tickets, error } = await supabase
+        .from('ticket_stubs')
+        .select('*')
+        .eq('year', year)
+        .order('date', { ascending: true })
+        .range(batchIndex * batchSize, (batchIndex + 1) * batchSize - 1);
+      if (error) {
+        throw error;
+      }
+      if (!tickets || tickets.length === 0) break;
+      allTickets = allTickets.concat(tickets);
+      if (tickets.length < batchSize) break;
+      batchIndex++;
     }
-
     return {
       props: {
         year,
-        initialTickets: tickets || [],
+        initialTickets: allTickets || [],
         error: null
       }
     };
