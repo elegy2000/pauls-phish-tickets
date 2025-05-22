@@ -155,11 +155,27 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
                     fontWeight: 'bold',
                     marginBottom: '0.5rem'
                   }}>
-                    {new Date(ticket.date).toLocaleDateString('en-US', {
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric'
-                    })}
+                    {(() => {
+                      const isoMatch = ticket.date && ticket.date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                      if (isoMatch) {
+                        const [_, y, m, d] = isoMatch;
+                        const utcDate = new Date(Date.UTC(Number(y), Number(m) - 1, Number(d)));
+                        return utcDate.toLocaleDateString('en-US', {
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric'
+                        });
+                      }
+                      const d = new Date(ticket.date);
+                      if (!isNaN(d)) {
+                        return d.toLocaleDateString('en-US', {
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric'
+                        });
+                      }
+                      return ticket.date;
+                    })()}
                   </p>
                   
                   <p style={{ 

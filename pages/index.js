@@ -25,12 +25,18 @@ export async function getServerSideProps() {
       };
     }
 
-    // Get unique years for filtering, robust to invalid dates
-    const validTickets = tickets.filter(ticket => {
+    // Get unique years robustly, fallback to regex if Date parsing fails
+    const extractYear = (ticket) => {
       const d = new Date(ticket.date);
-      return !isNaN(d);
-    });
-    const years = [...new Set(validTickets.map(ticket => new Date(ticket.date).getFullYear()))].sort((a, b) => b - a);
+      if (!isNaN(d)) return d.getFullYear();
+      // Fallback: try to extract 4-digit year from string
+      const match = ticket.date && ticket.date.match(/(\d{4})/);
+      if (match) return parseInt(match[1], 10);
+      // Log for debugging
+      if (ticket.date) console.warn('Unparseable date:', ticket.date, ticket);
+      return null;
+    };
+    const years = [...new Set(tickets.map(extractYear).filter(y => y))].sort((a, b) => b - a);
 
     return {
       props: {
