@@ -25,23 +25,27 @@ export async function getServerSideProps() {
       };
     }
 
-    // Get unique years robustly, fallback to regex if Date parsing fails
+    // Get unique years and show counts robustly
     const extractYear = (ticket) => {
       const d = new Date(ticket.date);
       if (!isNaN(d)) return d.getFullYear();
-      // Fallback: try to extract 4-digit year from string
       const match = ticket.date && ticket.date.match(/(\d{4})/);
       if (match) return parseInt(match[1], 10);
-      // Log for debugging
-      if (ticket.date) console.warn('Unparseable date:', ticket.date, ticket);
       return null;
     };
-    const years = [...new Set(tickets.map(extractYear).filter(y => y))].sort((a, b) => b - a);
+    const yearCounts = {};
+    tickets.forEach(ticket => {
+      const year = extractYear(ticket);
+      if (year) {
+        yearCounts[year] = (yearCounts[year] || 0) + 1;
+      }
+    });
+    const years = Object.keys(yearCounts).map(Number).sort((a, b) => b - a);
 
     return {
       props: {
-        tickets,
         years,
+        yearCounts,
         error: null
       }
     };
@@ -57,7 +61,7 @@ export async function getServerSideProps() {
   }
 }
 
-export default function HomePage({ tickets, years, error }) {
+export default function HomePage({ years, yearCounts, error }) {
   const [windowWidth, setWindowWidth] = useState(1024);
 
   useEffect(() => {
@@ -152,7 +156,7 @@ export default function HomePage({ tickets, years, error }) {
               fontSize: '0.875rem',
               color: '#6b7280'
             }}>
-              {tickets.filter(t => new Date(t.date).getFullYear() === year).length} shows
+              {yearCounts[year]} shows
             </span>
           </Link>
         ))}
