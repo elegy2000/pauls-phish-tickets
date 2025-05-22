@@ -6,9 +6,10 @@
 
 - **Frontend Hosting & Deployment:** Vercel (Next.js/React, custom domain, serverless API routes)
 - **Backend (Database & Storage):** Supabase (Postgres database for ticket data, Supabase Storage for images/CSVs)
-- **Code Versioning:** GitHub (integrated with Vercel for CI/CD)
+- **Code Versioning:** GitHub ([elegy2000/pauls-phish-tickets](https://github.com/elegy2000/pauls-phish-tickets), integrated with Vercel for CI/CD)
 - **Development Environment:** Cursor (AI code editor)
 - **Documentation:** PROJECT_OVERVIEW.md (project structure) and CHANGELOG.md (issues & progress tracking)
+- **Access:** Full GitHub and Supabase access is available for development, deployment, and troubleshooting.
 
 ---
 

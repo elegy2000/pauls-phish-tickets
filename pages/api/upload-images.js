@@ -1,5 +1,6 @@
 const { createClient } = require('@supabase/supabase-js');
 const formidable = require('formidable');
+const fs = require('fs');
 
 export const config = {
   api: {
