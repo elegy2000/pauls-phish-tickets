@@ -83,6 +83,12 @@ const convertCsvToJson = (csvData) => {
         row[key] = row[key].trim();
       });
 
+      // Defensive: skip header row or any row where year is not a 4-digit integer
+      if (!/^\d{4}$/.test(row.year)) {
+        errors.push(`Line ${lineNumber}: Skipped row with invalid year: ${row.year}`);
+        return;
+      }
+
       const validationErrors = validateTicket(row);
       if (validationErrors.length > 0) {
         errors.push(`Line ${lineNumber}: ${validationErrors.join(', ')}`);
