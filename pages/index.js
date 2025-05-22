@@ -26,11 +26,17 @@ export async function getServerSideProps() {
       };
     }
 
-    // Count shows per year
+    // Debug: Log raw yearData to Vercel logs
+    console.log('Raw yearData from Supabase:', yearData);
+
+    // Count shows per year, robust to string/number/whitespace
     const yearCounts = {};
     yearData.forEach(ticket => {
-      if (ticket.year) {
-        yearCounts[ticket.year] = (yearCounts[ticket.year] || 0) + 1;
+      let year = ticket.year;
+      if (typeof year === 'string') year = year.trim();
+      year = Number(year);
+      if (year && !isNaN(year)) {
+        yearCounts[year] = (yearCounts[year] || 0) + 1;
       }
     });
     const years = Object.keys(yearCounts).map(Number).sort((a, b) => b - a);
