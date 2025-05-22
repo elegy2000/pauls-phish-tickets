@@ -17,7 +17,8 @@ export async function getServerSideProps() {
     const { data: yearData, error: yearError } = await supabase
       .from('ticket_stubs')
       .select('year')
-      .order('year', { ascending: false });
+      .order('year', { ascending: false })
+      .range(0, 9999);
 
     if (yearError) {
       console.error('Error fetching years:', yearError);
