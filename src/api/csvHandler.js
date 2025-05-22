@@ -293,19 +293,27 @@ const handleCsvUpload = async (csvData) => {
 // Function to handle CSV download
 const handleCsvDownload = async () => {
   try {
-    // Fetch tickets from Supabase
-    const { data: tickets, error } = await supabase
-      .from('ticket_stubs')
-      .select('*')
-      .order('date', { ascending: false })
-      .range(0, 9999);
-
-    if (error) {
-      console.error('Error fetching tickets from Supabase:', error);
-      return { success: false, message: 'Error fetching tickets from database' };
+    // Fetch all tickets in batches of 1000
+    let allTickets = [];
+    let batchIndex = 0;
+    const batchSize = 1000;
+    while (true) {
+      const { data: tickets, error } = await supabase
+        .from('ticket_stubs')
+        .select('*')
+        .order('date', { ascending: false })
+        .range(batchIndex * batchSize, (batchIndex + 1) * batchSize - 1);
+      if (error) {
+        console.error('Error fetching tickets from Supabase:', error);
+        return { success: false, message: 'Error fetching tickets from database' };
+      }
+      if (!tickets || tickets.length === 0) break;
+      allTickets = allTickets.concat(tickets);
+      if (tickets.length < batchSize) break;
+      batchIndex++;
     }
 
-    const csvData = await convertJsonToCsv(tickets);
+    const csvData = await convertJsonToCsv(allTickets);
     return { success: true, data: csvData };
   } catch (error) {
     console.error('Error generating CSV:', error);
