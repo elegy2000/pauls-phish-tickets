@@ -160,26 +160,15 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
                       const isoMatch = ticket.date && ticket.date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
                       if (isoMatch) {
                         const [_, y, m, d] = isoMatch;
-                        const utcDate = new Date(Date.UTC(Number(y), Number(m) - 1, Number(d)));
-                        return utcDate.toLocaleDateString('en-US', {
+                        // Always use UTC for display
+                        return `${new Date(Date.UTC(Number(y), Number(m) - 1, Number(d))).toLocaleDateString('en-US', {
                           month: 'long',
                           day: 'numeric',
-                          year: 'numeric'
-                        });
+                          year: 'numeric',
+                          timeZone: 'UTC'
+                        })}`;
                       }
-                      // Fallback: try Date constructor (local time)
-                      const d = new Date(ticket.date);
-                      if (!isNaN(d)) {
-                        // Warn if not ISO format
-                        if (!/^\d{4}-\d{2}-\d{2}$/.test(ticket.date)) {
-                          console.warn('Non-ISO date format, may be off by one:', ticket.date, ticket);
-                        }
-                        return d.toLocaleDateString('en-US', {
-                          month: 'long',
-                          day: 'numeric',
-                          year: 'numeric'
-                        });
-                      }
+                      // Fallback: just show the raw date
                       return ticket.date;
                     })()}
                   </p>

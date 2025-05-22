@@ -9,35 +9,28 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export async function getServerSideProps() {
   try {
-    // Fetch tickets from Supabase
-    const { data: tickets, error } = await supabase
+    // Fetch all years and show counts directly from Supabase
+    const { data: yearData, error: yearError } = await supabase
       .from('ticket_stubs')
-      .select('*')
-      .order('date', { ascending: false });
+      .select('year')
+      .order('year', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching tickets:', error);
+    if (yearError) {
+      console.error('Error fetching years:', yearError);
       return {
         props: {
-          tickets: [],
-          error: error.message
+          years: [],
+          yearCounts: {},
+          error: yearError.message
         }
       };
     }
 
-    // Get unique years and show counts robustly
-    const extractYear = (ticket) => {
-      const d = new Date(ticket.date);
-      if (!isNaN(d)) return d.getFullYear();
-      const match = ticket.date && ticket.date.match(/(\d{4})/);
-      if (match) return parseInt(match[1], 10);
-      return null;
-    };
+    // Count shows per year
     const yearCounts = {};
-    tickets.forEach(ticket => {
-      const year = extractYear(ticket);
-      if (year) {
-        yearCounts[year] = (yearCounts[year] || 0) + 1;
+    yearData.forEach(ticket => {
+      if (ticket.year) {
+        yearCounts[ticket.year] = (yearCounts[ticket.year] || 0) + 1;
       }
     });
     const years = Object.keys(yearCounts).map(Number).sort((a, b) => b - a);
