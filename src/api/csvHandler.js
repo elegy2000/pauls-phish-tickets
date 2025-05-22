@@ -216,7 +216,8 @@ const handleCsvUpload = async (csvData) => {
     // Clear the Supabase table (delete all rows)
     const { count: deletedCount, error: deleteError } = await supabase
       .from('ticket_stubs')
-      .delete({ count: 'exact' });
+      .delete({ count: 'exact' })
+      .neq('id', null);
     console.log('Deleted rows before CSV upload:', deletedCount);
     if (deleteError) {
       console.error('Error clearing Supabase table:', deleteError);
