@@ -12,7 +12,15 @@ if (!supabaseKey) {
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+console.log('Supabase URL:', supabaseUrl);
+console.log('Service key starts with:', supabaseKey.slice(0, 20));
+console.log('Service key length:', supabaseKey.length);
+
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession: false
+  }
+});
 
 async function uploadTestImage() {
   const testImagePath = path.join(__dirname, 'test-image.jpg'); // Place a small test image in the same directory

@@ -12,7 +12,18 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const bucket = 'ticket-images';
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Missing Supabase environment variables:', { 
+    hasUrl: !!supabaseUrl, 
+    hasKey: !!supabaseKey 
+  });
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession: false
+  }
+});
 
 function parseForm(req) {
   return new Promise((resolve, reject) => {
