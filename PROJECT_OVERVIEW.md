@@ -25,12 +25,14 @@
 
 ## Latest Enhancements (January 2025)
 
+- **Modern Dark Theme Design:** Complete UI overhaul with dark theme (#0f0f0f background) providing better image contrast and minimal modern aesthetic. Improved year box visibility, enhanced typography, interactive hover effects, and consistent styling across all pages.
 - **Complete Image Upload System:** Implemented bulk image upload with smart batching (<4MB per batch), duplicate handling via `upsert`, and comprehensive admin interface with progress tracking.
 - **Oversized Image Protection:** Added pre-upload validation for files >4MB (Vercel limit) with clear warnings, visual indicators, and automatic skipping of oversized files.
 - **Image Status Tracking:** Added "IMAGE" column to admin dashboard showing green ✓ for tickets with images, red - for those without. Logic checks both database imageurl and storage by date pattern.
 - **Image Reset Functionality:** Added secure image reset with triple confirmation system (warning → confirmation → type "DELETE") and dedicated API endpoint.
-- **Consistent Admin UI:** Standardized all button styling across the admin interface with blue primary buttons (12px 24px padding, 16px font) and red danger buttons.
+- **Consistent Admin UI:** Standardized all button styling across the admin interface with modern dark theme and enhanced user experience.
 - **Production Ready:** All features tested and deployed via GitHub/Vercel integration with full error handling and user feedback.
+- **Rollback Available:** Tagged stable version `v1.0-stable` available for rollback if needed.
 
 ---
 
