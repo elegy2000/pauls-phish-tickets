@@ -5,6 +5,8 @@ const fs = require('fs');
 export const config = {
   api: {
     bodyParser: false,
+    responseLimit: false,
+    externalResolver: true,
   },
 };
 
@@ -27,7 +29,12 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 
 function parseForm(req) {
   return new Promise((resolve, reject) => {
-    const form = new formidable.IncomingForm({ multiples: true });
+    const form = new formidable.IncomingForm({ 
+      multiples: true,
+      maxFileSize: 10 * 1024 * 1024,      // 10MB per file
+      maxTotalFileSize: 50 * 1024 * 1024,  // 50MB total
+      keepExtensions: true
+    });
     form.parse(req, (err, fields, files) => {
       if (err) reject(err);
       else resolve({ fields, files });
