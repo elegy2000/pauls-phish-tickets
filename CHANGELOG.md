@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Implemented duplicate handling: removed timestamp prefixes from filenames, uses `upsert: true` for automatic replacement
   - Added "Reset All Images" functionality with triple confirmation system and dedicated API endpoint
   - Enhanced batch upload system for handling large image collections (automatically splits into <4MB batches)
+  - **Fixed oversized image handling: Pre-upload validation rejects files >4MB with clear warnings and visual indicators**
   - Fixed button styling consistency across all admin interface sections
   - Date: January 2025
   - Status: Production ready, deployed via GitHub/Vercel integration

@@ -51,16 +51,27 @@ const AdminPage = () => {
       try {
         setIsLoading(true);
         
-        // Load available images from Supabase Storage
-        const { data: imageList, error: imageError } = await supabase.storage
-          .from('ticket-images')
-          .list('', { limit: 5000, sortBy: { column: 'name', order: 'asc' } });
-        
-        if (imageError) {
-          console.error('Error loading images:', imageError);
-        } else {
-          const imageNames = new Set(imageList?.map(img => img.name) || []);
-          setAvailableImages(imageNames);
+        // Load available images from Supabase Storage via API
+        console.log('Loading images from Supabase Storage via API...');
+        try {
+          const imageResponse = await fetch('/api/list-images');
+          const imageData = await imageResponse.json();
+          
+          if (imageData.success) {
+            const imageNames = new Set(imageData.images || []);
+            console.log('Loaded images from storage:', {
+              count: imageNames.size,
+              images: Array.from(imageNames).slice(0, 10), // Show first 10
+              allImages: Array.from(imageNames)
+            });
+            setAvailableImages(imageNames);
+          } else {
+            console.error('Error loading images from API:', imageData.message);
+            setAvailableImages(new Set());
+          }
+        } catch (imageError) {
+          console.error('Error calling list-images API:', imageError);
+          setAvailableImages(new Set());
         }
         
         // Fetch data from Supabase in batches of 1000
@@ -81,6 +92,13 @@ const AdminPage = () => {
           if (tickets.length < batchSize) break;
           batchIndex++;
         }
+        console.log('Loaded tickets:', {
+          count: allTickets.length,
+          sampleTickets: allTickets.slice(0, 3).map(t => ({
+            date: t.date,
+            imageurl: t.imageurl
+          }))
+        });
         setTickets(allTickets || []);
       } catch (err) {
         console.error('Error loading tickets:', err);
@@ -346,9 +364,17 @@ const AdminPage = () => {
                           // Check if ticket has an image by extracting filename from imageurl
                           // OR by checking if any image exists for this date
                           const hasImage = (() => {
+                            // Don't check if images haven't loaded yet
+                            if (availableImages.size === 0) {
+                              if (index < 3) {
+                                console.log(`Ticket ${ticket.date}: availableImages not loaded yet (size: ${availableImages.size})`);
+                              }
+                              return false;
+                            }
+
                             try {
                               // First, check if there's a valid imageurl
-                              if (ticket.imageurl) {
+                              if (ticket.imageurl && ticket.imageurl.trim()) {
                                 const url = new URL(ticket.imageurl);
                                 const filename = url.pathname.split('/').pop();
                                 const imageExists = availableImages.has(filename);
@@ -358,7 +384,8 @@ const AdminPage = () => {
                                   console.log(`Ticket ${ticket.date} (with imageurl):`, {
                                     imageurl: ticket.imageurl,
                                     filename: filename,
-                                    imageExists: imageExists
+                                    imageExists: imageExists,
+                                    availableImagesSize: availableImages.size
                                   });
                                 }
                                 
@@ -372,13 +399,13 @@ const AdminPage = () => {
                               );
                               
                               // Debug logging for first few tickets without imageurl
-                              if (index < 5 && !ticket.imageurl) {
+                              if (index < 5 && (!ticket.imageurl || !ticket.imageurl.trim())) {
                                 console.log(`Ticket ${ticket.date} (no imageurl):`, {
                                   imageurl: ticket.imageurl,
                                   datePattern: datePattern,
                                   hasImageByDate: hasImageByDate,
                                   availableImagesCount: availableImages.size,
-                                  sampleImages: Array.from(availableImages).slice(0, 3)
+                                  matchingImages: Array.from(availableImages).filter(name => name.includes(datePattern))
                                 });
                               }
                               
@@ -396,7 +423,9 @@ const AdminPage = () => {
                               <td>{ticket.venue}</td>
                               <td>{ticket.city_state}</td>
                               <td className="image-cell">
-                                {hasImage ? (
+                                {availableImages.size === 0 ? (
+                                  <span style={{color: '#666'}}>...</span>
+                                ) : hasImage ? (
                                   <span className="checkmark">✓</span>
                                 ) : (
                                   <span className="no-image">-</span>
