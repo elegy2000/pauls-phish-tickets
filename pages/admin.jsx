@@ -18,6 +18,7 @@ const AdminPage = () => {
   const [tickets, setTickets] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dataError, setDataError] = useState('');
+  const [availableImages, setAvailableImages] = useState(new Set());
   const [newTicket, setNewTicket] = useState({
     year: '',
     date: '',
@@ -49,6 +50,19 @@ const AdminPage = () => {
       
       try {
         setIsLoading(true);
+        
+        // Load available images from Supabase Storage
+        const { data: imageList, error: imageError } = await supabase.storage
+          .from('ticket-images')
+          .list('', { limit: 5000, sortBy: { column: 'name', order: 'asc' } });
+        
+        if (imageError) {
+          console.error('Error loading images:', imageError);
+        } else {
+          const imageNames = new Set(imageList?.map(img => img.name) || []);
+          setAvailableImages(imageNames);
+        }
+        
         // Fetch data from Supabase in batches of 1000
         let allTickets = [];
         let batchIndex = 0;
@@ -324,17 +338,38 @@ const AdminPage = () => {
                           <th>DATE</th>
                           <th>VENUE</th>
                           <th>LOCATION</th>
+                          <th>IMAGE</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {tickets.map((ticket, index) => (
-                          <tr key={index}>
-                            <td>{ticket.year}</td>
-                            <td>{ticket.date}</td>
-                            <td>{ticket.venue}</td>
-                            <td>{ticket.city_state}</td>
-                          </tr>
-                        ))}
+                        {tickets.map((ticket, index) => {
+                          // Check if ticket has an image by extracting filename from imageurl
+                          const hasImage = ticket.imageurl && (() => {
+                            try {
+                              const url = new URL(ticket.imageurl);
+                              const filename = url.pathname.split('/').pop();
+                              return availableImages.has(filename);
+                            } catch {
+                              return false;
+                            }
+                          })();
+                          
+                          return (
+                            <tr key={index}>
+                              <td>{ticket.year}</td>
+                              <td>{ticket.date}</td>
+                              <td>{ticket.venue}</td>
+                              <td>{ticket.city_state}</td>
+                              <td className="image-cell">
+                                {hasImage ? (
+                                  <span className="checkmark">✓</span>
+                                ) : (
+                                  <span className="no-image">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -526,17 +561,33 @@ const AdminPage = () => {
           background-color: #f5f5f5;
         }
 
+        .image-cell {
+          text-align: center;
+          font-weight: bold;
+        }
+
+        .checkmark {
+          color: #28a745;
+          font-size: 16px;
+        }
+
+        .no-image {
+          color: #dc3545;
+          font-size: 16px;
+        }
+
         .export-section {
           margin: 20px 0;
         }
 
         .export-button {
-          padding: 8px 16px;
+          padding: 12px 24px;
           background-color: #0070f3;
           color: white;
           border: none;
           border-radius: 4px;
           cursor: pointer;
+          font-size: 16px;
         }
 
         .export-button:hover {

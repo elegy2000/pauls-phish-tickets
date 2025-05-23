@@ -77,7 +77,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, message: 'File path missing in upload. Please try again.', debug: { file } });
       }
       const buffer = await fs.promises.readFile(filePath);
-      const fileName = `${Date.now()}-${file.originalFilename || file.name}`;
+      const fileName = file.originalFilename || file.name;
       const { error } = await supabase.storage.from(bucket).upload(fileName, buffer, {
         upsert: true,
         contentType: file.mimetype || file.type,

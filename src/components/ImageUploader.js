@@ -7,6 +7,7 @@ const ImageUploader = () => {
   const [error, setError] = useState('');
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [isUploading, setIsUploading] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   const handleFileChange = (event) => {
     setSelectedFiles(Array.from(event.target.files));
@@ -107,6 +108,48 @@ const ImageUploader = () => {
     }
   };
 
+  const handleReset = async () => {
+    const confirmed = window.confirm(
+      '⚠️ WARNING: This will DELETE ALL images from the server.\n\n' +
+      'This action cannot be undone. Are you sure you want to proceed?'
+    );
+    
+    if (!confirmed) return;
+
+    const doubleConfirmed = window.confirm(
+      '🚨 FINAL CONFIRMATION\n\n' +
+      'This will permanently delete ALL ticket images from the server.\n\n' +
+      'Type "DELETE" in the next prompt to confirm.'
+    );
+    
+    if (!doubleConfirmed) return;
+
+    const userInput = window.prompt('Type "DELETE" to confirm (case sensitive):');
+    if (userInput !== 'DELETE') {
+      setError('Reset cancelled - incorrect confirmation text.');
+      return;
+    }
+
+    try {
+      setIsResetting(true);
+      setError('');
+      setUploadStatus('Deleting all images...');
+      
+      const response = await axios.delete('/api/reset-images');
+      
+      if (response.data.success) {
+        setUploadStatus(`Successfully deleted ${response.data.deletedCount} images from server.`);
+      } else {
+        throw new Error(response.data.message || 'Reset failed');
+      }
+    } catch (err) {
+      setError(`Error resetting images: ${err.message}`);
+      console.error('Image reset error:', err);
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   return (
     <div className="image-uploader">
       <h2>Bulk Image Upload</h2>
@@ -151,6 +194,14 @@ const ImageUploader = () => {
         disabled={isUploading || selectedFiles.length === 0}
       >
         {isUploading ? 'Uploading...' : 'Upload Images'}
+      </button>
+      
+      <button 
+        onClick={handleReset} 
+        className="reset-button"
+        disabled={isResetting || isUploading}
+      >
+        {isResetting ? 'Deleting...' : 'Reset All Images'}
       </button>
       
       {progress.total > 0 && (
@@ -203,11 +254,29 @@ const ImageUploader = () => {
           cursor: pointer;
           font-size: 16px;
           margin-top: 15px;
+          margin-right: 10px;
         }
         .upload-button:hover:not(:disabled) {
           background-color: #0051a8;
         }
         .upload-button:disabled {
+          background-color: #ccc;
+          cursor: not-allowed;
+        }
+        .reset-button {
+          padding: 12px 24px;
+          background-color: #dc3545;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 16px;
+          margin-top: 15px;
+        }
+        .reset-button:hover:not(:disabled) {
+          background-color: #c82333;
+        }
+        .reset-button:disabled {
           background-color: #ccc;
           cursor: not-allowed;
         }
@@ -276,4 +345,4 @@ const ImageUploader = () => {
   );
 };
 
-export default ImageUploader; 
+export default ImageUploader;
