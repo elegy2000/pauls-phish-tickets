@@ -341,22 +341,31 @@ const AdminPage = () => {
 
   return (
     <div className="admin-page">
-      <div className="fixed-home-button">
+      <div style={{ textAlign: 'right', marginBottom: '3rem' }}>
         <Link 
-          href="/" 
-          className="blue-button"
-          style={{
-            display: 'inline-block',
-            padding: '8px 16px',
-            backgroundColor: '#0070f3',
-            color: 'white',
-            borderRadius: '4px',
+          href="/"
+          style={{ 
+            display: 'inline-block', 
+            padding: '0.875rem 1.75rem', 
+            backgroundColor: '#1a1a1a', 
+            color: '#ffffff',
+            border: '1px solid #333333',
+            borderRadius: '0.75rem',
             textDecoration: 'none',
-            fontWeight: 'bold',
-            fontSize: '14px',
-            border: 'none',
-            cursor: 'pointer',
-            textAlign: 'center'
+            fontWeight: '500',
+            fontSize: '0.95rem',
+            transition: 'all 0.2s ease',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#2a2a2a';
+            e.target.style.borderColor = '#444444';
+            e.target.style.transform = 'translateY(-1px)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = '#1a1a1a';
+            e.target.style.borderColor = '#333333';
+            e.target.style.transform = 'translateY(0)';
           }}
         >
           Back to Home
@@ -589,6 +598,19 @@ const AdminPage = () => {
         </div>
       </div>
 
+      <style jsx global>{`
+        body {
+          background-color: #0f0f0f !important;
+          color: #ffffff !important;
+          margin: 0;
+          padding: 0;
+        }
+        
+        html {
+          background-color: #0f0f0f !important;
+        }
+      `}</style>
+      
       <style jsx>{`
         .admin-page {
           padding: 20px;
@@ -603,33 +625,6 @@ const AdminPage = () => {
         .admin-content {
           max-width: 800px;
           margin: 0 auto;
-        }
-        
-        .fixed-home-button {
-          position: fixed;
-          top: 10px;
-          left: 10px;
-          z-index: 100;
-        }
-        
-        .blue-button {
-          display: inline-block;
-          padding: 8px 16px;
-          background-color: #3b82f6;
-          color: white;
-          border-radius: 6px;
-          text-decoration: none;
-          font-weight: 600;
-          font-size: 14px;
-          border: none;
-          cursor: pointer;
-          text-align: center;
-          transition: all 0.2s ease;
-        }
-        
-        .blue-button:hover {
-          background-color: #2563eb;
-          transform: translateY(-1px);
         }
         
         .custom-warning {

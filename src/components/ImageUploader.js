@@ -277,63 +277,87 @@ const ImageUploader = () => {
           margin: 0 auto;
         }
         .upload-info {
-          background-color: #f8f9fa;
-          border: 1px solid #dee2e6;
-          border-radius: 4px;
+          background-color: #2a2a2a;
+          border: 1px solid #404040;
+          border-radius: 6px;
           padding: 15px;
           margin-bottom: 20px;
+          color: #cccccc;
         }
         .upload-info ul {
           margin: 10px 0 0 0;
           padding-left: 20px;
+          color: #cccccc;
+        }
+        .upload-info strong {
+          color: #ffffff;
         }
         .file-input {
           margin: 10px 0;
           padding: 10px;
-          border: 2px dashed #ccc;
+          border: 2px dashed #404040;
           border-radius: 4px;
           width: 100%;
+          background-color: #1a1a1a;
+          color: #ffffff;
         }
         .upload-button {
           padding: 12px 24px;
-          background-color: #0070f3;
+          background-color: #3b82f6;
           color: white;
-          border: none;
-          border-radius: 4px;
+          border: 1px solid #3b82f6;
+          border-radius: 8px;
           cursor: pointer;
           font-size: 16px;
+          font-weight: 600;
           margin-top: 15px;
           margin-right: 10px;
+          transition: all 0.2s ease;
         }
         .upload-button:hover:not(:disabled) {
-          background-color: #0051a8;
+          background-color: #2563eb;
+          border-color: #2563eb;
+          transform: translateY(-1px);
         }
         .upload-button:disabled {
-          background-color: #ccc;
+          background-color: #404040;
+          border-color: #404040;
           cursor: not-allowed;
+          color: #888888;
         }
         .reset-button {
           padding: 12px 24px;
-          background-color: #dc3545;
+          background-color: #ef4444;
           color: white;
-          border: none;
-          border-radius: 4px;
+          border: 1px solid #ef4444;
+          border-radius: 8px;
           cursor: pointer;
           font-size: 16px;
+          font-weight: 600;
           margin-top: 15px;
+          transition: all 0.2s ease;
         }
         .reset-button:hover:not(:disabled) {
-          background-color: #c82333;
+          background-color: #dc2626;
+          border-color: #dc2626;
+          transform: translateY(-1px);
         }
         .reset-button:disabled {
-          background-color: #ccc;
+          background-color: #404040;
+          border-color: #404040;
           cursor: not-allowed;
+          color: #888888;
         }
         .file-list {
           margin: 15px 0;
           padding: 15px;
-          background-color: #f8f9fa;
-          border-radius: 4px;
+          background-color: #2a2a2a;
+          border: 1px solid #404040;
+          border-radius: 6px;
+        }
+        .file-list h4 {
+          color: #ffffff;
+          margin-bottom: 10px;
         }
         .file-grid {
           max-height: 200px;
@@ -344,28 +368,29 @@ const ImageUploader = () => {
           display: flex;
           justify-content: space-between;
           padding: 5px 0;
-          border-bottom: 1px solid #eee;
+          border-bottom: 1px solid #404040;
         }
         .file-item.oversized {
-          background-color: #fff5f5;
+          background-color: #2a1a1a;
           padding: 8px;
           margin: 2px 0;
           border-radius: 4px;
-          border: 1px solid #fed7d7;
+          border: 1px solid #ef4444;
         }
         .file-name {
           font-weight: 500;
+          color: #ffffff;
         }
         .file-size {
-          color: #666;
+          color: #888888;
           font-size: 12px;
         }
         .file-size.oversized-text {
-          color: #e53e3e;
+          color: #ef4444;
           font-weight: bold;
         }
         .batch-info {
-          color: #0070f3;
+          color: #3b82f6;
           font-weight: 500;
           margin-top: 10px;
         }
@@ -375,27 +400,28 @@ const ImageUploader = () => {
         .progress-bar {
           width: 100%;
           height: 20px;
-          background-color: #e9ecef;
+          background-color: #404040;
           border-radius: 10px;
           overflow: hidden;
         }
         .progress-fill {
           height: 100%;
-          background-color: #0070f3;
+          background-color: #3b82f6;
           transition: width 0.3s ease;
         }
         .progress-text {
           text-align: center;
           margin-top: 5px;
           font-weight: 500;
+          color: #ffffff;
         }
         .status {
-          color: #28a745;
+          color: #10b981;
           margin-top: 10px;
           font-weight: 500;
         }
         .error {
-          color: #dc3545;
+          color: #ef4444;
           margin-top: 10px;
           font-weight: 500;
           white-space: pre-line;

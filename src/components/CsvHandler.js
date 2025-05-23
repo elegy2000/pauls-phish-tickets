@@ -190,49 +190,57 @@ const CsvHandler = () => {
         }
 
         h2 {
-          color: #333;
+          color: #ffffff;
           margin-bottom: 1.5rem;
+          font-weight: 600;
         }
 
         .upload-section, .download-section {
           margin: 20px 0;
           padding: 20px;
-          border: 1px solid #ddd;
+          border: 1px solid #2a2a2a;
           border-radius: 8px;
-          background: #fff;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+          background: #1a1a1a;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         h3 {
-          color: #444;
+          color: #ffffff;
           margin-bottom: 1rem;
+          font-weight: 600;
         }
 
         .instructions {
           margin: 1rem 0;
           padding: 1rem;
-          background-color: #f8f9fa;
+          background-color: #2a2a2a;
           border-radius: 6px;
-          border-left: 4px solid #0070f3;
+          border-left: 4px solid #3b82f6;
         }
 
         .instructions h4 {
-          color: #0070f3;
+          color: #3b82f6;
           margin: 0 0 0.5rem 0;
         }
 
         .instructions ul {
           margin: 0.5rem 0;
           padding-left: 1.5rem;
+          color: #cccccc;
         }
 
         .instructions li {
           margin: 0.25rem 0;
+          color: #cccccc;
+        }
+
+        .instructions p {
+          color: #cccccc;
         }
 
         .note {
           font-style: italic;
-          color: #666;
+          color: #888888;
           margin-top: 0.5rem;
         }
 
@@ -244,30 +252,31 @@ const CsvHandler = () => {
           width: 100%;
           padding: 0.5rem;
           margin: 0.5rem 0;
-          border: 1px solid #ddd;
+          border: 1px solid #404040;
           border-radius: 4px;
-          background: #fff;
+          background: #2a2a2a;
+          color: #ffffff;
         }
 
         .file-input:disabled {
           opacity: 0.7;
           cursor: not-allowed;
-          background: #f5f5f5;
+          background: #1a1a1a;
         }
 
         .upload-progress {
           display: flex;
           align-items: center;
           margin-top: 0.5rem;
-          color: #0070f3;
+          color: #3b82f6;
         }
 
         .spinner {
           width: 20px;
           height: 20px;
           margin-right: 0.5rem;
-          border: 2px solid #f3f3f3;
-          border-top: 2px solid #0070f3;
+          border: 2px solid #404040;
+          border-top: 2px solid #3b82f6;
           border-radius: 50%;
           animation: spin 1s linear infinite;
         }
@@ -284,41 +293,45 @@ const CsvHandler = () => {
         }
 
         .status.success {
-          background-color: #d4edda;
-          color: #155724;
-          border: 1px solid #c3e6cb;
+          background-color: #1a2e1a;
+          color: #10b981;
+          border: 1px solid #10b981;
         }
 
         .error-message {
           margin: 1rem 0;
           padding: 1rem;
-          background-color: #fff3f3;
-          border: 1px solid #ffcdd2;
+          background-color: #2a1a1a;
+          border: 1px solid #ef4444;
           border-radius: 4px;
-          color: #c62828;
+          color: #ef4444;
         }
 
         .error-message p {
           margin: 0.25rem 0;
+          color: #ef4444;
         }
 
         .download-button {
           padding: 0.75rem 1.5rem;
-          background-color: #0070f3;
+          background-color: #3b82f6;
           color: white;
-          border: none;
-          border-radius: 4px;
+          border: 1px solid #3b82f6;
+          border-radius: 8px;
           cursor: pointer;
           font-size: 1rem;
-          transition: background-color 0.2s;
+          font-weight: 600;
+          transition: all 0.2s ease;
         }
 
         .download-button:hover {
-          background-color: #0051cc;
+          background-color: #2563eb;
+          border-color: #2563eb;
+          transform: translateY(-1px);
         }
 
         .download-button:active {
-          background-color: #003d99;
+          background-color: #1d4ed8;
         }
       `}</style>
     </div>
