@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Latest Completed (January 2025)
 - [x] **Image Upload System Enhancements**
-  - Added "IMAGE" status column to Current Tickets table showing green ✓ for tickets with images, red - without
+  - ✅ **Added "IMAGE" status column to Current Tickets table showing green ✓ for tickets with images, red - without (WORKING)**
+  - ✅ **Fixed image detection logic with dedicated `/api/list-images` endpoint using service role permissions**
   - Improved image checking logic to detect images both by database imageurl and by date pattern matching
   - Implemented duplicate handling: removed timestamp prefixes from filenames, uses `upsert: true` for automatic replacement
   - Added "Reset All Images" functionality with triple confirmation system and dedicated API endpoint
