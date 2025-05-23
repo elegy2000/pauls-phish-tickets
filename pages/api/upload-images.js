@@ -29,6 +29,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ success: false, message: 'Method not allowed' });
   }
   try {
+    console.log('Supabase URL:', supabaseUrl);
+    console.log('Supabase Key (first 8 chars):', supabaseKey ? supabaseKey.slice(0, 8) : 'undefined');
     const { files } = await parseForm(req);
     console.log('Received files:', files); // Debug log
     let images = files.images;
