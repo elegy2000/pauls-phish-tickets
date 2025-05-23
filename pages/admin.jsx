@@ -203,66 +203,138 @@ const AdminPage = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="admin-login">
-        <h1>Admin Login</h1>
-        <form onSubmit={handleLogin}>
-          <div className="form-group">
-            <label htmlFor="username">Username:</label>
-            <input type="text" id="username" name="username" required />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Password:</label>
-            <input type="password" id="password" name="password" required />
-          </div>
-          <button type="submit">Login</button>
-          {error && <p className="error">{error}</p>}
-        </form>
-
-        <style jsx>{`
-          .admin-login {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background: white;
-          }
-
-          .form-group {
-            margin-bottom: 15px;
-          }
-
-          label {
-            display: block;
-            margin-bottom: 5px;
-          }
-
-          input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-          }
-
-          button {
-            width: 100%;
-            padding: 10px;
-            background-color: #0070f3;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-          }
-
-          button:hover {
-            background-color: #0051a8;
-          }
-
-          .error {
-            color: #ff0000;
-            margin-top: 10px;
-          }
-        `}</style>
+      <div className="admin-login" style={{
+        minHeight: '100vh',
+        backgroundColor: '#0f0f0f',
+        color: '#ffffff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+      }}>
+        <div style={{
+          maxWidth: '400px',
+          width: '100%',
+          padding: '2rem',
+          backgroundColor: '#1a1a1a',
+          border: '1px solid #2a2a2a',
+          borderRadius: '12px',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)'
+        }}>
+          <h1 style={{
+            textAlign: 'center',
+            marginBottom: '2rem',
+            fontSize: '1.75rem',
+            fontWeight: '700',
+            background: 'linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>Admin Login</h1>
+          <form onSubmit={handleLogin}>
+            <div className="form-group" style={{
+              marginBottom: '1.5rem'
+            }}>
+              <label htmlFor="username" style={{
+                display: 'block',
+                marginBottom: '0.5rem',
+                fontWeight: '500',
+                color: '#ffffff'
+              }}>Username:</label>
+              <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                required 
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  backgroundColor: '#2a2a2a',
+                  border: '1px solid #404040',
+                  borderRadius: '0.5rem',
+                  color: '#ffffff',
+                  fontSize: '1rem'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#3b82f6';
+                  e.target.style.boxShadow = '0 0 0 2px rgba(59, 130, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#404040';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
+            <div className="form-group" style={{
+              marginBottom: '1.5rem'
+            }}>
+              <label htmlFor="password" style={{
+                display: 'block',
+                marginBottom: '0.5rem',
+                fontWeight: '500',
+                color: '#ffffff'
+              }}>Password:</label>
+              <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                required 
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  backgroundColor: '#2a2a2a',
+                  border: '1px solid #404040',
+                  borderRadius: '0.5rem',
+                  color: '#ffffff',
+                  fontSize: '1rem'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#3b82f6';
+                  e.target.style.boxShadow = '0 0 0 2px rgba(59, 130, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#404040';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
+            <button 
+              type="submit"
+              style={{
+                width: '100%',
+                padding: '0.875rem',
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                border: '1px solid #3b82f6',
+                borderRadius: '0.5rem',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                fontWeight: '600',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#2563eb';
+                e.target.style.borderColor = '#2563eb';
+                e.target.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#3b82f6';
+                e.target.style.borderColor = '#3b82f6';
+                e.target.style.transform = 'translateY(0)';
+              }}
+            >
+              Login
+            </button>
+            {error && (
+              <p style={{
+                color: '#ef4444',
+                marginTop: '1rem',
+                textAlign: 'center',
+                fontSize: '0.875rem'
+              }}>{error}</p>
+            )}
+          </form>
+        </div>
       </div>
     );
   }
@@ -522,6 +594,10 @@ const AdminPage = () => {
           padding: 20px;
           max-width: 1200px;
           margin: 0 auto;
+          background-color: #0f0f0f;
+          color: #ffffff;
+          min-height: 100vh;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
         
         .admin-content {
@@ -539,33 +615,43 @@ const AdminPage = () => {
         .blue-button {
           display: inline-block;
           padding: 8px 16px;
-          background-color: #0070f3;
+          background-color: #3b82f6;
           color: white;
-          border-radius: 4px;
+          border-radius: 6px;
           text-decoration: none;
-          font-weight: bold;
+          font-weight: 600;
           font-size: 14px;
           border: none;
           cursor: pointer;
           text-align: center;
+          transition: all 0.2s ease;
         }
         
         .blue-button:hover {
-          background-color: #0051a8;
+          background-color: #2563eb;
+          transform: translateY(-1px);
         }
         
         .custom-warning {
-          background-color: #fff9e6;
-          border: 1px solid #ffd700;
-          border-radius: 4px;
-          padding: 10px 15px;
+          background-color: #1a1a1a;
+          border: 1px solid #fbbf24;
+          border-radius: 8px;
+          padding: 15px 20px;
           margin: 10px auto 20px auto;
           width: 100%;
+          color: #fbbf24;
         }
 
         h1 {
           margin-bottom: 20px;
           text-align: center;
+          color: #ffffff;
+          font-weight: 700;
+          font-size: 2.5rem;
+          background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
 
         .tabs {
@@ -576,28 +662,33 @@ const AdminPage = () => {
         }
 
         .tab-button {
-          padding: 10px 20px;
-          border: none;
-          border-radius: 4px;
-          background-color: #f0f0f0;
+          padding: 12px 24px;
+          border: 1px solid #2a2a2a;
+          border-radius: 8px;
+          background-color: #1a1a1a;
+          color: #ffffff;
           cursor: pointer;
           font-size: 16px;
+          font-weight: 500;
           transition: all 0.3s ease;
         }
 
         .tab-button:hover {
-          background-color: #e0e0e0;
+          background-color: #2a2a2a;
+          border-color: #404040;
         }
 
         .tab-button.active {
-          background-color: #0070f3;
+          background-color: #3b82f6;
+          border-color: #3b82f6;
           color: white;
         }
 
         .tab-content {
-          background: white;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          background: #1a1a1a;
+          border: 1px solid #2a2a2a;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
         }
 
         .tickets-container {
@@ -607,22 +698,31 @@ const AdminPage = () => {
         .table-wrapper {
           overflow-x: auto;
           margin-top: 20px;
+          border-radius: 8px;
         }
 
         .tickets-table {
           width: 100%;
           border-collapse: collapse;
+          background-color: #1a1a1a;
         }
 
         .tickets-table th,
         .tickets-table td {
-          border: 1px solid #ddd;
-          padding: 8px;
+          border: 1px solid #2a2a2a;
+          padding: 12px 8px;
           text-align: left;
+          color: #ffffff;
         }
 
         .tickets-table th {
-          background-color: #f5f5f5;
+          background-color: #2a2a2a;
+          font-weight: 600;
+          color: #ffffff;
+        }
+
+        .tickets-table tr:hover {
+          background-color: #222222;
         }
 
         .image-cell {
@@ -631,12 +731,12 @@ const AdminPage = () => {
         }
 
         .checkmark {
-          color: #28a745;
+          color: #10b981;
           font-size: 16px;
         }
 
         .no-image {
-          color: #dc3545;
+          color: #ef4444;
           font-size: 16px;
         }
 
@@ -646,16 +746,20 @@ const AdminPage = () => {
 
         .export-button {
           padding: 12px 24px;
-          background-color: #0070f3;
+          background-color: #3b82f6;
           color: white;
-          border: none;
-          border-radius: 4px;
+          border: 1px solid #3b82f6;
+          border-radius: 8px;
           cursor: pointer;
           font-size: 16px;
+          font-weight: 600;
+          transition: all 0.2s ease;
         }
 
         .export-button:hover {
-          background-color: #0051a8;
+          background-color: #2563eb;
+          border-color: #2563eb;
+          transform: translateY(-1px);
         }
 
         .add-ticket-container {
@@ -670,19 +774,50 @@ const AdminPage = () => {
           gap: 15px;
         }
 
+        .add-ticket-container .form-group {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .add-ticket-container label {
+          color: #ffffff;
+          font-weight: 500;
+          font-size: 14px;
+        }
+
+        .add-ticket-container input {
+          padding: 10px 12px;
+          background-color: #2a2a2a;
+          border: 1px solid #404040;
+          border-radius: 6px;
+          color: #ffffff;
+          font-size: 14px;
+        }
+
+        .add-ticket-container input:focus {
+          outline: none;
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
         .add-ticket-container button {
           margin-top: 10px;
           padding: 12px 24px;
-          background-color: #0070f3;
+          background-color: #3b82f6;
           color: white;
-          border: none;
-          border-radius: 4px;
+          border: 1px solid #3b82f6;
+          border-radius: 8px;
           cursor: pointer;
           font-size: 16px;
+          font-weight: 600;
+          transition: all 0.2s ease;
         }
 
         .add-ticket-container button:hover {
-          background-color: #0051a8;
+          background-color: #2563eb;
+          border-color: #2563eb;
+          transform: translateY(-1px);
         }
       `}</style>
     </div>

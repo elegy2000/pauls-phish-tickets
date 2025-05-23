@@ -73,47 +73,76 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
 
   if (error) {
     return (
-      <div style={{ minHeight: '100vh', padding: '2rem' }}>
+      <div style={{ 
+        minHeight: '100vh', 
+        backgroundColor: '#0f0f0f',
+        color: '#ffffff',
+        padding: '2rem',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+      }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <Link 
             href="/"
             style={{
               display: 'inline-block',
               marginBottom: '1.5rem',
-              color: '#2563eb',
-              textDecoration: 'none'
+              color: '#3b82f6',
+              textDecoration: 'none',
+              fontSize: '1rem',
+              fontWeight: '500'
             }}
           >
             ← Back to Years
           </Link>
-          <p style={{ color: 'red' }}>{error}</p>
+          <p style={{ color: '#ef4444', fontSize: '1.1rem' }}>{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: '100vh', padding: '2rem' }}>
+    <div style={{ 
+      minHeight: '100vh', 
+      backgroundColor: '#0f0f0f',
+      color: '#ffffff',
+      padding: '2rem',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+    }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <Link 
           href="/"
           style={{
             display: 'inline-block',
-            marginBottom: '1.5rem',
-            color: '#2563eb',
-            textDecoration: 'none'
+            marginBottom: '2rem',
+            color: '#3b82f6',
+            textDecoration: 'none',
+            fontSize: '1rem',
+            fontWeight: '500',
+            transition: 'color 0.2s ease'
           }}
+          onMouseEnter={(e) => e.target.style.color = '#60a5fa'}
+          onMouseLeave={(e) => e.target.style.color = '#3b82f6'}
         >
           ← Back to Years
         </Link>
 
-        <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>
+        <h1 style={{ 
+          fontSize: '2.5rem', 
+          fontWeight: '700', 
+          marginBottom: '3rem',
+          textAlign: 'center',
+          background: 'linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          letterSpacing: '-0.02em'
+        }}>
           {year} Shows
         </h1>
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-            <p>Loading tickets...</p>
+          <div style={{ textAlign: 'center', padding: '4rem 0' }}>
+            <p style={{ color: '#888888', fontSize: '1.1rem' }}>Loading tickets...</p>
           </div>
         ) : tickets.length > 0 ? (
           <div style={{ 
@@ -125,11 +154,23 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
               <div 
                 key={index}
                 style={{
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '0.5rem',
+                  border: '1px solid #2a2a2a',
+                  borderRadius: '1rem',
                   overflow: 'hidden',
-                  backgroundColor: 'white',
-                  boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                  backgroundColor: '#1a1a1a',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+                  transition: 'all 0.3s ease',
+                  cursor: ticket.imageurl ? 'pointer' : 'default'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.6)';
+                  e.currentTarget.style.borderColor = '#404040';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.4)';
+                  e.currentTarget.style.borderColor = '#2a2a2a';
                 }}
               >
                 {ticket.imageurl && (
@@ -137,7 +178,8 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
                     style={{ 
                       height: '200px', 
                       overflow: 'hidden',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      position: 'relative'
                     }}
                     onClick={() => setLightboxImage(ticket.imageurl)}
                   >
@@ -147,21 +189,25 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
                       style={{
                         width: '100%',
                         height: '100%',
-                        objectFit: 'cover'
+                        objectFit: 'cover',
+                        transition: 'transform 0.3s ease'
                       }}
                       onError={(e) => {
                         e.target.src = '/placeholder-ticket.jpg';
                         e.target.onerror = null;
                       }}
+                      onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                      onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                     />
                   </div>
                 )}
                 
-                <div style={{ padding: '1rem' }}>
+                <div style={{ padding: '1.5rem' }}>
                   <p style={{ 
                     fontSize: '1.1rem',
-                    fontWeight: 'bold',
-                    marginBottom: '0.5rem'
+                    fontWeight: '700',
+                    marginBottom: '0.5rem',
+                    color: '#ffffff'
                   }}>
                     {(() => {
                       // Always parse YYYY-MM-DD as UTC
@@ -182,16 +228,19 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
                   </p>
                   
                   <p style={{ 
-                    color: '#4b5563',
-                    marginBottom: '0.25rem'
+                    color: '#cccccc',
+                    marginBottom: '0.25rem',
+                    fontSize: '1rem',
+                    fontWeight: '600'
                   }}>
                     {ticket.venue}
                   </p>
                   
                   <p style={{ 
-                    color: '#6b7280',
-                    fontSize: '0.875rem',
-                    marginBottom: '1rem'
+                    color: '#888888',
+                    fontSize: '0.9rem',
+                    marginBottom: '1.25rem',
+                    fontWeight: '500'
                   }}>
                     {ticket.city_state}
                   </p>
@@ -203,13 +252,23 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
                       rel="noopener noreferrer"
                       style={{
                         display: 'inline-block',
-                        padding: '0.5rem 1rem',
-                        backgroundColor: '#2563eb',
-                        color: 'white',
-                        borderRadius: '0.375rem',
+                        padding: '0.625rem 1.25rem',
+                        backgroundColor: '#1a1a1a',
+                        color: '#3b82f6',
+                        border: '1px solid #3b82f6',
+                        borderRadius: '0.5rem',
                         textDecoration: 'none',
                         fontSize: '0.875rem',
-                        fontWeight: '500'
+                        fontWeight: '600',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = '#3b82f6';
+                        e.target.style.color = '#ffffff';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = '#1a1a1a';
+                        e.target.style.color = '#3b82f6';
                       }}
                     >
                       View on Phish.net
@@ -220,8 +279,8 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
             ))}
           </div>
         ) : (
-          <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-            <p>No tickets found for {year}</p>
+          <div style={{ textAlign: 'center', padding: '4rem 0' }}>
+            <p style={{ color: '#888888', fontSize: '1.1rem' }}>No tickets found for {year}</p>
           </div>
         )}
 
@@ -233,12 +292,13 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.9)',
+              backgroundColor: 'rgba(0, 0, 0, 0.95)',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
               zIndex: 1000,
-              cursor: 'pointer'
+              cursor: 'pointer',
+              backdropFilter: 'blur(4px)'
             }}
             onClick={() => setLightboxImage(null)}
           >
@@ -248,7 +308,9 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
               style={{
                 maxWidth: '90%',
                 maxHeight: '90vh',
-                objectFit: 'contain'
+                objectFit: 'contain',
+                borderRadius: '0.5rem',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.8)'
               }}
             />
           </div>
