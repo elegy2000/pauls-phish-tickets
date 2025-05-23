@@ -1,4 +1,4 @@
-year,date,venue,city_state,imageurl,net_link
+year,date,venue,city_state,imageUrl,net_link
 1989,1989-01-18,Gallagher's,"Waitsfield, VT",https://hykzrxjtkpssrfmcerky.supabase.co/storage/v1/object/public/ticket-images/1989-01-18.jpg,https://phish.net/setlists/phish-january-18-1989-gallaghers-waitsfield-vt-usa.html
 1989,1989-01-26,The Paradise,"Boston, MA",https://hykzrxjtkpssrfmcerky.supabase.co/storage/v1/object/public/ticket-images/1989-01-26.jpg,https://phish.net/setlists/phish-january-26-1989-the-paradise-boston-ma-usa.html
 1989,1989-03-24,The Paradise,"Boston, MA",https://hykzrxjtkpssrfmcerky.supabase.co/storage/v1/object/public/ticket-images/1989-03-24.jpg,https://phish.net/setlists/phish-march-24-1989-the-paradise-boston-ma-usa.html

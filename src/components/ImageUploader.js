@@ -22,8 +22,19 @@ const ImageUploader = () => {
     let currentBatch = [];
     let currentBatchSize = 0;
     const maxBatchSize = 4 * 1024 * 1024; // 4MB to stay under Vercel's 4.5MB limit
+    const maxFileSize = 4 * 1024 * 1024; // 4MB per individual file
+    const oversizedFiles = [];
 
     for (const file of files) {
+      // Check if individual file is too large
+      if (file.size > maxFileSize) {
+        oversizedFiles.push({
+          name: file.name,
+          size: Math.round(file.size / (1024 * 1024) * 10) / 10 // Size in MB, rounded to 1 decimal
+        });
+        continue; // Skip this file
+      }
+
       // If adding this file would exceed the limit, start a new batch
       if (currentBatchSize + file.size > maxBatchSize && currentBatch.length > 0) {
         batches.push(currentBatch);
@@ -40,7 +51,7 @@ const ImageUploader = () => {
       batches.push(currentBatch);
     }
 
-    return batches;
+    return { batches, oversizedFiles };
   };
 
   const uploadBatch = async (batch) => {
@@ -64,10 +75,27 @@ const ImageUploader = () => {
       return;
     }
 
-    const batches = createBatches(selectedFiles);
+    const { batches, oversizedFiles } = createBatches(selectedFiles);
     const totalBatches = batches.length;
     
-    console.log(`Uploading ${selectedFiles.length} files in ${totalBatches} batches`);
+    // Show warning about oversized files
+    if (oversizedFiles.length > 0) {
+      const oversizedList = oversizedFiles.map(f => `${f.name} (${f.size}MB)`).join('\n');
+      const proceed = window.confirm(
+        `⚠️ WARNING: ${oversizedFiles.length} file(s) are too large (>4MB) and will be SKIPPED:\n\n${oversizedList}\n\nVercel has a 4.5MB request limit. Please resize these images to under 4MB.\n\nDo you want to continue uploading the remaining ${selectedFiles.length - oversizedFiles.length} file(s)?`
+      );
+      
+      if (!proceed) {
+        return;
+      }
+    }
+
+    if (batches.length === 0) {
+      setError('All selected files are too large (>4MB). Please resize your images and try again.');
+      return;
+    }
+    
+    console.log(`Uploading ${selectedFiles.length - oversizedFiles.length} files in ${totalBatches} batches (${oversizedFiles.length} files skipped due to size)`);
 
     try {
       setIsUploading(true);
@@ -96,7 +124,12 @@ const ImageUploader = () => {
         }
       }
 
-      setUploadStatus(`All ${allUploaded.length} images uploaded successfully!`);
+      let successMessage = `Successfully uploaded ${allUploaded.length} images!`;
+      if (oversizedFiles.length > 0) {
+        successMessage += ` (${oversizedFiles.length} files skipped due to size limits)`;
+      }
+      
+      setUploadStatus(successMessage);
       setSelectedFiles([]);
       setProgress({ current: 0, total: 0 });
       
@@ -158,7 +191,8 @@ const ImageUploader = () => {
         <ul>
           <li>Select multiple images (JPG, PNG, etc.)</li>
           <li>Images will be uploaded in batches to avoid size limits</li>
-          <li>Maximum 10MB per image, recommended under 1MB each</li>
+          <li><strong>Maximum 4MB per image</strong> (Vercel hosting limitation)</li>
+          <li>Recommended: Under 1MB each for faster uploads</li>
         </ul>
       </div>
       
@@ -175,15 +209,30 @@ const ImageUploader = () => {
         <div className="file-list">
           <h4>Selected Images ({selectedFiles.length}):</h4>
           <div className="file-grid">
-            {selectedFiles.map((file, idx) => (
-              <div key={idx} className="file-item">
-                <span className="file-name">{file.name}</span>
-                <span className="file-size">({Math.round(file.size / 1024)}KB)</span>
-              </div>
-            ))}
+            {selectedFiles.map((file, idx) => {
+              const isOversized = file.size > 4 * 1024 * 1024; // 4MB limit
+              const fileSizeKB = Math.round(file.size / 1024);
+              const fileSizeMB = Math.round(file.size / (1024 * 1024) * 10) / 10;
+              
+              return (
+                <div key={idx} className={`file-item ${isOversized ? 'oversized' : ''}`}>
+                  <span className="file-name">
+                    {isOversized && '⚠️ '}{file.name}
+                  </span>
+                  <span className={`file-size ${isOversized ? 'oversized-text' : ''}`}>
+                    ({fileSizeKB < 1024 ? `${fileSizeKB}KB` : `${fileSizeMB}MB`})
+                    {isOversized && ' - TOO LARGE'}
+                  </span>
+                </div>
+              );
+            })}
           </div>
           <p className="batch-info">
-            Will be uploaded in {createBatches(selectedFiles).length} batch(es)
+            Will be uploaded in {createBatches(selectedFiles).batches.length} batch(es)
+            {(() => {
+              const { oversizedFiles } = createBatches(selectedFiles);
+              return oversizedFiles.length > 0 ? ` (${oversizedFiles.length} files will be skipped)` : '';
+            })()}
           </p>
         </div>
       )}
@@ -297,12 +346,23 @@ const ImageUploader = () => {
           padding: 5px 0;
           border-bottom: 1px solid #eee;
         }
+        .file-item.oversized {
+          background-color: #fff5f5;
+          padding: 8px;
+          margin: 2px 0;
+          border-radius: 4px;
+          border: 1px solid #fed7d7;
+        }
         .file-name {
           font-weight: 500;
         }
         .file-size {
           color: #666;
           font-size: 12px;
+        }
+        .file-size.oversized-text {
+          color: #e53e3e;
+          font-weight: bold;
         }
         .batch-info {
           color: #0070f3;
