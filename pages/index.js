@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
+import Head from 'next/head';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -91,144 +92,139 @@ export default function HomePage({ years, yearCounts, error }) {
   }
 
   return (
-    <main style={{ 
-      minHeight: '100vh', 
-      backgroundColor: '#0f0f0f',
-      color: '#ffffff',
-      padding: '2rem',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-    }}>
-      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-        <h1 style={{ 
-          fontSize: '3rem', 
-          fontWeight: '700', 
-          textAlign: 'center', 
-          marginBottom: '1rem',
-          background: 'linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-          letterSpacing: '-0.02em'
-        }}>Phish Tour Archives</h1>
-        
-        <p style={{
-          textAlign: 'center',
-          color: '#888888',
-          fontSize: '1.1rem',
-          marginBottom: '3rem',
-          fontWeight: '400'
-        }}>
-          Paul's Ticket Stub Collection
-        </p>
-        
-        <div style={{ textAlign: 'right', marginBottom: '3rem' }}>
-          <Link 
-            href="/admin"
-            style={{ 
-              display: 'inline-block', 
-              padding: '0.875rem 1.75rem', 
-              backgroundColor: '#1a1a1a', 
-              color: '#ffffff',
-              border: '1px solid #333333',
-              borderRadius: '0.75rem',
-              textDecoration: 'none',
-              fontWeight: '500',
-              fontSize: '0.95rem',
-              transition: 'all 0.2s ease',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#2a2a2a';
-              e.target.style.borderColor = '#444444';
-              e.target.style.transform = 'translateY(-1px)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#1a1a1a';
-              e.target.style.borderColor = '#333333';
-              e.target.style.transform = 'translateY(0)';
-            }}
-          >
-            Admin Dashboard
-          </Link>
-        </div>
-
-        <h2 style={{ 
-          fontSize: '1.75rem', 
-          fontWeight: '600', 
-          marginBottom: '2rem',
-          color: '#ffffff',
-          textAlign: 'center'
-        }}>Available Tour Years</h2>
-        
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: windowWidth < 640 ? '1fr' : 
-                              windowWidth < 768 ? 'repeat(2, 1fr)' : 
-                              windowWidth < 1024 ? 'repeat(3, 1fr)' :
-                              'repeat(4, 1fr)', 
-          gap: '1.25rem',
-          margin: '0 auto'
-        }}>
-          {years.map((year, index) => (
+    <>
+      <Head>
+        <title>Phish Ticket Stub Archive</title>
+      </Head>
+      <main style={{ 
+        minHeight: '100vh', 
+        backgroundColor: '#0f0f0f',
+        color: '#ffffff',
+        padding: '2rem',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+      }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          <h1 style={{ 
+            fontSize: '3rem', 
+            fontWeight: '700', 
+            textAlign: 'center', 
+            marginBottom: '1rem',
+            background: 'linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            letterSpacing: '-0.02em'
+          }}>Phish Ticket Stub Archive</h1>
+          
+          <div style={{ textAlign: 'right', marginBottom: '3rem' }}>
             <Link 
-              key={year} 
-              href={`/year/${year}`}
-              style={{
-                display: 'block',
-                padding: '2rem 1.5rem',
-                backgroundColor: '#1a1a1a',
-                border: '1px solid #2a2a2a',
-                borderRadius: '1rem',
-                textDecoration: 'none',
+              href="/admin"
+              style={{ 
+                display: 'inline-block', 
+                padding: '0.875rem 1.75rem', 
+                backgroundColor: '#1a1a1a', 
                 color: '#ffffff',
-                transition: 'all 0.3s ease',
-                textAlign: 'center',
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)'
+                border: '1px solid #333333',
+                borderRadius: '0.75rem',
+                textDecoration: 'none',
+                fontWeight: '500',
+                fontSize: '0.95rem',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
               }}
               onMouseEnter={(e) => {
                 e.target.style.backgroundColor = '#2a2a2a';
-                e.target.style.borderColor = '#404040';
-                e.target.style.transform = 'translateY(-4px)';
-                e.target.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.6)';
+                e.target.style.borderColor = '#444444';
+                e.target.style.transform = 'translateY(-1px)';
               }}
               onMouseLeave={(e) => {
                 e.target.style.backgroundColor = '#1a1a1a';
-                e.target.style.borderColor = '#2a2a2a';
+                e.target.style.borderColor = '#333333';
                 e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.4)';
               }}
             >
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '3px',
-                background: 'linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899)',
-                opacity: 0.8
-              }} />
-              <span style={{ 
-                display: 'block', 
-                fontSize: '1.75rem',
-                fontWeight: '700',
-                marginBottom: '0.5rem',
-                color: '#ffffff'
-              }}>
-                {year}
-              </span>
-              <span style={{
-                fontSize: '0.95rem',
-                color: '#a0a0a0',
-                fontWeight: '500'
-              }}>
-                {yearCounts[year]} shows
-              </span>
+              Admin Dashboard
             </Link>
-          ))}
+          </div>
+
+          <h2 style={{ 
+            fontSize: '1.75rem', 
+            fontWeight: '600', 
+            marginBottom: '2rem',
+            color: '#ffffff',
+            textAlign: 'center'
+          }}>Available Tour Years</h2>
+          
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: windowWidth < 640 ? '1fr' : 
+                                windowWidth < 768 ? 'repeat(2, 1fr)' : 
+                                windowWidth < 1024 ? 'repeat(3, 1fr)' :
+                                'repeat(4, 1fr)', 
+            gap: '1.25rem',
+            margin: '0 auto'
+          }}>
+            {years.map((year, index) => (
+              <Link 
+                key={year} 
+                href={`/year/${year}`}
+                style={{
+                  display: 'block',
+                  padding: '2rem 1.5rem',
+                  backgroundColor: '#1a1a1a',
+                  border: '1px solid #2a2a2a',
+                  borderRadius: '1rem',
+                  textDecoration: 'none',
+                  color: '#ffffff',
+                  transition: 'all 0.3s ease',
+                  textAlign: 'center',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#2a2a2a';
+                  e.target.style.borderColor = '#404040';
+                  e.target.style.transform = 'translateY(-4px)';
+                  e.target.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = '#1a1a1a';
+                  e.target.style.borderColor = '#2a2a2a';
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.4)';
+                }}
+              >
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '3px',
+                  background: 'linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899)',
+                  opacity: 0.8
+                }} />
+                <span style={{ 
+                  display: 'block', 
+                  fontSize: '1.75rem',
+                  fontWeight: '700',
+                  marginBottom: '0.5rem',
+                  color: '#ffffff'
+                }}>
+                  {year}
+                </span>
+                <span style={{
+                  fontSize: '0.95rem',
+                  color: '#a0a0a0',
+                  fontWeight: '500'
+                }}>
+                  {yearCounts[year]} shows
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 } 
