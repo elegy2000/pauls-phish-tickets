@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Latest Completed (January 2025)
+- [x] **Image Upload System Enhancements**
+  - Added "IMAGE" status column to Current Tickets table showing green ✓ for tickets with images, red - without
+  - Improved image checking logic to detect images both by database imageurl and by date pattern matching
+  - Implemented duplicate handling: removed timestamp prefixes from filenames, uses `upsert: true` for automatic replacement
+  - Added "Reset All Images" functionality with triple confirmation system and dedicated API endpoint
+  - Enhanced batch upload system for handling large image collections (automatically splits into <4MB batches)
+  - Fixed button styling consistency across all admin interface sections
+  - Date: January 2025
+  - Status: Production ready, deployed via GitHub/Vercel integration
+
+- [x] **Admin Interface Improvements**
+  - Standardized button styling: blue primary buttons (12px 24px padding, 16px font), red danger button for reset
+  - Fixed inconsistent button sizes and colors across CSV Management, Image Upload, and Add Ticket sections
+  - Added comprehensive admin dashboard with tabbed interface for different functions
+  - Improved user experience with progress tracking and detailed error messages
+  - Date: January 2025
+  - Status: Complete
+
 ### Current Issues
 - CSV upload functionality not working
   - Error: "Method not allowed" and "Error inserting tickets into Supabase"
@@ -20,6 +39,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Next steps:
     * Test CSV upload with new validation
     * Monitor error messages for any remaining issues
+- Website is limited to 1000 tickets due to Supabase client default; needs batch fetching/pagination everywhere tickets are loaded.
+- CSV upload can create duplicate entries in the Supabase table; deduplication logic needs to be enforced on upload and/or at the database level.
+- CSV download includes the 'id' column, which is not needed for user uploads
+  - Planned: Update CSV download logic to exclude the 'id' column so exported CSVs only contain relevant ticket fields (year, date, venue, city_state, imageurl, net_link)
 
 ### In Progress
 - [ ] Test CSV upload with enhanced validation
@@ -139,6 +162,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Images (e.g., 2021-07-30.jpg) exist in the 'ticket-images' bucket and match the expected filenames
   - Frontend does not render these images, even though the data and filenames appear correct
   - Ongoing bug, under investigation
+
+- [x] Fixed off-by-one day bug in date display on year pages
+  - Cause: JavaScript `Date` parsing was shifting dates due to local timezone interpretation of `YYYY-MM-DD` strings.
+  - Solution: Always parse and display dates as UTC in the frontend, ensuring the date matches exactly what's in Supabase.
+  - Date: June 2024
+  - Status: Complete
+
+- [x] Removed 1000 ticket limit everywhere by batching all ticket fetches (homepage, admin, year pages, CSV export)
+  - All ticket queries now fetch in batches of 1000 and combine results, so the full dataset is always loaded.
+  - Date: June 2024
+  - Status: Complete
+
+- [x] Fixed CSV upload so it fully clears the Supabase table before inserting new data (no more duplicates/triplicates)
+  - Updated delete logic to use .gt('id', -1) and added RLS policy for DELETE to allow this operation.
+  - Date: June 2024
+  - Status: Complete
 
 ### Migration Tasks
 - [x] Migrate ticket images to Supabase Storage

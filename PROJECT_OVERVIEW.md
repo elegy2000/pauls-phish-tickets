@@ -23,6 +23,14 @@
 - **Vercel deployment size issues are now resolved.**
 - **[May 20, 2024] Fixed Supabase Row Level Security (RLS) policy to allow API/service inserts for CSV upload.**
 
+## Latest Enhancements (January 2025)
+
+- **Complete Image Upload System:** Implemented bulk image upload with smart batching (<4MB per batch), duplicate handling via `upsert`, and comprehensive admin interface with progress tracking.
+- **Image Status Tracking:** Added "IMAGE" column to admin dashboard showing green ✓ for tickets with images, red - for those without. Logic checks both database imageurl and storage by date pattern.
+- **Image Reset Functionality:** Added secure image reset with triple confirmation system (warning → confirmation → type "DELETE") and dedicated API endpoint.
+- **Consistent Admin UI:** Standardized all button styling across the admin interface with blue primary buttons (12px 24px padding, 16px font) and red danger buttons.
+- **Production Ready:** All features tested and deployed via GitHub/Vercel integration with full error handling and user feedback.
+
 ---
 
 ## To-Do List

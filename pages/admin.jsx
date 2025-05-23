@@ -344,12 +344,47 @@ const AdminPage = () => {
                       <tbody>
                         {tickets.map((ticket, index) => {
                           // Check if ticket has an image by extracting filename from imageurl
-                          const hasImage = ticket.imageurl && (() => {
+                          // OR by checking if any image exists for this date
+                          const hasImage = (() => {
                             try {
-                              const url = new URL(ticket.imageurl);
-                              const filename = url.pathname.split('/').pop();
-                              return availableImages.has(filename);
-                            } catch {
+                              // First, check if there's a valid imageurl
+                              if (ticket.imageurl) {
+                                const url = new URL(ticket.imageurl);
+                                const filename = url.pathname.split('/').pop();
+                                const imageExists = availableImages.has(filename);
+                                
+                                // Debug logging for first few tickets
+                                if (index < 5) {
+                                  console.log(`Ticket ${ticket.date} (with imageurl):`, {
+                                    imageurl: ticket.imageurl,
+                                    filename: filename,
+                                    imageExists: imageExists
+                                  });
+                                }
+                                
+                                return imageExists;
+                              }
+                              
+                              // If no imageurl, check if any image exists for this date
+                              const datePattern = ticket.date; // e.g., "2022-09-02"
+                              const hasImageByDate = Array.from(availableImages).some(filename => 
+                                filename.includes(datePattern)
+                              );
+                              
+                              // Debug logging for first few tickets without imageurl
+                              if (index < 5 && !ticket.imageurl) {
+                                console.log(`Ticket ${ticket.date} (no imageurl):`, {
+                                  imageurl: ticket.imageurl,
+                                  datePattern: datePattern,
+                                  hasImageByDate: hasImageByDate,
+                                  availableImagesCount: availableImages.size,
+                                  sampleImages: Array.from(availableImages).slice(0, 3)
+                                });
+                              }
+                              
+                              return hasImageByDate;
+                            } catch (error) {
+                              console.error('Error processing ticket:', ticket.date, error);
                               return false;
                             }
                           })();
@@ -608,12 +643,17 @@ const AdminPage = () => {
 
         .add-ticket-container button {
           margin-top: 10px;
-          padding: 10px;
+          padding: 12px 24px;
           background-color: #0070f3;
           color: white;
           border: none;
           border-radius: 4px;
           cursor: pointer;
+          font-size: 16px;
+        }
+
+        .add-ticket-container button:hover {
+          background-color: #0051a8;
         }
       `}</style>
     </div>

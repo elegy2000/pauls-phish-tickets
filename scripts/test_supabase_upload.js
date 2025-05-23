@@ -42,4 +42,8 @@ async function uploadTestImage() {
   console.log('Upload successful! Public URL:', data.publicUrl);
 }
 
-uploadTestImage(); 
+uploadTestImage();
+
+// Instructions:
+// 1. Put a small image file named 'test-image.jpg' in the scripts/ directory
+// 2. Run: SUPABASE_SERVICE_ROLE_KEY=your_actual_key node scripts/test_supabase_upload.js

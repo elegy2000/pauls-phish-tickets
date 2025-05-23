@@ -313,7 +313,9 @@ const handleCsvDownload = async () => {
       batchIndex++;
     }
 
-    const csvData = await convertJsonToCsv(allTickets);
+    // Remove the 'id' column from each ticket before converting to CSV
+    const ticketsWithoutId = allTickets.map(({ id, ...rest }) => rest);
+    const csvData = await convertJsonToCsv(ticketsWithoutId);
     return { success: true, data: csvData };
   } catch (error) {
     console.error('Error generating CSV:', error);
