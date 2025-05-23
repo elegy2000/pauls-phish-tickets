@@ -42,6 +42,18 @@ export default async function handler(req, res) {
   try {
     console.log('Supabase URL:', supabaseUrl);
     console.log('Supabase Key (first 8 chars):', supabaseKey ? supabaseKey.slice(0, 8) : 'undefined');
+    console.log('Supabase Key length:', supabaseKey ? supabaseKey.length : 'undefined');
+    
+    // Validate key format
+    if (!supabaseKey || supabaseKey.length < 100) {
+      console.error('Service role key appears to be truncated or missing');
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Invalid service role key configuration',
+        debug: { keyLength: supabaseKey ? supabaseKey.length : 0 }
+      });
+    }
+    
     const { files } = await parseForm(req);
     console.log('Received files:', files); // Debug log
     let images = files.images;
@@ -64,7 +76,8 @@ export default async function handler(req, res) {
         contentType: file.mimetype || file.type,
       });
       if (error) {
-        return res.status(500).json({ success: false, message: 'Error uploading to Supabase', error: error.message, debug: { file } });
+        console.error('Detailed Supabase error:', JSON.stringify(error, null, 2));
+        return res.status(500).json({ success: false, message: 'Error uploading to Supabase', error: error.message, debug: { file, fullError: error } });
       }
       const { data } = supabase.storage.from(bucket).getPublicUrl(fileName);
       uploaded.push({ fileName, url: data.publicUrl });
