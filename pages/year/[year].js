@@ -190,14 +190,15 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
-                        transition: 'transform 0.3s ease'
+                        transform: 'scale(1.2)',
+                        transition: 'transform 0.3s ease',
                       }}
                       onError={(e) => {
                         e.target.src = '/placeholder-ticket.jpg';
                         e.target.onerror = null;
                       }}
-                      onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                      onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                      onMouseEnter={(e) => e.target.style.transform = 'scale(1.25)'}
+                      onMouseLeave={(e) => e.target.style.transform = 'scale(1.2)'}
                     />
                   </div>
                 )}
