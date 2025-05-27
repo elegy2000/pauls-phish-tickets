@@ -103,7 +103,7 @@ export default function HomePage({ years, yearCounts, error }) {
         padding: '2rem',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
       }}>
-        <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center', marginBottom: '2.5rem' }}>
+        <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'left', marginBottom: '2.5rem' }}>
           <img
             src="https://hykzrxjtkpssrfmcerky.supabase.co/storage/v1/object/public/site-assets/logo.png"
             alt="Phish Ticket Stub Archive Logo"
@@ -111,7 +111,7 @@ export default function HomePage({ years, yearCounts, error }) {
               width: '220px',
               maxWidth: '90vw',
               height: 'auto',
-              margin: '0 auto 1.5rem auto',
+              margin: '0 0 1.5rem 0',
               display: 'block',
               filter: 'drop-shadow(0 2px 12px rgba(0,0,0,0.25))',
             }}
@@ -120,10 +120,10 @@ export default function HomePage({ years, yearCounts, error }) {
             fontSize: '1.15rem',
             color: '#e0e0e0',
             lineHeight: 1.7,
-            margin: '0 auto 0.5rem auto',
+            margin: '0 0 0.5rem 0',
             fontWeight: 400,
             maxWidth: '650px',
-            textAlign: 'center',
+            textAlign: 'left',
             letterSpacing: '-0.01em',
           }}>
             Throughout Phish's storied career, nothing built the anticipation of a new tour like receiving your tickets in the mail, nothing signaled showtime like having your ticket ripped (and in later years scanned) at the door. That's because Phish tickets are so much more than entry passes—they're memories, shared experiences, individual works of art as unique as the shows themselves.<br /><br />
@@ -132,18 +132,6 @@ export default function HomePage({ years, yearCounts, error }) {
           </p>
         </div>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <h1 style={{ 
-            fontSize: '3rem', 
-            fontWeight: '700', 
-            textAlign: 'center', 
-            marginBottom: '1rem',
-            background: 'linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            letterSpacing: '-0.02em'
-          }}>Phish Ticket Stub Archive</h1>
-          
           <div style={{ textAlign: 'right', marginBottom: '3rem' }}>
             <Link 
               href="/admin"
@@ -158,7 +146,8 @@ export default function HomePage({ years, yearCounts, error }) {
                 fontWeight: '500',
                 fontSize: '0.95rem',
                 transition: 'all 0.2s ease',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                marginTop: '2rem',
               }}
               onMouseEnter={(e) => {
                 e.target.style.backgroundColor = '#2a2a2a';
