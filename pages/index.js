@@ -164,64 +164,89 @@ export default function HomePage({ years, yearCounts, error }) {
             gap: '1.25rem',
             margin: '0 auto'
           }}>
-            {years.map((year, index) => (
-              <Link 
-                key={year} 
-                href={`/year/${year}`}
-                style={{
-                  display: 'block',
-                  padding: '2rem 1.5rem',
-                  backgroundColor: '#1a1a1a',
-                  border: '1px solid #2a2a2a',
-                  borderRadius: '1rem',
-                  textDecoration: 'none',
-                  color: '#ffffff',
-                  transition: 'all 0.3s ease',
-                  textAlign: 'center',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#2a2a2a';
-                  e.target.style.borderColor = '#404040';
-                  e.target.style.transform = 'translateY(-4px)';
-                  e.target.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.6)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#1a1a1a';
-                  e.target.style.borderColor = '#2a2a2a';
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.4)';
-                }}
-              >
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: '3px',
-                  background: 'linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899)',
-                  opacity: 0.8
-                }} />
-                <span style={{ 
-                  display: 'block', 
-                  fontSize: '1.75rem',
-                  fontWeight: '700',
-                  marginBottom: '0.5rem',
-                  color: '#ffffff'
-                }}>
-                  {year}
-                </span>
-                <span style={{
-                  fontSize: '0.95rem',
-                  color: '#a0a0a0',
-                  fontWeight: '500'
-                }}>
-                  {yearCounts[year]} shows
-                </span>
-              </Link>
-            ))}
+            {years.map((year, index) => {
+              const yearImageUrl = `https://hykzrxjtkpssrfmcerky.supabase.co/storage/v1/object/public/year-images/${year}.jpg`;
+              return (
+                <Link 
+                  key={year} 
+                  href={`/year/${year}`}
+                  style={{
+                    display: 'block',
+                    padding: '2rem 1.5rem',
+                    backgroundColor: '#1a1a1a',
+                    border: '1px solid #2a2a2a',
+                    borderRadius: '1rem',
+                    textDecoration: 'none',
+                    color: '#ffffff',
+                    transition: 'all 0.3s ease',
+                    textAlign: 'center',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#2a2a2a';
+                    e.target.style.borderColor = '#404040';
+                    e.target.style.transform = 'translateY(-4px)';
+                    e.target.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.6)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = '#1a1a1a';
+                    e.target.style.borderColor = '#2a2a2a';
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.4)';
+                  }}
+                >
+                  <div style={{
+                    width: '100%',
+                    height: '160px',
+                    marginBottom: '1.25rem',
+                    borderRadius: '0.75rem',
+                    overflow: 'hidden',
+                    background: '#181818',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '1px solid #222',
+                  }}>
+                    <img
+                      src={yearImageUrl}
+                      alt={`Ticket stubs for ${year}`}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        transition: 'transform 0.3s ease',
+                        display: 'block',
+                      }}
+                      onError={e => {
+                        e.target.src = '/placeholder-ticket.jpg';
+                        e.target.onerror = null;
+                      }}
+                      onMouseEnter={e => e.target.style.transform = 'scale(1.05)'}
+                      onMouseLeave={e => e.target.style.transform = 'scale(1)'}
+                    />
+                  </div>
+                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899)', opacity: 0.8 }} />
+                  <span style={{ 
+                    display: 'block', 
+                    fontSize: '1.75rem',
+                    fontWeight: '700',
+                    marginBottom: '0.5rem',
+                    color: '#ffffff'
+                  }}>
+                    {year}
+                  </span>
+                  <span style={{
+                    fontSize: '0.95rem',
+                    color: '#a0a0a0',
+                    fontWeight: '500'
+                  }}>
+                    {yearCounts[year]} shows
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </main>

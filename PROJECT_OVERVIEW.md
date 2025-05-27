@@ -2,6 +2,13 @@
 
 ---
 
+**[July 2024 Update]**
+- Full dark theme and modern UI now live across all pages (admin and user)
+- Homepage and browser title updated to "Phish Ticket Stub Archive"
+- Rollback point created: `v2.0-dark-theme` (see CHANGELOG.md for details)
+
+---
+
 ## Tools & Architecture (2024 Update)
 
 - **Frontend Hosting & Deployment:** Vercel (Next.js/React, custom domain, serverless API routes)

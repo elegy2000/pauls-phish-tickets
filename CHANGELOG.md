@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### July 2024
+- [x] **Dark Theme & Branding Update**
+  - Complete dark theme for all admin and user-facing pages (backgrounds, cards, tables, forms, buttons, etc.)
+  - Improved contrast and readability throughout the admin interface
+  - Updated homepage and browser title to "Phish Ticket Stub Archive"
+  - Removed "Paul's Ticket Stub Collection" subtitle from homepage
+  - Consistent button styling and hover effects
+  - All changes tested and deployed
+- [x] **Rollback Point Created**
+  - Tag: `v2.0-dark-theme`
+  - Description: Stable version with full dark theme, new homepage title, and all recent UI/branding improvements. Use this tag to revert to the current look and feel if needed.
+- [x] **Homepage Year Box Images**
+  - Added a unique image for each year box on the homepage, sourced from Supabase Storage (`year-images` bucket)
+  - Images are displayed above the year and show count, styled to match the modern dark theme
+  - All year images uploaded to Supabase Storage and referenced via public URLs
+  - Homepage UI updated for improved visual appeal and consistency
+
 ### Latest Completed (January 2025)
 - [x] **Modern Dark Theme Design Implementation**
   - ✅ **Complete UI overhaul with dark theme (#0f0f0f background) for better image contrast**
