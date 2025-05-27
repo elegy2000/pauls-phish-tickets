@@ -218,14 +218,14 @@ export default function HomePage({ years, yearCounts, error }) {
                     fontSize: '2.25rem',
                     fontWeight: '700',
                     marginBottom: '0.25rem',
-                    color: '#ffffff',
+                    color: '#F2C46D',
                     marginTop: '1.25rem',
                   }}>
                     {year}
                   </span>
                   <span style={{
                     fontSize: '1.15rem',
-                    color: '#a0a0a0',
+                    color: '#F2C46D',
                     fontWeight: '500',
                     marginBottom: '0.25rem',
                   }}>
