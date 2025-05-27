@@ -172,7 +172,7 @@ export default function HomePage({ years, yearCounts, error }) {
                   href={`/year/${year}`}
                   style={{
                     display: 'block',
-                    padding: '2rem 1.5rem',
+                    padding: '1rem 1rem',
                     backgroundColor: '#1a1a1a',
                     border: '1px solid #2a2a2a',
                     borderRadius: '1rem',
@@ -200,7 +200,7 @@ export default function HomePage({ years, yearCounts, error }) {
                   <div style={{
                     width: '100%',
                     height: '160px',
-                    marginBottom: '1.25rem',
+                    marginBottom: '0.75rem',
                     borderRadius: '0.75rem',
                     overflow: 'hidden',
                     background: '#181818',
@@ -215,9 +215,10 @@ export default function HomePage({ years, yearCounts, error }) {
                       style={{
                         width: '100%',
                         height: '100%',
-                        objectFit: 'cover',
+                        objectFit: 'contain',
                         transition: 'transform 0.3s ease',
                         display: 'block',
+                        background: '#181818',
                       }}
                       onError={e => {
                         e.target.src = '/placeholder-ticket.jpg';
