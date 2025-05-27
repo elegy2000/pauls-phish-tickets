@@ -164,14 +164,6 @@ export default function HomePage({ years, yearCounts, error }) {
             </Link>
           </div>
 
-          <h2 style={{ 
-            fontSize: '1.75rem', 
-            fontWeight: '600', 
-            marginBottom: '2rem',
-            color: '#ffffff',
-            textAlign: 'center'
-          }}>Available Tour Years</h2>
-          
           <div style={{ 
             display: 'grid', 
             gridTemplateColumns: windowWidth < 640 ? '1fr' : 
