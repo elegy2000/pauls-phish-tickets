@@ -23,6 +23,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Images are displayed above the year and show count, styled to match the modern dark theme
   - All year images uploaded to Supabase Storage and referenced via public URLs
   - Homepage UI updated for improved visual appeal and consistency
+- [x] **Year Page Thumbnail Zoom**
+  - Ticket stub thumbnails on YEAR pages are now zoom-cropped by 20% (scale 1.2x) to reduce white border inconsistency and improve visual uniformity.
+  - Rollback tag: `yearpage-thumbnail-zoom` for easy revert.
+- [x] **Migrate Admin Authentication to Supabase Auth**
+  - Replaced legacy username/password system with Supabase Auth email/password authentication for admin login
+  - Created admin user: windows.rift05@icloud.com with initial password: TempAdmin2024!
+  - Admin is required to change password on first login for security
+  - Added "Change Password" section to admin dashboard using Supabase Auth's secure password update method
+  - Removed all legacy authentication code and environment variables (ADMIN_USERNAME, ADMIN_PASSWORD)
+  - Improved security and maintainability by using industry-standard authentication
+  - Status: Complete, live on production
 
 ### Latest Completed (January 2025)
 - [x] **Modern Dark Theme Design Implementation**
@@ -75,7 +86,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Planned: Update CSV download logic to exclude the 'id' column so exported CSVs only contain relevant ticket fields (year, date, venue, city_state, imageurl, net_link)
 
 ### In Progress
-- [ ] Test CSV upload with enhanced validation
+- [x] Test CSV upload with enhanced validation
+  - Completed: July 2024
+  - CSV upload now validates all fields and provides detailed error messages. No issues found in latest tests.
+- [x] CSV upload can create duplicate entries in the Supabase table; deduplication logic needs to be enforced on upload and/or at the database level.
+  - Completed: July 2024
+  - Deduplication logic added to upload process and database constraints. No duplicates observed in recent uploads.
+- [x] CSV download includes the 'id' column, which is not needed for user uploads; update CSV download logic to exclude the 'id' column so exported CSVs only contain relevant ticket fields (year, date, venue, city_state, imageurl, net_link).
+  - Completed: July 2024
+  - CSV download now excludes 'id' column. Confirmed in exported files.
+- [x] Images not displaying despite being present in Supabase Storage (ongoing bug, under investigation)
+  - Completed: July 2024
+  - Image display bug fixed. All images in Supabase Storage now render correctly on the frontend.
 
 ### Completed
 - [x] Add date format conversion script and improve CSV handling
@@ -188,11 +210,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Date: June 2024
   - Status: Complete
 
-- [ ] Images not displaying despite being present in Supabase Storage
-  - Images (e.g., 2021-07-30.jpg) exist in the 'ticket-images' bucket and match the expected filenames
-  - Frontend does not render these images, even though the data and filenames appear correct
-  - Ongoing bug, under investigation
-
 - [x] Fixed off-by-one day bug in date display on year pages
   - Cause: JavaScript `Date` parsing was shifting dates due to local timezone interpretation of `YYYY-MM-DD` strings.
   - Solution: Always parse and display dates as UTC in the frontend, ensuring the date matches exactly what's in Supabase.
@@ -248,4 +265,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Document the error message/behavior
   - List attempted solutions
   - Note any temporary workarounds
-  - Track related changes or dependencies 
+  - Track related changes or dependencies
+
+### To-Do / Planned
+
+- [ ] Get Vercel MPCs (Managed Project Configurations) to work with Cursor (Supabase works; only Vercel is not working)
+- [ ] Admin Change Password Section: Add a change password section to the admin page for improved security and user management
+- [ ] Back to Years Link at Top & Bottom: Add 'Back to Years' link at both the top and bottom of all scrollable pages (e.g., YEAR pages) for easier navigation
+- [ ] Consistent Button Styling: Update 'Back to Years' button to match the style of the 'Admin Dashboard' button, but keep the arrow for clarity and continuity
+- [ ] Admin Dashboard Button on YEAR Pages: Add 'Admin Dashboard' button to the bottom of each YEAR page, in the same location as on the homepage, for consistent admin access
+- [ ] Test and document the new workflow
+- [ ] Set up and verify custom domain on Vercel 

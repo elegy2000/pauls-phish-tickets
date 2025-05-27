@@ -40,23 +40,8 @@
 - **Consistent Admin UI:** Standardized all button styling across the admin interface with modern dark theme and enhanced user experience.
 - **Production Ready:** All features tested and deployed via GitHub/Vercel integration with full error handling and user feedback.
 - **Rollback Available:** Tagged stable version `v1.0-stable` available for rollback if needed.
-
----
-
-## To-Do List
-
-- [x] Migrate ticket images to Supabase Storage
-- [x] Update ticket data to use Supabase image URLs
-- [x] Remove local images directory and commit changes
-- [ ] Integrate Supabase with Vercel in this project
-- [ ] Get Vercel and Supabase MPCs (Managed Project Configurations) to work with Cursor (previous attempts were unsuccessful)
-- [ ] Implement CSV download/upload functionality using Supabase Storage
-- [ ] Implement image upload and retrieval using Supabase Storage
-- [ ] Update frontend to read/write ticket data from Supabase database
-- [ ] Add single ticket + image add form (writes to Supabase)
-- [ ] Test and document the new workflow
-- [ ] Set up and verify custom domain on Vercel
-- [ ] Work on image upload functionality with Supabase Storage (tomorrow's task)
+- **July 2024**
+  - **Year Page Thumbnail Zoom:** Ticket stub thumbnails on YEAR pages are now zoom-cropped by 20% (scale 1.2x) for improved visual consistency and to reduce the impact of white borders. Rollback tag: `yearpage-thumbnail-zoom`.
 
 ---
 

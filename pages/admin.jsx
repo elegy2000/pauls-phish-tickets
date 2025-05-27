@@ -27,6 +27,17 @@ const AdminPage = () => {
     imageFileName: '',
     net_link: ''
   });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [changePasswordError, setChangePasswordError] = useState('');
+  const [changePasswordSuccess, setChangePasswordSuccess] = useState('');
+  const [adminExists, setAdminExists] = useState(null); // null = loading, false = not exists, true = exists
+  const [registerEmail, setRegisterEmail] = useState('windows.rift05@icloud.com');
+  const [registerPassword, setRegisterPassword] = useState('');
+  const [registerError, setRegisterError] = useState('');
+  const [registerSuccess, setRegisterSuccess] = useState('');
 
   useEffect(() => {
     // Check if user is already authenticated
@@ -113,27 +124,65 @@ const AdminPage = () => {
     }
   }, [isAuthenticated]);
 
+  useEffect(() => {
+    // Check if admin user exists in Supabase Auth
+    const checkAdminUser = async () => {
+      try {
+        const { data, error } = await supabase.auth.admin.listUsers();
+        if (error) {
+          setAdminExists(true); // fallback: assume exists to avoid lockout
+          return;
+        }
+        const found = data.users.some(u => u.email === 'windows.rift05@icloud.com');
+        setAdminExists(found);
+      } catch (err) {
+        setAdminExists(true); // fallback: assume exists
+      }
+    };
+    checkAdminUser();
+  }, []);
+
   const handleLogin = async (e) => {
     e.preventDefault();
-    const username = e.target.username.value;
-    const password = e.target.password.value;
-
+    setError('');
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
-
       if (response.ok) {
         setIsAuthenticated(true);
+        // If using initial password, prompt for change
+        if (password === 'TempAdmin2024!') {
+          setShowChangePassword(true);
+        }
       } else {
-        setError('Invalid credentials');
+        const data = await response.json();
+        setError(data.error || 'Invalid credentials');
       }
     } catch (err) {
       setError('Login failed. Please try again.');
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setChangePasswordError('');
+    setChangePasswordSuccess('');
+    try {
+      const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+      const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        setChangePasswordError(error.message);
+      } else {
+        setChangePasswordSuccess('Password changed successfully! Please log in again.');
+        setIsAuthenticated(false);
+        setShowChangePassword(false);
+        setPassword('');
+      }
+    } catch (err) {
+      setChangePasswordError('Failed to change password.');
     }
   };
 
@@ -201,6 +250,49 @@ const AdminPage = () => {
     }
   };
 
+  const handleRegisterAdmin = async (e) => {
+    e.preventDefault();
+    setRegisterError('');
+    setRegisterSuccess('');
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: registerEmail,
+        password: registerPassword,
+      });
+      if (error) {
+        setRegisterError(error.message);
+      } else {
+        setRegisterSuccess('Admin user created! You can now log in.');
+        setAdminExists(true);
+      }
+    } catch (err) {
+      setRegisterError('Failed to create admin user.');
+    }
+  };
+
+  if (adminExists === false) {
+    return (
+      <div className="admin-register" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0f0f0f', color: '#fff' }}>
+        <div style={{ maxWidth: '400px', width: '100%', padding: '2rem', backgroundColor: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.6)' }}>
+          <h1 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '1.75rem', fontWeight: '700', background: 'linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Create Admin User</h1>
+          <form onSubmit={handleRegisterAdmin}>
+            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+              <label htmlFor="registerEmail" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#ffffff' }}>Email:</label>
+              <input type="email" id="registerEmail" name="registerEmail" value={registerEmail} onChange={e => setRegisterEmail(e.target.value)} required style={{ width: '100%', padding: '0.75rem', backgroundColor: '#2a2a2a', border: '1px solid #404040', borderRadius: '0.5rem', color: '#ffffff', fontSize: '1rem' }} />
+            </div>
+            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+              <label htmlFor="registerPassword" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#ffffff' }}>Password:</label>
+              <input type="password" id="registerPassword" name="registerPassword" value={registerPassword} onChange={e => setRegisterPassword(e.target.value)} required style={{ width: '100%', padding: '0.75rem', backgroundColor: '#2a2a2a', border: '1px solid #404040', borderRadius: '0.5rem', color: '#ffffff', fontSize: '1rem' }} />
+            </div>
+            <button type="submit" style={{ width: '100%', padding: '0.875rem', backgroundColor: '#3b82f6', color: 'white', border: '1px solid #3b82f6', borderRadius: '0.5rem', cursor: 'pointer', fontSize: '1rem', fontWeight: '600', transition: 'all 0.2s ease' }}>Create Admin User</button>
+            {registerError && <p style={{ color: '#ef4444', marginTop: '1rem', textAlign: 'center', fontSize: '0.875rem' }}>{registerError}</p>}
+            {registerSuccess && <p style={{ color: '#10b981', marginTop: '1rem', textAlign: 'center', fontSize: '0.875rem' }}>{registerSuccess}</p>}
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="admin-login" style={{
@@ -235,16 +327,18 @@ const AdminPage = () => {
             <div className="form-group" style={{
               marginBottom: '1.5rem'
             }}>
-              <label htmlFor="username" style={{
+              <label htmlFor="email" style={{
                 display: 'block',
                 marginBottom: '0.5rem',
                 fontWeight: '500',
                 color: '#ffffff'
-              }}>Username:</label>
+              }}>Email:</label>
               <input 
-                type="text" 
-                id="username" 
-                name="username" 
+                type="email" 
+                id="email" 
+                name="email" 
+                value={email}
+                onChange={e => setEmail(e.target.value)}
                 required 
                 style={{
                   width: '100%',
@@ -278,6 +372,8 @@ const AdminPage = () => {
                 type="password" 
                 id="password" 
                 name="password" 
+                value={password}
+                onChange={e => setPassword(e.target.value)}
                 required 
                 style={{
                   width: '100%',
@@ -334,6 +430,18 @@ const AdminPage = () => {
               }}>{error}</p>
             )}
           </form>
+          {showChangePassword && (
+            <form onSubmit={handleChangePassword} style={{ marginTop: '2rem' }}>
+              <h2>Change Password (Required)</h2>
+              <div className="form-group">
+                <label htmlFor="newPassword">New Password:</label>
+                <input type="password" id="newPassword" name="newPassword" value={newPassword} onChange={e => setNewPassword(e.target.value)} required />
+              </div>
+              <button type="submit">Change Password</button>
+              {changePasswordError && <p className="error">{changePasswordError}</p>}
+              {changePasswordSuccess && <p className="success">{changePasswordSuccess}</p>}
+            </form>
+          )}
         </div>
       </div>
     );
@@ -597,6 +705,21 @@ const AdminPage = () => {
           )}
         </div>
       </div>
+
+      {isAuthenticated && (
+        <div style={{ margin: '2rem 0' }}>
+          <h2>Change Password</h2>
+          <form onSubmit={handleChangePassword}>
+            <div className="form-group">
+              <label htmlFor="newPassword">New Password:</label>
+              <input type="password" id="newPassword" name="newPassword" value={newPassword} onChange={e => setNewPassword(e.target.value)} required />
+            </div>
+            <button type="submit">Change Password</button>
+            {changePasswordError && <p className="error">{changePasswordError}</p>}
+            {changePasswordSuccess && <p className="success">{changePasswordSuccess}</p>}
+          </form>
+        </div>
+      )}
 
       <style jsx global>{`
         body {

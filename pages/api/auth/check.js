@@ -1,4 +1,7 @@
 import { parse } from 'cookie';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 // Add CORS headers
 function setCorsHeaders(res) {
@@ -28,13 +31,18 @@ export default async function handler(req, res) {
 
   try {
     const cookies = parse(req.headers.cookie || '');
-    const session = cookies.admin_session;
+    const access_token = cookies['sb-access-token'];
 
-    if (session === 'authenticated') {
-      return res.status(200).json({ authenticated: true });
+    if (!access_token) {
+      return res.status(401).json({ authenticated: false });
     }
 
-    return res.status(401).json({ authenticated: false });
+    const { data, error } = await supabase.auth.getUser(access_token);
+    if (error || !data.user || data.user.email !== 'windows.rift05@icloud.com') {
+      return res.status(401).json({ authenticated: false });
+    }
+
+    return res.status(200).json({ authenticated: true });
   } catch (error) {
     console.error('Auth check error:', error);
     return res.status(500).json({ error: 'Internal server error' });

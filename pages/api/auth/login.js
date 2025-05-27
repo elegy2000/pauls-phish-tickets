@@ -1,4 +1,6 @@
-import { serialize } from 'cookie';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 // Add CORS headers
 function setCorsHeaders(res) {
@@ -26,34 +28,20 @@ export default async function handler(req, res) {
 
   setCorsHeaders(res);
 
-  try {
-    const { username, password } = req.body;
+  const { email, password } = req.body;
 
-    // Get credentials from environment variables
-    const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-
-    if (!ADMIN_PASSWORD) {
-      console.error('ADMIN_PASSWORD environment variable is not set');
-      return res.status(500).json({ error: 'Server configuration error' });
-    }
-
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      // Set a session cookie with SameSite attribute
-      res.setHeader('Set-Cookie', serialize('admin_session', 'authenticated', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax', // Changed from 'strict' to 'lax' for better compatibility
-        maxAge: 3600, // 1 hour
-        path: '/',
-      }));
-
-      return res.status(200).json({ success: true });
-    }
-
-    return res.status(401).json({ error: 'Invalid credentials' });
-  } catch (error) {
-    console.error('Login error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+  if (email !== 'windows.rift05@icloud.com') {
+    return res.status(401).json({ error: 'Unauthorized: Only admin allowed' });
   }
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    return res.status(401).json({ error: error.message });
+  }
+
+  // Set a session cookie (optional: you may want to use Supabase's JWT/session)
+  res.setHeader('Set-Cookie', `sb-access-token=${data.session.access_token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600; Secure`);
+
+  return res.status(200).json({ success: true });
 } 

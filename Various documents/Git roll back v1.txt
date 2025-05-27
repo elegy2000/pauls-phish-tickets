@@ -1,0 +1,5 @@
+Perfect! You can now roll back to this stable version using: git checkout v1.0-stable
+3. Design Improvements - Modern Dark Theme
+	•	Rollback point created:
+	•	Tag: v2.0-dark-theme
+	•	Description: Stable version with full dark theme, new homepage title, and all July 2024 UI/branding improvements.
