@@ -103,6 +103,34 @@ export default function HomePage({ years, yearCounts, error }) {
         padding: '2rem',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
       }}>
+        <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center', marginBottom: '2.5rem' }}>
+          <img
+            src="https://hykzrxjtkpssrfmcerky.supabase.co/storage/v1/object/public/site-assets/logo.png"
+            alt="Phish Ticket Stub Archive Logo"
+            style={{
+              width: '220px',
+              maxWidth: '90vw',
+              height: 'auto',
+              margin: '0 auto 1.5rem auto',
+              display: 'block',
+              filter: 'drop-shadow(0 2px 12px rgba(0,0,0,0.25))',
+            }}
+          />
+          <p style={{
+            fontSize: '1.15rem',
+            color: '#e0e0e0',
+            lineHeight: 1.7,
+            margin: '0 auto 0.5rem auto',
+            fontWeight: 400,
+            maxWidth: '650px',
+            textAlign: 'center',
+            letterSpacing: '-0.01em',
+          }}>
+            Throughout Phish's storied career, nothing built the anticipation of a new tour like receiving your tickets in the mail, nothing signaled showtime like having your ticket ripped (and in later years scanned) at the door. That's because Phish tickets are so much more than entry passes—they're memories, shared experiences, individual works of art as unique as the shows themselves.<br /><br />
+            While the days of physical tickets are sadly behind us, this ticket stub archive aims to keep this important aspect of Phish's history and the live music experience alive. Inspired by the now-offline The Golgi Project, this resource catalogs years of Phish ticket art all in one place.<br /><br />
+            Huge thanks to early contributors Corey Girouard, Steve Bekkala, and Liron Unreich for helping to get this site off the ground. If you spot a show that's missing or have a better-quality scan, please contribute by sending your stubs or suggestions to <a href="mailto:phishticketstubs@gmail.com" style={{ color: '#4E94BF', textDecoration: 'underline', fontWeight: 500 }}>phishticketstubs@gmail.com</a>.
+          </p>
+        </div>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <h1 style={{ 
             fontSize: '3rem', 
