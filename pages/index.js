@@ -103,28 +103,31 @@ export default function HomePage({ years, yearCounts, error }) {
         padding: '2rem',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
       }}>
-        <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'left', marginBottom: '2.5rem' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'left', marginBottom: '2.5rem' }}>
           <img
             src="https://hykzrxjtkpssrfmcerky.supabase.co/storage/v1/object/public/site-assets/logo.png"
             alt="Phish Ticket Stub Archive Logo"
             style={{
-              width: '220px',
-              maxWidth: '90vw',
+              width: '320px',
+              maxWidth: '100%',
               height: 'auto',
-              margin: '0 0 1.5rem 0',
+              margin: '0 0 2rem 0',
               display: 'block',
               filter: 'drop-shadow(0 2px 12px rgba(0,0,0,0.25))',
             }}
           />
           <p style={{
-            fontSize: '1.15rem',
+            fontSize: '1.18rem',
             color: '#e0e0e0',
-            lineHeight: 1.7,
+            lineHeight: 1.75,
             margin: '0 0 0.5rem 0',
             fontWeight: 400,
-            maxWidth: '650px',
+            maxWidth: '900px',
             textAlign: 'left',
             letterSpacing: '-0.01em',
+            wordBreak: 'break-word',
+            hyphens: 'auto',
+            paddingRight: '1rem',
           }}>
             Throughout Phish's storied career, nothing built the anticipation of a new tour like receiving your tickets in the mail, nothing signaled showtime like having your ticket ripped (and in later years scanned) at the door. That's because Phish tickets are so much more than entry passes—they're memories, shared experiences, individual works of art as unique as the shows themselves.<br /><br />
             While the days of physical tickets are sadly behind us, this ticket stub archive aims to keep this important aspect of Phish's history and the live music experience alive. Inspired by the now-offline The Golgi Project, this resource catalogs years of Phish ticket art all in one place.<br /><br />
