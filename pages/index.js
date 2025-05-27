@@ -203,11 +203,11 @@ export default function HomePage({ years, yearCounts, error }) {
                 >
                   <div style={{
                     width: '100%',
-                    height: '300px',
-                    marginBottom: '1rem',
+                    height: '360px',
+                    marginBottom: '0.5rem',
                     borderRadius: '0.75rem',
                     overflow: 'hidden',
-                    background: '#181818',
+                    background: '#232323',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -233,21 +233,21 @@ export default function HomePage({ years, yearCounts, error }) {
                       onMouseLeave={e => e.target.style.transform = 'scale(1)'}
                     />
                   </div>
-                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899)', opacity: 0.8 }} />
                   <span style={{ 
                     display: 'block', 
                     fontSize: '2.25rem',
                     fontWeight: '700',
-                    marginBottom: '0.5rem',
+                    marginBottom: '0.25rem',
                     color: '#ffffff',
-                    marginTop: '0.5rem',
+                    marginTop: '1.25rem',
                   }}>
                     {year}
                   </span>
                   <span style={{
                     fontSize: '1.15rem',
                     color: '#a0a0a0',
-                    fontWeight: '500'
+                    fontWeight: '500',
+                    marginBottom: '0.25rem',
                   }}>
                     {yearCounts[year]} shows
                   </span>
