@@ -49,7 +49,7 @@ export async function getServerSideProps() {
         yearCounts[year] = (yearCounts[year] || 0) + 1;
       }
     });
-    const years = Object.keys(yearCounts).map(Number).sort((a, b) => b - a);
+    const years = Object.keys(yearCounts).map(Number).sort((a, b) => a - b);
     return {
       props: {
         years,
@@ -172,8 +172,8 @@ export default function HomePage({ years, yearCounts, error }) {
                   style={{
                     display: 'block',
                     padding: '1rem 1rem',
-                    backgroundColor: '#1a1a1a',
-                    border: '1px solid #2a2a2a',
+                    backgroundColor: '#232323',
+                    border: '1.5px solid #333',
                     borderRadius: '1rem',
                     textDecoration: 'none',
                     color: '#ffffff',
@@ -181,7 +181,7 @@ export default function HomePage({ years, yearCounts, error }) {
                     textAlign: 'center',
                     position: 'relative',
                     overflow: 'hidden',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)',
+                    boxShadow: '0 6px 24px rgba(0,0,0,0.7)',
                     minHeight: '420px',
                     display: 'flex',
                     flexDirection: 'column',
