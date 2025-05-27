@@ -132,38 +132,6 @@ export default function HomePage({ years, yearCounts, error }) {
           </p>
         </div>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'right', marginBottom: '3rem' }}>
-            <Link 
-              href="/admin"
-              style={{ 
-                display: 'inline-block', 
-                padding: '0.875rem 1.75rem', 
-                backgroundColor: '#1a1a1a', 
-                color: '#ffffff',
-                border: '1px solid #333333',
-                borderRadius: '0.75rem',
-                textDecoration: 'none',
-                fontWeight: '500',
-                fontSize: '0.95rem',
-                transition: 'all 0.2s ease',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-                marginTop: '2rem',
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = '#2a2a2a';
-                e.target.style.borderColor = '#444444';
-                e.target.style.transform = 'translateY(-1px)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = '#1a1a1a';
-                e.target.style.borderColor = '#333333';
-                e.target.style.transform = 'translateY(0)';
-              }}
-            >
-              Admin Dashboard
-            </Link>
-          </div>
-
           <div style={{ 
             display: 'grid', 
             gridTemplateColumns: windowWidth < 640 ? '1fr' : 
