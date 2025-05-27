@@ -158,10 +158,9 @@ export default function HomePage({ years, yearCounts, error }) {
           <div style={{ 
             display: 'grid', 
             gridTemplateColumns: windowWidth < 640 ? '1fr' : 
-                                windowWidth < 768 ? 'repeat(2, 1fr)' : 
-                                windowWidth < 1024 ? 'repeat(3, 1fr)' :
-                                'repeat(4, 1fr)', 
-            gap: '1.25rem',
+                                windowWidth < 1024 ? 'repeat(2, 1fr)' :
+                                'repeat(3, 1fr)', 
+            gap: '1.5rem',
             margin: '0 auto'
           }}>
             {years.map((year, index) => {
@@ -182,25 +181,30 @@ export default function HomePage({ years, yearCounts, error }) {
                     textAlign: 'center',
                     position: 'relative',
                     overflow: 'hidden',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)'
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)',
+                    minHeight: '420px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
                   }}
                   onMouseEnter={(e) => {
                     e.target.style.backgroundColor = '#2a2a2a';
                     e.target.style.borderColor = '#404040';
                     e.target.style.transform = 'translateY(-4px)';
-                    e.target.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.6)';
+                    e.target.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.7)';
                   }}
                   onMouseLeave={(e) => {
                     e.target.style.backgroundColor = '#1a1a1a';
                     e.target.style.borderColor = '#2a2a2a';
                     e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.4)';
+                    e.target.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.5)';
                   }}
                 >
                   <div style={{
                     width: '100%',
-                    height: '160px',
-                    marginBottom: '0.75rem',
+                    height: '300px',
+                    marginBottom: '1rem',
                     borderRadius: '0.75rem',
                     overflow: 'hidden',
                     background: '#181818',
@@ -208,6 +212,7 @@ export default function HomePage({ years, yearCounts, error }) {
                     alignItems: 'center',
                     justifyContent: 'center',
                     border: '1px solid #222',
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.25)',
                   }}>
                     <img
                       src={yearImageUrl}
@@ -231,15 +236,16 @@ export default function HomePage({ years, yearCounts, error }) {
                   <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899)', opacity: 0.8 }} />
                   <span style={{ 
                     display: 'block', 
-                    fontSize: '1.75rem',
+                    fontSize: '2.25rem',
                     fontWeight: '700',
                     marginBottom: '0.5rem',
-                    color: '#ffffff'
+                    color: '#ffffff',
+                    marginTop: '0.5rem',
                   }}>
                     {year}
                   </span>
                   <span style={{
-                    fontSize: '0.95rem',
+                    fontSize: '1.15rem',
                     color: '#a0a0a0',
                     fontWeight: '500'
                   }}>
