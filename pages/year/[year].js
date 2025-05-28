@@ -86,10 +86,26 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
             style={{
               display: 'inline-block',
               marginBottom: '1.5rem',
-              color: '#3b82f6',
+              padding: '0.875rem 1.75rem',
+              backgroundColor: '#1a1a1a',
+              color: '#ffffff',
+              border: '1px solid #333333',
+              borderRadius: '0.75rem',
               textDecoration: 'none',
-              fontSize: '1rem',
-              fontWeight: '500'
+              fontWeight: '500',
+              fontSize: '0.95rem',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#2a2a2a';
+              e.target.style.borderColor = '#444444';
+              e.target.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#1a1a1a';
+              e.target.style.borderColor = '#333333';
+              e.target.style.transform = 'translateY(0)';
             }}
           >
             ← Back to Years
@@ -114,14 +130,27 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
           style={{
             display: 'inline-block',
             marginBottom: '2rem',
-            color: '#3b82f6',
+            padding: '0.875rem 1.75rem',
+            backgroundColor: '#1a1a1a',
+            color: '#ffffff',
+            border: '1px solid #333333',
+            borderRadius: '0.75rem',
             textDecoration: 'none',
-            fontSize: '1rem',
             fontWeight: '500',
-            transition: 'color 0.2s ease'
+            fontSize: '0.95rem',
+            transition: 'all 0.2s ease',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
           }}
-          onMouseEnter={(e) => e.target.style.color = '#60a5fa'}
-          onMouseLeave={(e) => e.target.style.color = '#3b82f6'}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#2a2a2a';
+            e.target.style.borderColor = '#444444';
+            e.target.style.transform = 'translateY(-1px)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = '#1a1a1a';
+            e.target.style.borderColor = '#333333';
+            e.target.style.transform = 'translateY(0)';
+          }}
         >
           ← Back to Years
         </Link>
@@ -284,6 +313,37 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
             <p style={{ color: '#888888', fontSize: '1.1rem' }}>No tickets found for {year}</p>
           </div>
         )}
+
+        <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+          <Link 
+            href="/"
+            style={{
+              display: 'inline-block',
+              padding: '0.875rem 1.75rem',
+              backgroundColor: '#1a1a1a',
+              color: '#ffffff',
+              border: '1px solid #333333',
+              borderRadius: '0.75rem',
+              textDecoration: 'none',
+              fontWeight: '500',
+              fontSize: '0.95rem',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#2a2a2a';
+              e.target.style.borderColor = '#444444';
+              e.target.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#1a1a1a';
+              e.target.style.borderColor = '#333333';
+              e.target.style.transform = 'translateY(0)';
+            }}
+          >
+            ← Back to Years
+          </Link>
+        </div>
 
         {lightboxImage && (
           <div

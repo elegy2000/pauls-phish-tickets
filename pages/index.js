@@ -108,7 +108,7 @@ export default function HomePage({ years, yearCounts, error }) {
             src="https://hykzrxjtkpssrfmcerky.supabase.co/storage/v1/object/public/site-assets/logo.png"
             alt="Phish Ticket Stub Archive Logo"
             style={{
-              width: '320px',
+              width: '450px',
               maxWidth: '100%',
               height: 'auto',
               margin: '0 0 2rem 0',

@@ -566,15 +566,6 @@ const AdminPage = () => {
           <button 
             onClick={handleLogout}
             className="logout-button"
-            style={{
-              background: '#dc3545',
-              color: 'white',
-              border: 'none',
-              padding: '8px 16px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '14px'
-            }}
           >
             Logout
           </button>
@@ -890,6 +881,33 @@ const AdminPage = () => {
           color: #ffffff;
           min-height: 100vh;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        .admin-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+        
+        .logout-button {
+          padding: 0.875rem 1.75rem !important;
+          background: #dc3545 !important;
+          color: white !important;
+          border: 1px solid #dc3545 !important;
+          border-radius: 0.75rem !important;
+          cursor: pointer !important;
+          font-size: 0.95rem !important;
+          font-weight: 500 !important;
+          transition: all 0.2s ease !important;
+          box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3) !important;
+        }
+        
+        .logout-button:hover {
+          background: #c82333 !important;
+          border-color: #c82333 !important;
+          transform: translateY(-1px) !important;
+          box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4) !important;
         }
         
         .admin-content {

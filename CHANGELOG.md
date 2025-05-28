@@ -36,6 +36,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Status: Complete, live on production
 
 ### Latest Completed (January 2025)
+- [x] **Back to Years Link at Top & Bottom** - ✅ COMPLETE
+  - ✅ **Added second 'Back to Years' button at the bottom of all year pages**
+  - ✅ **Consistent styling with top button and Admin Dashboard button design**
+  - ✅ **Centered positioning for balanced layout at page bottom**
+  - ✅ **Enhanced user experience for easier navigation after scrolling through content**
+  - ✅ **Maintained arrow (←) for consistent navigation patterns**
+  - Date: January 2025
+  - Status: Complete
+
+- [x] **Consistent Button Styling** - ✅ COMPLETE
+  - ✅ **Updated 'Back to Years' button styling to match Admin Dashboard button design**
+  - ✅ **Maintained arrow (←) for clear navigation indication and continuity**
+  - ✅ **Applied consistent padding, background, border, and border-radius styling**
+  - ✅ **Added matching hover effects with smooth transitions**
+  - ✅ **Enhanced visual consistency across all navigation buttons**
+  - Date: January 2025
+  - Status: Complete
+
+- [x] **Admin Button Alignment** - ✅ COMPLETE
+  - ✅ **Aligned logout button with back to home button at the same height**
+  - ✅ **Updated logout button styling to match Back to Home button design (same padding, border radius, font size)**
+  - ✅ **Maintained red color for logout button while improving visual consistency**
+  - ✅ **Added flex layout to admin-header for proper horizontal alignment**
+  - ✅ **Enhanced logout button with hover effects and improved spacing**
+  - Date: January 2025
+  - Status: Complete
+
 - [x] **Modern Dark Theme Design Implementation**
   - ✅ **Complete UI overhaul with dark theme (#0f0f0f background) for better image contrast**
   - ✅ **Improved year box visibility with high-contrast styling and gradient accents**
@@ -270,12 +297,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### To-Do / Planned
 
 - [ ] Get Vercel MPCs (Managed Project Configurations) to work with Cursor (Supabase works; only Vercel is not working)
+- [ ] **Year Images Upload Manager**: Add admin functionality to replace homepage year images
+  - Create new admin section with same design as existing "Image Upload" section
+  - Allow uploading new images to replace existing year images in Supabase Storage (`year-images` bucket)
+  - Enforce filename matching: uploaded images must have exact same names as existing year images they're replacing
+  - Implement direct replacement in Supabase Storage (same location, same filename)
+  - Maintain consistency with existing admin interface styling and user experience
+  - Validate image formats and provide user feedback during upload process
+- [ ] **Homepage Content Editor**: Add admin functionality to edit homepage opening paragraph
+  - Create new admin section following same design guidelines as other admin features
+  - Allow editing and updating the homepage opening paragraph text content
+  - Store content in Supabase database for dynamic loading on homepage
+  - Include text area with preview functionality and save/cancel options
+  - Maintain consistent styling with existing admin interface
+  - Provide real-time content updates without code deployment
 - [ ] Admin Change Password Section: Add a change password section to the admin page for improved security and user management
-- [ ] Back to Years Link at Top & Bottom: Add 'Back to Years' link at both the top and bottom of all scrollable pages (e.g., YEAR pages) for easier navigation
-- [ ] Consistent Button Styling: Update 'Back to Years' button to match the style of the 'Admin Dashboard' button, but keep the arrow for clarity and continuity
-- [ ] Admin Dashboard Button on YEAR Pages: Add 'Admin Dashboard' button to the bottom of each YEAR page, in the same location as on the homepage, for consistent admin access
 - [ ] Test and document the new workflow
-- [ ] Set up and verify custom domain on Vercel 
+- [ ] Set up and verify custom domain on Vercel
 
 ## [Latest] - 2024-12-27
 
