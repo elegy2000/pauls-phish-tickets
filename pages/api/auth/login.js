@@ -40,8 +40,9 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: error.message });
   }
 
-  // Set a session cookie (optional: you may want to use Supabase's JWT/session)
-  res.setHeader('Set-Cookie', `sb-access-token=${data.session.access_token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600; Secure`);
-
-  return res.status(200).json({ success: true });
+  // Return session data so frontend can establish the session
+  return res.status(200).json({ 
+    success: true,
+    session: data.session
+  });
 } 

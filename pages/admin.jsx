@@ -151,7 +151,16 @@ const AdminPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
+      
       if (response.ok) {
+        const data = await response.json();
+        
+        // Establish the Supabase session on the frontend
+        if (data.session) {
+          const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+          await supabase.auth.setSession(data.session);
+        }
+        
         setIsAuthenticated(true);
       } else {
         const data = await response.json();
@@ -159,6 +168,19 @@ const AdminPage = () => {
       }
     } catch (err) {
       setError('Login failed. Please try again.');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+      await supabase.auth.signOut();
+      setIsAuthenticated(false);
+      setActiveTab('tickets');
+      setEmail('');
+      setPassword('');
+    } catch (err) {
+      console.error('Logout error:', err);
     }
   };
 
@@ -235,7 +257,8 @@ const AdminPage = () => {
         setPasswordStrength('');
         
         // Log out user so they can log in with new password
-        setTimeout(() => {
+        setTimeout(async () => {
+          await supabase.auth.signOut();
           setIsAuthenticated(false);
           setActiveTab('tickets');
         }, 2000);
@@ -537,292 +560,311 @@ const AdminPage = () => {
         </Link>
       </div>
       
-      <h1>Admin Dashboard</h1>
-      
-      <div className="admin-content">
-        <div className="custom-warning">
-          <p><strong>Important:</strong> Changes made through this interface are being saved to the GitHub repository 
-          and will persist across deployments. There might be a 1-2 minute delay before changes are visible on the live site 
-          as a new deployment is triggered automatically.</p>
-        </div>
-      
-        <div className="tabs">
-          <button
-            className={`tab-button ${activeTab === 'csv' ? 'active' : ''}`}
-            onClick={() => setActiveTab('csv')}
+      <div className="admin-container">
+        <div className="admin-header">
+          <h1>Admin Dashboard</h1>
+          <button 
+            onClick={handleLogout}
+            className="logout-button"
+            style={{
+              background: '#dc3545',
+              color: 'white',
+              border: 'none',
+              padding: '8px 16px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
           >
-            CSV Management
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'images' ? 'active' : ''}`}
-            onClick={() => setActiveTab('images')}
-          >
-            Image Upload
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'tickets' ? 'active' : ''}`}
-            onClick={() => setActiveTab('tickets')}
-          >
-            Current Tickets
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'add' ? 'active' : ''}`}
-            onClick={() => setActiveTab('add')}
-          >
-            Add Ticket
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'settings' ? 'active' : ''}`}
-            onClick={() => setActiveTab('settings')}
-          >
-            Settings
+            Logout
           </button>
         </div>
+      
+        <div className="admin-content">
+          <div className="custom-warning">
+            <p><strong>Important:</strong> Changes made through this interface are being saved to the GitHub repository 
+            and will persist across deployments. There might be a 1-2 minute delay before changes are visible on the live site 
+            as a new deployment is triggered automatically.</p>
+          </div>
+        
+          <div className="tabs">
+            <button
+              className={`tab-button ${activeTab === 'csv' ? 'active' : ''}`}
+              onClick={() => setActiveTab('csv')}
+            >
+              CSV Management
+            </button>
+            <button
+              className={`tab-button ${activeTab === 'images' ? 'active' : ''}`}
+              onClick={() => setActiveTab('images')}
+            >
+              Image Upload
+            </button>
+            <button
+              className={`tab-button ${activeTab === 'tickets' ? 'active' : ''}`}
+              onClick={() => setActiveTab('tickets')}
+            >
+              Current Tickets
+            </button>
+            <button
+              className={`tab-button ${activeTab === 'add' ? 'active' : ''}`}
+              onClick={() => setActiveTab('add')}
+            >
+              Add Ticket
+            </button>
+            <button
+              className={`tab-button ${activeTab === 'settings' ? 'active' : ''}`}
+              onClick={() => setActiveTab('settings')}
+            >
+              Settings
+            </button>
+          </div>
 
-        <div className="tab-content">
-          {activeTab === 'csv' && (
-            <CsvHandler />
-          )}
-          {activeTab === 'images' && (
-            <ImageUploader />
-          )}
-          {activeTab === 'tickets' && (
-            <div className="tickets-container">
-              <h2>Current Tickets</h2>
-              {isLoading && <p>Loading ticket data...</p>}
-              {dataError && <p className="error">{dataError}</p>}
-              
-              {!isLoading && !dataError && (
-                <>
-                  <div className="export-section">
-                    <button className="export-button" onClick={handleExportCsv}>
-                      Export to CSV
-                    </button>
-                  </div>
-                  <p>Total tickets: {tickets.length}</p>
-                  <div className="table-wrapper">
-                    <table className="tickets-table">
-                      <thead>
-                        <tr>
-                          <th>YEAR</th>
-                          <th>DATE</th>
-                          <th>VENUE</th>
-                          <th>LOCATION</th>
-                          <th>IMAGE</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {tickets.map((ticket, index) => {
-                          // Check if ticket has an image by extracting filename from imageurl
-                          // OR by checking if any image exists for this date
-                          const hasImage = (() => {
-                            // Don't check if images haven't loaded yet
-                            if (availableImages.size === 0) {
-                              if (index < 3) {
-                                console.log(`Ticket ${ticket.date}: availableImages not loaded yet (size: ${availableImages.size})`);
+          <div className="tab-content">
+            {activeTab === 'csv' && (
+              <CsvHandler />
+            )}
+            {activeTab === 'images' && (
+              <ImageUploader />
+            )}
+            {activeTab === 'tickets' && (
+              <div className="tickets-container">
+                <h2>Current Tickets</h2>
+                {isLoading && <p>Loading ticket data...</p>}
+                {dataError && <p className="error">{dataError}</p>}
+                
+                {!isLoading && !dataError && (
+                  <>
+                    <div className="export-section">
+                      <button className="export-button" onClick={handleExportCsv}>
+                        Export to CSV
+                      </button>
+                    </div>
+                    <p>Total tickets: {tickets.length}</p>
+                    <div className="table-wrapper">
+                      <table className="tickets-table">
+                        <thead>
+                          <tr>
+                            <th>YEAR</th>
+                            <th>DATE</th>
+                            <th>VENUE</th>
+                            <th>LOCATION</th>
+                            <th>IMAGE</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {tickets.map((ticket, index) => {
+                            // Check if ticket has an image by extracting filename from imageurl
+                            // OR by checking if any image exists for this date
+                            const hasImage = (() => {
+                              // Don't check if images haven't loaded yet
+                              if (availableImages.size === 0) {
+                                if (index < 3) {
+                                  console.log(`Ticket ${ticket.date}: availableImages not loaded yet (size: ${availableImages.size})`);
+                                }
+                                return false;
                               }
-                              return false;
-                            }
 
-                            try {
-                              // First, check if there's a valid imageurl
-                              if (ticket.imageurl && ticket.imageurl.trim()) {
-                                const url = new URL(ticket.imageurl);
-                                const filename = url.pathname.split('/').pop();
-                                const imageExists = availableImages.has(filename);
+                              try {
+                                // First, check if there's a valid imageurl
+                                if (ticket.imageurl && ticket.imageurl.trim()) {
+                                  const url = new URL(ticket.imageurl);
+                                  const filename = url.pathname.split('/').pop();
+                                  const imageExists = availableImages.has(filename);
+                                  
+                                  // Debug logging for first few tickets
+                                  if (index < 5) {
+                                    console.log(`Ticket ${ticket.date} (with imageurl):`, {
+                                      imageurl: ticket.imageurl,
+                                      filename: filename,
+                                      imageExists: imageExists,
+                                      availableImagesSize: availableImages.size
+                                    });
+                                  }
+                                  
+                                  return imageExists;
+                                }
                                 
-                                // Debug logging for first few tickets
-                                if (index < 5) {
-                                  console.log(`Ticket ${ticket.date} (with imageurl):`, {
+                                // If no imageurl, check if any image exists for this date
+                                const datePattern = ticket.date; // e.g., "2022-09-02"
+                                const hasImageByDate = Array.from(availableImages).some(filename => 
+                                  filename.includes(datePattern)
+                                );
+                                
+                                // Debug logging for first few tickets without imageurl
+                                if (index < 5 && (!ticket.imageurl || !ticket.imageurl.trim())) {
+                                  console.log(`Ticket ${ticket.date} (no imageurl):`, {
                                     imageurl: ticket.imageurl,
-                                    filename: filename,
-                                    imageExists: imageExists,
-                                    availableImagesSize: availableImages.size
+                                    datePattern: datePattern,
+                                    hasImageByDate: hasImageByDate,
+                                    availableImagesCount: availableImages.size,
+                                    matchingImages: Array.from(availableImages).filter(name => name.includes(datePattern))
                                   });
                                 }
                                 
-                                return imageExists;
+                                return hasImageByDate;
+                              } catch (error) {
+                                console.error('Error processing ticket:', ticket.date, error);
+                                return false;
                               }
-                              
-                              // If no imageurl, check if any image exists for this date
-                              const datePattern = ticket.date; // e.g., "2022-09-02"
-                              const hasImageByDate = Array.from(availableImages).some(filename => 
-                                filename.includes(datePattern)
-                              );
-                              
-                              // Debug logging for first few tickets without imageurl
-                              if (index < 5 && (!ticket.imageurl || !ticket.imageurl.trim())) {
-                                console.log(`Ticket ${ticket.date} (no imageurl):`, {
-                                  imageurl: ticket.imageurl,
-                                  datePattern: datePattern,
-                                  hasImageByDate: hasImageByDate,
-                                  availableImagesCount: availableImages.size,
-                                  matchingImages: Array.from(availableImages).filter(name => name.includes(datePattern))
-                                });
-                              }
-                              
-                              return hasImageByDate;
-                            } catch (error) {
-                              console.error('Error processing ticket:', ticket.date, error);
-                              return false;
-                            }
-                          })();
-                          
-                          return (
-                            <tr key={index}>
-                              <td>{ticket.year}</td>
-                              <td>{ticket.date}</td>
-                              <td>{ticket.venue}</td>
-                              <td>{ticket.city_state}</td>
-                              <td className="image-cell">
-                                {availableImages.size === 0 ? (
-                                  <span style={{color: '#666'}}>...</span>
-                                ) : hasImage ? (
-                                  <span className="checkmark">✓</span>
-                                ) : (
-                                  <span className="no-image">-</span>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-          {activeTab === 'add' && (
-            <div className="add-ticket-container">
-              <h2>Add Ticket</h2>
-              <form onSubmit={handleAddTicket}>
-                <div className="form-group">
-                  <label htmlFor="year">Year:</label>
-                  <input 
-                    type="text" 
-                    id="year" 
-                    name="year" 
-                    value={newTicket.year}
-                    onChange={handleInputChange}
-                    required 
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="date">Date:</label>
-                  <input 
-                    type="text" 
-                    id="date" 
-                    name="date" 
-                    value={newTicket.date}
-                    onChange={handleInputChange}
-                    placeholder="mm/dd/yyyy"
-                    required 
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="venue">Venue:</label>
-                  <input 
-                    type="text" 
-                    id="venue" 
-                    name="venue" 
-                    value={newTicket.venue}
-                    onChange={handleInputChange}
-                    required 
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="city_state">City, State:</label>
-                  <input 
-                    type="text" 
-                    id="city_state" 
-                    name="city_state" 
-                    value={newTicket.city_state}
-                    onChange={handleInputChange}
-                    required 
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="imageFileName">Image file name (include ext.) (optional):</label>
-                  <input 
-                    type="text" 
-                    id="imageFileName" 
-                    name="imageFileName" 
-                    value={newTicket.imageFileName || ''}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="net_link">NFT Link (optional):</label>
-                  <input 
-                    type="text" 
-                    id="net_link" 
-                    name="net_link" 
-                    value={newTicket.net_link}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <button type="submit">Add Ticket</button>
-              </form>
-            </div>
-          )}
-          {activeTab === 'settings' && (
-            <div className="settings-container">
-              <h2>Account Settings</h2>
-              
-              <div className="settings-section">
-                <h3>Change Password</h3>
-                <p style={{ color: '#a0a0a0', marginBottom: '1rem', fontSize: '0.9rem' }}>
-                  Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character.
-                </p>
-                <form onSubmit={handleChangePassword}>
+                            })();
+                            
+                            return (
+                              <tr key={index}>
+                                <td>{ticket.year}</td>
+                                <td>{ticket.date}</td>
+                                <td>{ticket.venue}</td>
+                                <td>{ticket.city_state}</td>
+                                <td className="image-cell">
+                                  {availableImages.size === 0 ? (
+                                    <span style={{color: '#666'}}>...</span>
+                                  ) : hasImage ? (
+                                    <span className="checkmark">✓</span>
+                                  ) : (
+                                    <span className="no-image">-</span>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+            {activeTab === 'add' && (
+              <div className="add-ticket-container">
+                <h2>Add Ticket</h2>
+                <form onSubmit={handleAddTicket}>
                   <div className="form-group">
-                    <label htmlFor="newPassword">New Password:</label>
+                    <label htmlFor="year">Year:</label>
                     <input 
-                      type="password" 
-                      id="newPassword" 
-                      name="newPassword" 
-                      value={newPassword} 
-                      onChange={handlePasswordChange} 
-                      required 
-                    />
-                    {passwordStrength && (
-                      <div style={{ 
-                        marginTop: '0.5rem', 
-                        fontSize: '0.875rem', 
-                        color: passwordStrength.color,
-                        fontWeight: '500'
-                      }}>
-                        Password strength: {passwordStrength.strength}
-                      </div>
-                    )}
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="confirmPassword">Confirm Password:</label>
-                    <input 
-                      type="password" 
-                      id="confirmPassword" 
-                      name="confirmPassword" 
-                      value={confirmPassword} 
-                      onChange={e => setConfirmPassword(e.target.value)} 
+                      type="text" 
+                      id="year" 
+                      name="year" 
+                      value={newTicket.year}
+                      onChange={handleInputChange}
                       required 
                     />
                   </div>
-                  <button type="submit">Change Password</button>
-                  {changePasswordError && (
-                    <p style={{ color: '#ef4444', marginTop: '1rem', fontSize: '0.875rem' }}>
-                      {changePasswordError}
-                    </p>
-                  )}
-                  {changePasswordSuccess && (
-                    <p style={{ color: '#10b981', marginTop: '1rem', fontSize: '0.875rem' }}>
-                      {changePasswordSuccess}
-                    </p>
-                  )}
+                  <div className="form-group">
+                    <label htmlFor="date">Date:</label>
+                    <input 
+                      type="text" 
+                      id="date" 
+                      name="date" 
+                      value={newTicket.date}
+                      onChange={handleInputChange}
+                      placeholder="mm/dd/yyyy"
+                      required 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="venue">Venue:</label>
+                    <input 
+                      type="text" 
+                      id="venue" 
+                      name="venue" 
+                      value={newTicket.venue}
+                      onChange={handleInputChange}
+                      required 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="city_state">City, State:</label>
+                    <input 
+                      type="text" 
+                      id="city_state" 
+                      name="city_state" 
+                      value={newTicket.city_state}
+                      onChange={handleInputChange}
+                      required 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="imageFileName">Image file name (include ext.) (optional):</label>
+                    <input 
+                      type="text" 
+                      id="imageFileName" 
+                      name="imageFileName" 
+                      value={newTicket.imageFileName || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="net_link">NFT Link (optional):</label>
+                    <input 
+                      type="text" 
+                      id="net_link" 
+                      name="net_link" 
+                      value={newTicket.net_link}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <button type="submit">Add Ticket</button>
                 </form>
               </div>
-            </div>
-          )}
+            )}
+            {activeTab === 'settings' && (
+              <div className="settings-container">
+                <h2>Account Settings</h2>
+                
+                <div className="settings-section">
+                  <h3>Change Password</h3>
+                  <p style={{ color: '#a0a0a0', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                    Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character.
+                  </p>
+                  <form onSubmit={handleChangePassword}>
+                    <div className="form-group">
+                      <label htmlFor="newPassword">New Password:</label>
+                      <input 
+                        type="password" 
+                        id="newPassword" 
+                        name="newPassword" 
+                        value={newPassword} 
+                        onChange={handlePasswordChange} 
+                        required 
+                      />
+                      {passwordStrength && (
+                        <div style={{ 
+                          marginTop: '0.5rem', 
+                          fontSize: '0.875rem', 
+                          color: passwordStrength.color,
+                          fontWeight: '500'
+                        }}>
+                          Password strength: {passwordStrength.strength}
+                        </div>
+                      )}
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="confirmPassword">Confirm Password:</label>
+                      <input 
+                        type="password" 
+                        id="confirmPassword" 
+                        name="confirmPassword" 
+                        value={confirmPassword} 
+                        onChange={e => setConfirmPassword(e.target.value)} 
+                        required 
+                      />
+                    </div>
+                    <button type="submit">Change Password</button>
+                    {changePasswordError && (
+                      <p style={{ color: '#ef4444', marginTop: '1rem', fontSize: '0.875rem' }}>
+                        {changePasswordError}
+                      </p>
+                    )}
+                    {changePasswordSuccess && (
+                      <p style={{ color: '#10b981', marginTop: '1rem', fontSize: '0.875rem' }}>
+                        {changePasswordSuccess}
+                      </p>
+                    )}
+                  </form>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
