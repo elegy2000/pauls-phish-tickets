@@ -128,16 +128,12 @@ const AdminPage = () => {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    // Check if admin user exists in Supabase Auth
+    // Check if admin user exists using backend API
     const checkAdminUser = async () => {
       try {
-        const { data, error } = await supabase.auth.admin.listUsers();
-        if (error) {
-          setAdminExists(true); // fallback: assume exists to avoid lockout
-          return;
-        }
-        const found = data.users.some(u => u.email === 'windows.rift05@icloud.com');
-        setAdminExists(found);
+        const response = await fetch('/api/auth/admin-exists');
+        const data = await response.json();
+        setAdminExists(!!data.exists);
       } catch (err) {
         setAdminExists(true); // fallback: assume exists
       }
