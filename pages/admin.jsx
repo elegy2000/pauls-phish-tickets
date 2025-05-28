@@ -11,7 +11,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // IMPORTANT: For security, only use this secret for initial admin setup, then remove from frontend!
-const ADMIN_CREATE_SECRET = process.env.NEXT_PUBLIC_ADMIN_CREATE_SECRET || 'a8f7b2c9e4d6f1g3h5j7k9l2m4n6p8q0'; // Replace with your actual secret or use env var
+const ADMIN_CREATE_SECRET = process.env.NEXT_PUBLIC_ADMIN_CREATE_SECRET || 'temp-admin-setup-secret-2024';
 
 const AdminPage = () => {
   const router = useRouter();
@@ -253,6 +253,7 @@ const AdminPage = () => {
     e.preventDefault();
     setRegisterError('');
     setRegisterSuccess('');
+    console.log('Starting admin registration...', { email: registerEmail, secretUsed: ADMIN_CREATE_SECRET });
     try {
       const response = await fetch('/api/auth/create-admin', {
         method: 'POST',
@@ -264,6 +265,7 @@ const AdminPage = () => {
         }),
       });
       const data = await response.json();
+      console.log('Admin creation response:', { status: response.status, data });
       if (!response.ok) {
         setRegisterError(data.error || 'Failed to create admin user.');
       } else {
@@ -271,6 +273,7 @@ const AdminPage = () => {
         setAdminExists(true);
       }
     } catch (err) {
+      console.error('Admin registration error:', err);
       setRegisterError('Failed to create admin user.');
     }
   };
