@@ -10,50 +10,60 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export async function getServerSideProps() {
   try {
-    // TEMP: Log Supabase URL and anon key for debugging
-    console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-    console.log('Supabase Anon Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-
-    // Fetch all years and show counts directly from Supabase in batches of 1000
-    let allYearData = [];
+    // Initialize Supabase client for server-side operations
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseServer = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Fetch all years and counts using Supabase server client in batches
+    let allTickets = [];
     let batchIndex = 0;
     const batchSize = 1000;
+    
     while (true) {
-      const { data: yearData, error: yearError } = await supabase
+      const { data: ticketBatch, error } = await supabaseServer
         .from('ticket_stubs')
         .select('year')
-        .order('year', { ascending: false })
+        .order('year', { ascending: true })
         .range(batchIndex * batchSize, (batchIndex + 1) * batchSize - 1);
-      if (yearError) {
-        console.error('Error fetching years:', yearError);
-        return {
-          props: {
-            years: [],
-            yearCounts: {},
-            error: yearError.message
-          }
-        };
+      
+      if (error) {
+        throw error;
       }
-      if (!yearData || yearData.length === 0) break;
-      allYearData = allYearData.concat(yearData);
-      if (yearData.length < batchSize) break;
+      
+      if (!ticketBatch || ticketBatch.length === 0) break;
+      
+      allTickets = allTickets.concat(ticketBatch);
+      
+      if (ticketBatch.length < batchSize) break;
       batchIndex++;
     }
-    // Count shows per year, robust to string/number/whitespace
+
+    // Fetch homepage content
+    const { data: homepageContent, error: contentError } = await supabaseServer
+      .from('homepage_content')
+      .select('content_text')
+      .eq('content_key', 'opening_paragraph')
+      .single();
+
+    if (contentError) {
+      console.error('Error fetching homepage content:', contentError);
+    }
+
+    // Calculate year counts and get unique years
     const yearCounts = {};
-    allYearData.forEach(ticket => {
-      let year = ticket.year;
-      if (typeof year === 'string') year = year.trim();
-      year = Number(year);
-      if (year && !isNaN(year)) {
-        yearCounts[year] = (yearCounts[year] || 0) + 1;
-      }
+    allTickets.forEach(ticket => {
+      const year = ticket.year;
+      yearCounts[year] = (yearCounts[year] || 0) + 1;
     });
-    const years = Object.keys(yearCounts).map(Number).sort((a, b) => a - b);
+
+    const years = Object.keys(yearCounts).map(year => parseInt(year)).sort((a, b) => a - b);
+
     return {
       props: {
         years,
         yearCounts,
+        homepageContent: homepageContent?.content_text || 'Throughout Phish\'s storied career, nothing built the anticipation of a new tour like receiving your tickets in the mail, nothing signaled showtime like having your ticket ripped (and in later years scanned) at the door. That\'s because Phish tickets are so much more than entry passes—they\'re memories, shared experiences, individual works of art as unique as the shows themselves.<br /><br />While the days of physical tickets are sadly behind us, this ticket stub archive aims to keep this important aspect of Phish\'s history and the live music experience alive. Inspired by the now-offline The Golgi Project, this resource catalogs years of Phish ticket art all in one place.<br /><br />Huge thanks to early contributors Corey Girouard, Steve Bekkala, and Liron Unreich for helping to get this site off the ground. If you spot a show that\'s missing or have a better-quality scan, please contribute by sending your stubs or suggestions to <a href="mailto:phishticketstubs@gmail.com" style="color: #4E94BF; text-decoration: underline; font-weight: 500;">phishticketstubs@gmail.com</a>.',
         error: null
       }
     };
@@ -61,15 +71,16 @@ export async function getServerSideProps() {
     console.error('Error in getServerSideProps:', error);
     return {
       props: {
-        tickets: [],
         years: [],
+        yearCounts: {},
+        homepageContent: '',
         error: error.message
       }
     };
   }
 }
 
-export default function HomePage({ years, yearCounts, error }) {
+export default function HomePage({ years, yearCounts, homepageContent, error }) {
   const [windowWidth, setWindowWidth] = useState(1024);
 
   useEffect(() => {
@@ -128,11 +139,9 @@ export default function HomePage({ years, yearCounts, error }) {
             wordBreak: 'break-word',
             hyphens: 'auto',
             paddingRight: '1rem',
-          }}>
-            Throughout Phish's storied career, nothing built the anticipation of a new tour like receiving your tickets in the mail, nothing signaled showtime like having your ticket ripped (and in later years scanned) at the door. That's because Phish tickets are so much more than entry passes—they're memories, shared experiences, individual works of art as unique as the shows themselves.<br /><br />
-            While the days of physical tickets are sadly behind us, this ticket stub archive aims to keep this important aspect of Phish's history and the live music experience alive. Inspired by the now-offline The Golgi Project, this resource catalogs years of Phish ticket art all in one place.<br /><br />
-            Huge thanks to early contributors Corey Girouard, Steve Bekkala, and Liron Unreich for helping to get this site off the ground. If you spot a show that's missing or have a better-quality scan, please contribute by sending your stubs or suggestions to <a href="mailto:phishticketstubs@gmail.com" style={{ color: '#4E94BF', textDecoration: 'underline', fontWeight: 500 }}>phishticketstubs@gmail.com</a>.
-          </p>
+          }}
+          dangerouslySetInnerHTML={{ __html: homepageContent }}
+          />
         </div>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <div style={{ 

@@ -36,6 +36,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Status: Complete, live on production
 
 ### Latest Completed (January 2025)
+- [x] **Homepage Content Editor** - ✅ COMPLETE
+  - ✅ **Added new "Content Editor" tab to admin dashboard**
+  - ✅ **Created database table to store homepage content dynamically**
+  - ✅ **Built rich text editor interface with live preview functionality**
+  - ✅ **Homepage now loads content dynamically from Supabase database**
+  - ✅ **Supports HTML formatting (links, line breaks, styling)**
+  - ✅ **Real-time content updates without code deployment**
+  - ✅ **Consistent admin interface styling and user experience**
+  - ✅ **Auto-save detection and cancel functionality**
+  - ✅ **Character count and validation feedback**
+  - ✅ **Responsive design for mobile and desktop editing**
+  - Date: January 2025
+  - Status: Complete
+
 - [x] **Year Images Upload Manager** - ✅ COMPLETE
   - ✅ **Added dedicated section to Image Upload tab in admin dashboard**
   - ✅ **Filename validation ensures uploaded images match existing year images exactly**
@@ -310,7 +324,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### To-Do / Planned
 
 - [ ] Get Vercel MPCs (Managed Project Configurations) to work with Cursor (Supabase works; only Vercel is not working)
-- [ ] Admin Change Password Section: Add a change password section to the admin page for improved security and user management
 - [ ] Test and document the new workflow
 - [ ] Set up and verify custom domain on Vercel
 

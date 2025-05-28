@@ -4,6 +4,7 @@ import CsvHandler from '../src/components/CsvHandler';
 import Link from 'next/link';
 import ImageUploader from '../src/components/ImageUploader';
 import { createClient } from '@supabase/supabase-js';
+import ContentEditor from '../src/components/ContentEditor';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -592,6 +593,12 @@ const AdminPage = () => {
               Image Upload
             </button>
             <button
+              className={`tab-button ${activeTab === 'content' ? 'active' : ''}`}
+              onClick={() => setActiveTab('content')}
+            >
+              Content Editor
+            </button>
+            <button
               className={`tab-button ${activeTab === 'tickets' ? 'active' : ''}`}
               onClick={() => setActiveTab('tickets')}
             >
@@ -617,6 +624,9 @@ const AdminPage = () => {
             )}
             {activeTab === 'images' && (
               <ImageUploader />
+            )}
+            {activeTab === 'content' && (
+              <ContentEditor />
             )}
             {activeTab === 'tickets' && (
               <div className="tickets-container">
