@@ -17,7 +17,7 @@ const AdminPage = () => {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState('csv'); // 'csv' or 'images'
+  const [activeTab, setActiveTab] = useState('tickets');
   const [tickets, setTickets] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dataError, setDataError] = useState('');
@@ -32,15 +32,16 @@ const AdminPage = () => {
   });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showChangePassword, setShowChangePassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [changePasswordError, setChangePasswordError] = useState('');
   const [changePasswordSuccess, setChangePasswordSuccess] = useState('');
   const [adminExists, setAdminExists] = useState(null); // null = loading, false = not exists, true = exists
-  const [registerEmail, setRegisterEmail] = useState('windows.rift05@icloud.com');
+  const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [registerError, setRegisterError] = useState('');
   const [registerSuccess, setRegisterSuccess] = useState('');
+  const [passwordStrength, setPasswordStrength] = useState('');
 
   useEffect(() => {
     // Check if user is already authenticated
@@ -152,10 +153,6 @@ const AdminPage = () => {
       });
       if (response.ok) {
         setIsAuthenticated(true);
-        // If using initial password, prompt for change
-        if (password === 'TempAdmin2024!') {
-          setShowChangePassword(true);
-        }
       } else {
         const data = await response.json();
         setError(data.error || 'Invalid credentials');
@@ -165,23 +162,87 @@ const AdminPage = () => {
     }
   };
 
+  const validatePassword = (password) => {
+    const requirements = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+      special: /[@$!%*?&]/.test(password)
+    };
+    
+    const passed = Object.values(requirements).filter(Boolean).length;
+    const total = Object.keys(requirements).length;
+    
+    if (passed === total) return { strength: 'Strong', color: '#10b981' };
+    if (passed >= 3) return { strength: 'Medium', color: '#f59e0b' };
+    return { strength: 'Weak', color: '#ef4444' };
+  };
+
+  const handlePasswordChange = (e) => {
+    const password = e.target.value;
+    setNewPassword(password);
+    
+    if (password) {
+      const validation = validatePassword(password);
+      setPasswordStrength(validation);
+    } else {
+      setPasswordStrength('');
+    }
+  };
+
   const handleChangePassword = async (e) => {
     e.preventDefault();
     setChangePasswordError('');
     setChangePasswordSuccess('');
+
+    if (newPassword !== confirmPassword) {
+      setChangePasswordError('Passwords do not match');
+      return;
+    }
+
+    if (!passwordStrength || passwordStrength.strength === 'Weak') {
+      setChangePasswordError('Please choose a stronger password');
+      return;
+    }
+
     try {
       const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-      const { data, error } = await supabase.auth.updateUser({ password: newPassword });
-      if (error) {
-        setChangePasswordError(error.message);
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        setChangePasswordError('No active session found. Please log in again.');
+        return;
+      }
+
+      const response = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          password: newPassword,
+          accessToken: session.access_token
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        setChangePasswordError(data.error || 'Failed to change password');
       } else {
-        setChangePasswordSuccess('Password changed successfully! Please log in again.');
-        setIsAuthenticated(false);
-        setShowChangePassword(false);
-        setPassword('');
+        setChangePasswordSuccess(data.message);
+        setNewPassword('');
+        setConfirmPassword('');
+        setPasswordStrength('');
+        
+        // Log out user so they can log in with new password
+        setTimeout(() => {
+          setIsAuthenticated(false);
+          setActiveTab('tickets');
+        }, 2000);
       }
     } catch (err) {
-      setChangePasswordError('Failed to change password.');
+      console.error('Change password error:', err);
+      setChangePasswordError('Failed to change password. Please try again.');
     }
   };
 
@@ -438,18 +499,6 @@ const AdminPage = () => {
               }}>{error}</p>
             )}
           </form>
-          {showChangePassword && (
-            <form onSubmit={handleChangePassword} style={{ marginTop: '2rem' }}>
-              <h2>Change Password (Required)</h2>
-              <div className="form-group">
-                <label htmlFor="newPassword">New Password:</label>
-                <input type="password" id="newPassword" name="newPassword" value={newPassword} onChange={e => setNewPassword(e.target.value)} required />
-              </div>
-              <button type="submit">Change Password</button>
-              {changePasswordError && <p className="error">{changePasswordError}</p>}
-              {changePasswordSuccess && <p className="success">{changePasswordSuccess}</p>}
-            </form>
-          )}
         </div>
       </div>
     );
@@ -521,6 +570,12 @@ const AdminPage = () => {
             onClick={() => setActiveTab('add')}
           >
             Add Ticket
+          </button>
+          <button
+            className={`tab-button ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('settings')}
+          >
+            Settings
           </button>
         </div>
 
@@ -711,23 +766,65 @@ const AdminPage = () => {
               </form>
             </div>
           )}
+          {activeTab === 'settings' && (
+            <div className="settings-container">
+              <h2>Account Settings</h2>
+              
+              <div className="settings-section">
+                <h3>Change Password</h3>
+                <p style={{ color: '#a0a0a0', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                  Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character.
+                </p>
+                <form onSubmit={handleChangePassword}>
+                  <div className="form-group">
+                    <label htmlFor="newPassword">New Password:</label>
+                    <input 
+                      type="password" 
+                      id="newPassword" 
+                      name="newPassword" 
+                      value={newPassword} 
+                      onChange={handlePasswordChange} 
+                      required 
+                    />
+                    {passwordStrength && (
+                      <div style={{ 
+                        marginTop: '0.5rem', 
+                        fontSize: '0.875rem', 
+                        color: passwordStrength.color,
+                        fontWeight: '500'
+                      }}>
+                        Password strength: {passwordStrength.strength}
+                      </div>
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="confirmPassword">Confirm Password:</label>
+                    <input 
+                      type="password" 
+                      id="confirmPassword" 
+                      name="confirmPassword" 
+                      value={confirmPassword} 
+                      onChange={e => setConfirmPassword(e.target.value)} 
+                      required 
+                    />
+                  </div>
+                  <button type="submit">Change Password</button>
+                  {changePasswordError && (
+                    <p style={{ color: '#ef4444', marginTop: '1rem', fontSize: '0.875rem' }}>
+                      {changePasswordError}
+                    </p>
+                  )}
+                  {changePasswordSuccess && (
+                    <p style={{ color: '#10b981', marginTop: '1rem', fontSize: '0.875rem' }}>
+                      {changePasswordSuccess}
+                    </p>
+                  )}
+                </form>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-
-      {isAuthenticated && (
-        <div style={{ margin: '2rem 0' }}>
-          <h2>Change Password</h2>
-          <form onSubmit={handleChangePassword}>
-            <div className="form-group">
-              <label htmlFor="newPassword">New Password:</label>
-              <input type="password" id="newPassword" name="newPassword" value={newPassword} onChange={e => setNewPassword(e.target.value)} required />
-            </div>
-            <button type="submit">Change Password</button>
-            {changePasswordError && <p className="error">{changePasswordError}</p>}
-            {changePasswordSuccess && <p className="success">{changePasswordSuccess}</p>}
-          </form>
-        </div>
-      )}
 
       <style jsx global>{`
         body {
@@ -941,6 +1038,81 @@ const AdminPage = () => {
         }
 
         .add-ticket-container button:hover {
+          background-color: #2563eb;
+          border-color: #2563eb;
+          transform: translateY(-1px);
+        }
+
+        .settings-container {
+          padding: 20px;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+
+        .settings-section {
+          margin-bottom: 20px;
+        }
+
+        .settings-section h3 {
+          margin-bottom: 10px;
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #ffffff;
+        }
+
+        .settings-section p {
+          margin-bottom: 10px;
+          color: #a0a0a0;
+          font-size: 0.9rem;
+        }
+
+        .settings-section form {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .settings-section .form-group {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .settings-section label {
+          color: #ffffff;
+          font-weight: 500;
+          font-size: 14px;
+        }
+
+        .settings-section input {
+          padding: 10px 12px;
+          background-color: #2a2a2a;
+          border: 1px solid #404040;
+          border-radius: 6px;
+          color: #ffffff;
+          font-size: 14px;
+        }
+
+        .settings-section input:focus {
+          outline: none;
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .settings-section button {
+          margin-top: 10px;
+          padding: 12px 24px;
+          background-color: #3b82f6;
+          color: white;
+          border: 1px solid #3b82f6;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 16px;
+          font-weight: 600;
+          transition: all 0.2s ease;
+        }
+
+        .settings-section button:hover {
           background-color: #2563eb;
           border-color: #2563eb;
           transform: translateY(-1px);
