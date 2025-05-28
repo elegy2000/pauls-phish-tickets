@@ -314,7 +314,7 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
           </div>
         )}
 
-        <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+        <div style={{ marginTop: '3rem' }}>
           <Link 
             href="/"
             style={{

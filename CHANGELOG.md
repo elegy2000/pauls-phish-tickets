@@ -36,6 +36,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Status: Complete, live on production
 
 ### Latest Completed (January 2025)
+- [x] **Year Images Upload Manager** - ✅ COMPLETE
+  - ✅ **Added dedicated section to Image Upload tab in admin dashboard**
+  - ✅ **Filename validation ensures uploaded images match existing year images exactly**
+  - ✅ **Direct replacement functionality in Supabase Storage (`year-images` bucket)**
+  - ✅ **Visual feedback with filename validation (✅ valid, ❌ invalid)**
+  - ✅ **Maintains consistent admin interface styling and user experience**
+  - ✅ **Image format validation and user feedback during upload process**
+  - ✅ **Real-time display of existing year images that can be replaced**
+  - ✅ **4MB file size validation with clear error messaging**
+  - ✅ **Secure API endpoints with proper error handling and validation**
+  - Date: January 2025
+  - Status: Complete
+
 - [x] **Back to Years Link at Top & Bottom** - ✅ COMPLETE
   - ✅ **Added second 'Back to Years' button at the bottom of all year pages**
   - ✅ **Consistent styling with top button and Admin Dashboard button design**
@@ -297,20 +310,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### To-Do / Planned
 
 - [ ] Get Vercel MPCs (Managed Project Configurations) to work with Cursor (Supabase works; only Vercel is not working)
-- [ ] **Year Images Upload Manager**: Add admin functionality to replace homepage year images
-  - Create new admin section with same design as existing "Image Upload" section
-  - Allow uploading new images to replace existing year images in Supabase Storage (`year-images` bucket)
-  - Enforce filename matching: uploaded images must have exact same names as existing year images they're replacing
-  - Implement direct replacement in Supabase Storage (same location, same filename)
-  - Maintain consistency with existing admin interface styling and user experience
-  - Validate image formats and provide user feedback during upload process
-- [ ] **Homepage Content Editor**: Add admin functionality to edit homepage opening paragraph
-  - Create new admin section following same design guidelines as other admin features
-  - Allow editing and updating the homepage opening paragraph text content
-  - Store content in Supabase database for dynamic loading on homepage
-  - Include text area with preview functionality and save/cancel options
-  - Maintain consistent styling with existing admin interface
-  - Provide real-time content updates without code deployment
 - [ ] Admin Change Password Section: Add a change password section to the admin page for improved security and user management
 - [ ] Test and document the new workflow
 - [ ] Set up and verify custom domain on Vercel

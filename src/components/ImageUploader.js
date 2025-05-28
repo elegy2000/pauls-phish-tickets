@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const ImageUploader = () => {
@@ -8,6 +8,29 @@ const ImageUploader = () => {
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [isUploading, setIsUploading] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+
+  // Year Images Upload Manager state
+  const [yearFiles, setYearFiles] = useState([]);
+  const [yearUploadStatus, setYearUploadStatus] = useState('');
+  const [yearError, setYearError] = useState('');
+  const [isUploadingYears, setIsUploadingYears] = useState(false);
+  const [existingYearImages, setExistingYearImages] = useState([]);
+
+  // Load existing year images when component mounts
+  useEffect(() => {
+    loadExistingYearImages();
+  }, []);
+
+  const loadExistingYearImages = async () => {
+    try {
+      const response = await axios.get('/api/list-year-images');
+      if (response.data.success) {
+        setExistingYearImages(response.data.images || []);
+      }
+    } catch (err) {
+      console.error('Error loading existing year images:', err);
+    }
+  };
 
   const handleFileChange = (event) => {
     setSelectedFiles(Array.from(event.target.files));
@@ -183,6 +206,86 @@ const ImageUploader = () => {
     }
   };
 
+  // Year Images Upload Handlers
+  const handleYearFileChange = (event) => {
+    const files = Array.from(event.target.files);
+    setYearFiles(files);
+    setYearUploadStatus('');
+    setYearError('');
+    
+    // Validate that filenames match existing year images
+    validateYearFilenames(files);
+  };
+
+  const validateYearFilenames = (files) => {
+    const invalidFiles = [];
+    const validFiles = [];
+    
+    files.forEach(file => {
+      const isValid = existingYearImages.includes(file.name);
+      if (isValid) {
+        validFiles.push(file.name);
+      } else {
+        invalidFiles.push(file.name);
+      }
+    });
+    
+    if (invalidFiles.length > 0) {
+      setYearError(
+        `❌ Invalid filenames detected:\n${invalidFiles.join('\n')}\n\n` +
+        `✅ Valid filenames that can be replaced:\n${existingYearImages.join('\n')}\n\n` +
+        `Please rename your files to match existing year image names exactly.`
+      );
+    } else if (validFiles.length > 0) {
+      setYearUploadStatus(`✅ ${validFiles.length} valid filename(s) detected: ${validFiles.join(', ')}`);
+    }
+  };
+
+  const handleYearUpload = async () => {
+    if (yearFiles.length === 0) {
+      setYearError('Please select at least one year image to upload.');
+      return;
+    }
+
+    // Final validation
+    const invalidFiles = yearFiles.filter(file => !existingYearImages.includes(file.name));
+    if (invalidFiles.length > 0) {
+      setYearError(`Cannot upload files with invalid names: ${invalidFiles.map(f => f.name).join(', ')}`);
+      return;
+    }
+
+    try {
+      setIsUploadingYears(true);
+      setYearError('');
+      setYearUploadStatus('Uploading year images...');
+
+      const formData = new FormData();
+      yearFiles.forEach((file) => {
+        formData.append('yearImages', file);
+      });
+
+      const response = await axios.post('/api/upload-year-images', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data.success) {
+        setYearUploadStatus(`✅ Successfully replaced ${response.data.replacedCount} year image(s)!`);
+        setYearFiles([]);
+        // Refresh the existing images list
+        await loadExistingYearImages();
+      } else {
+        throw new Error(response.data.message || 'Upload failed');
+      }
+    } catch (err) {
+      setYearError(`Error uploading year images: ${err.response?.data?.message || err.message}`);
+      console.error('Year image upload error:', err);
+    } finally {
+      setIsUploadingYears(false);
+    }
+  };
+
   return (
     <div className="image-uploader">
       <h2>Bulk Image Upload</h2>
@@ -269,6 +372,81 @@ const ImageUploader = () => {
       
       {uploadStatus && <p className="status">{uploadStatus}</p>}
       {error && <p className="error">{error}</p>}
+      
+      {/* Year Images Upload Manager */}
+      <div className="year-images-section">
+        <h2>Year Images Upload Manager</h2>
+        <div className="upload-info">
+          <p><strong>🎯 Replace Homepage Year Images:</strong></p>
+          <ul>
+            <li>Upload new images to replace existing year images on the homepage</li>
+            <li><strong>Filename must match exactly</strong> (e.g., "1983.jpg", "1984.jpg")</li>
+            <li>Supported formats: JPG, PNG, WebP</li>
+            <li>Recommended size: 400x300px or similar aspect ratio</li>
+            <li>Maximum 4MB per image</li>
+          </ul>
+          {existingYearImages.length > 0 && (
+            <div className="existing-files">
+              <p><strong>📁 Current year images that can be replaced:</strong></p>
+              <div className="existing-files-grid">
+                {existingYearImages.map((filename, idx) => (
+                  <span key={idx} className="existing-file">{filename}</span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleYearFileChange}
+          className="file-input"
+          disabled={isUploadingYears}
+        />
+        
+        {yearFiles.length > 0 && (
+          <div className="file-list">
+            <h4>Selected Year Images ({yearFiles.length}):</h4>
+            <div className="file-grid">
+              {yearFiles.map((file, idx) => {
+                const isValid = existingYearImages.includes(file.name);
+                const fileSizeKB = Math.round(file.size / 1024);
+                const fileSizeMB = Math.round(file.size / (1024 * 1024) * 10) / 10;
+                const isOversized = file.size > 4 * 1024 * 1024;
+                
+                return (
+                  <div key={idx} className={`file-item ${!isValid ? 'invalid' : ''} ${isOversized ? 'oversized' : ''}`}>
+                    <span className="file-name">
+                      {!isValid && '❌ '}
+                      {isOversized && '⚠️ '}
+                      {isValid && !isOversized && '✅ '}
+                      {file.name}
+                    </span>
+                    <span className={`file-size ${isOversized ? 'oversized-text' : ''}`}>
+                      ({fileSizeKB < 1024 ? `${fileSizeKB}KB` : `${fileSizeMB}MB`})
+                      {isOversized && ' - TOO LARGE'}
+                      {!isValid && ' - INVALID NAME'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        
+        <button 
+          onClick={handleYearUpload} 
+          className="upload-button"
+          disabled={isUploadingYears || yearFiles.length === 0 || yearFiles.some(f => !existingYearImages.includes(f.name) || f.size > 4 * 1024 * 1024)}
+        >
+          {isUploadingYears ? 'Replacing Images...' : 'Replace Year Images'}
+        </button>
+        
+        {yearUploadStatus && <p className="status">{yearUploadStatus}</p>}
+        {yearError && <p className="error">{yearError}</p>}
+      </div>
       
       <style jsx>{`
         .image-uploader {
@@ -377,6 +555,13 @@ const ImageUploader = () => {
           border-radius: 4px;
           border: 1px solid #ef4444;
         }
+        .file-item.invalid {
+          background-color: #2a1a1a;
+          padding: 8px;
+          margin: 2px 0;
+          border-radius: 4px;
+          border: 1px solid #ef4444;
+        }
         .file-name {
           font-weight: 500;
           color: #ffffff;
@@ -425,6 +610,37 @@ const ImageUploader = () => {
           margin-top: 10px;
           font-weight: 500;
           white-space: pre-line;
+        }
+        .year-images-section {
+          margin-top: 40px;
+          padding-top: 30px;
+          border-top: 2px solid #404040;
+        }
+        .existing-files {
+          background-color: #1e3a2e;
+          border: 1px solid #10b981;
+          border-radius: 6px;
+          padding: 15px;
+          margin-top: 15px;
+        }
+        .existing-files p {
+          color: #10b981;
+          margin-bottom: 10px;
+          font-weight: 500;
+        }
+        .existing-files-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        .existing-file {
+          background-color: #0f2419;
+          border: 1px solid #10b981;
+          border-radius: 4px;
+          padding: 6px 12px;
+          color: #10b981;
+          font-size: 14px;
+          font-weight: 500;
         }
       `}</style>
     </div>
