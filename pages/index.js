@@ -171,7 +171,7 @@ export default function HomePage({ years, yearCounts, homepageContent, error }) 
                     position: 'relative',
                     overflow: 'hidden',
                     boxShadow: '0 6px 24px rgba(0,0,0,0.7)',
-                    minHeight: '320px',
+                    minHeight: '380px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'flex-start',
