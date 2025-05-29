@@ -138,8 +138,23 @@ export default async function handler(req, res) {
     // Process each file
     for (const file of yearImages) {
       try {
-        const filename = file.originalFilename || file.newFilename;
+        console.log('Raw file object properties:', Object.keys(file));
+        console.log('File object details:', {
+          originalFilename: file.originalFilename,
+          newFilename: file.newFilename,
+          name: file.name,
+          filepath: file.filepath,
+          mimetype: file.mimetype
+        });
+        
+        const filename = file.originalFilename || file.newFilename || file.name;
         console.log(`Processing file: ${filename}`);
+        
+        if (!filename) {
+          console.error('❌ No filename found in file object:', file);
+          errors.push(`❌ File upload error: Unable to determine filename`);
+          continue;
+        }
         
         // Validate filename exists in year-images bucket
         if (!existingFilenames.includes(filename)) {
@@ -151,7 +166,14 @@ export default async function handler(req, res) {
         console.log(`✅ File ${filename} validated, proceeding with upload`);
 
         // Read file data
-        const fileBuffer = fs.readFileSync(file.filepath);
+        const filePath = file.filepath || file.path;
+        if (!filePath) {
+          console.error('❌ No file path found in file object:', file);
+          errors.push(`❌ ${filename}: Unable to locate uploaded file`);
+          continue;
+        }
+        
+        const fileBuffer = fs.readFileSync(filePath);
         
         // Upload to Supabase Storage (this will replace existing file)
         const { data, error } = await supabase.storage
@@ -170,7 +192,7 @@ export default async function handler(req, res) {
         }
 
         // Clean up temp file
-        fs.unlinkSync(file.filepath);
+        fs.unlinkSync(filePath);
         
       } catch (fileError) {
         console.error(`Error processing file ${file.originalFilename}:`, fileError);
