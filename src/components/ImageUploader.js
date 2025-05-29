@@ -44,7 +44,7 @@ const ImageUploader = () => {
     const batches = [];
     let currentBatch = [];
     let currentBatchSize = 0;
-    const maxBatchSize = 4 * 1024 * 1024; // 4MB to stay under Vercel's 4.5MB limit
+    const maxBatchSize = 3.5 * 1024 * 1024; // 3.5MB to stay well under Vercel's 4.5MB limit
     const maxFileSize = 4 * 1024 * 1024; // 4MB per individual file
     const oversizedFiles = [];
 
@@ -77,19 +77,34 @@ const ImageUploader = () => {
     return { batches, oversizedFiles };
   };
 
-  const uploadBatch = async (batch) => {
+  const uploadBatch = async (batch, batchNumber, totalBatches) => {
     const formData = new FormData();
     batch.forEach((file) => {
       formData.append('images', file);
     });
 
-    const response = await axios.post('/api/upload-images', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    console.log(`Uploading batch ${batchNumber}/${totalBatches} with ${batch.length} files`);
 
-    return response.data;
+    try {
+      const response = await axios.post('/api/upload-images', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 60000, // 60 second timeout per batch
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error(`Batch ${batchNumber} upload error:`, error);
+      // Provide more detailed error information
+      if (error.response) {
+        throw new Error(`Server error (${error.response.status}): ${error.response.data?.message || error.message}`);
+      } else if (error.request) {
+        throw new Error('Network error - request timed out or connection lost');
+      } else {
+        throw new Error(`Upload error: ${error.message}`);
+      }
+    }
   };
 
   const handleUpload = async () => {
@@ -132,16 +147,31 @@ const ImageUploader = () => {
         setUploadStatus(`Uploading batch ${i + 1} of ${totalBatches} (${batch.length} images)...`);
         
         try {
-          const result = await uploadBatch(batch);
+          const result = await uploadBatch(batch, i + 1, totalBatches);
           if (result.success) {
             allUploaded.push(...result.files);
             setProgress({ current: i + 1, total: totalBatches });
+            
+            // Handle partial successes
+            if (result.errors && result.errors.length > 0) {
+              console.warn(`Batch ${i + 1} had ${result.errors.length} failures:`, result.errors);
+              setUploadStatus(`Batch ${i + 1} completed with ${result.uploadedCount}/${result.totalCount} files uploaded. Continuing...`);
+            }
           } else {
-            throw new Error(result.message || 'Batch upload failed');
+            // Handle complete batch failure
+            const errorMessage = result.message || 'Batch upload failed';
+            const detailedErrors = result.errors ? `: ${result.errors.join(', ')}` : '';
+            throw new Error(errorMessage + detailedErrors);
           }
         } catch (batchError) {
           console.error(`Batch ${i + 1} failed:`, batchError);
-          setError(`Batch ${i + 1} failed: ${batchError.message}. ${allUploaded.length} images uploaded successfully before this error.`);
+          
+          // For network errors, suggest smaller batches
+          if (batchError.message.includes('Network error') || batchError.message.includes('timed out')) {
+            setError(`❌ Batch ${i + 1} failed due to network timeout.\n\n💡 Try uploading fewer images at once (5-10 at a time) or check your internet connection.\n\nSuccessfully uploaded ${allUploaded.length} images before this error.`);
+          } else {
+            setError(`❌ Batch ${i + 1} failed: ${batchError.message}\n\nSuccessfully uploaded ${allUploaded.length} images before this error.`);
+          }
           setIsUploading(false);
           return;
         }
