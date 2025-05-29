@@ -390,6 +390,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### To-Do / Planned
 
+- [ ] **Year Navigation Enhancement** - User Request (January 2025)
+  - Add "Next Year →" and "Previous Year ←" buttons to year pages for direct chronological navigation
+  - Position on right side (top and bottom) to complement existing "Back to Years" buttons on left
+  - Maintain consistent styling with existing navigation buttons
+  - Logic: Navigate to next/previous year that has tickets (skip years with no shows)
+  - Handle edge cases: Disable/hide buttons at earliest/latest years
+  - Eliminates need to return to homepage for year-to-year browsing
+  - Improves user flow for chronological exploration of ticket collection
+
 - [ ] Get Vercel MPCs (Managed Project Configurations) to work with Cursor (Supabase works; only Vercel is not working)
 - [ ] Set up and verify custom domain on Vercel
 

@@ -65,6 +65,17 @@ When images are uploaded, the system will automatically:
 2. Update status from ⚠️ to ✓ automatically
 3. No manual URL linking required
 
+## Planned Enhancements - User Requests
+
+### 🔄 **Year Navigation Enhancement** (January 2025)
+**User Request:** Add direct year-to-year navigation on year pages
+- **"Next Year →"** and **"Previous Year ←"** buttons positioned on right side
+- **Chronological navigation** without returning to homepage
+- **Smart logic** to skip years with no shows
+- **Consistent styling** with existing "Back to Years" buttons
+- **Edge case handling** for earliest/latest years
+- **Improved UX** for browsing the chronological ticket collection
+
 ---
 
 ## Project Overview
