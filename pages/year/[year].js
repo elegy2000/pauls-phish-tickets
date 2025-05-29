@@ -40,14 +40,14 @@ export async function getServerSideProps({ params }) {
 
     let availableYears = [];
     if (!yearError && yearData) {
-      availableYears = [...new Set(yearData.map(row => row.year))]
-        .filter(y => y && String(y).trim()) // Convert to string before trim to handle numbers
+      availableYears = [...new Set(yearData.map(row => String(row.year)))] // Convert all to strings
+        .filter(y => y && y.trim()) // Filter out empty values
         .sort((a, b) => parseInt(a) - parseInt(b)); // Sort numerically
     }
 
     return {
       props: {
-        year,
+        year: String(year), // Ensure year is a string
         initialTickets: allTickets || [],
         availableYears: availableYears || [],
         error: null
@@ -57,7 +57,7 @@ export async function getServerSideProps({ params }) {
     console.error('Error fetching year data:', error);
     return {
       props: {
-        year: params.year,
+        year: String(params.year), // Ensure year is a string
         initialTickets: [],
         availableYears: [],
         error: 'Failed to load ticket data'
@@ -74,10 +74,20 @@ export default function YearPage({ year, initialTickets, availableYears, error: 
   const [windowWidth, setWindowWidth] = useState(1024);
   const [lightboxImage, setLightboxImage] = useState(null);
 
-  // Find next and previous years
-  const currentYearIndex = availableYears.indexOf(year);
+  // Find next and previous years with proper string comparison
+  const currentYear = String(year); // Ensure current year is string
+  const currentYearIndex = availableYears.findIndex(y => String(y) === currentYear);
   const previousYear = currentYearIndex > 0 ? availableYears[currentYearIndex - 1] : null;
-  const nextYear = currentYearIndex < availableYears.length - 1 ? availableYears[currentYearIndex + 1] : null;
+  const nextYear = currentYearIndex >= 0 && currentYearIndex < availableYears.length - 1 ? availableYears[currentYearIndex + 1] : null;
+
+  // Debug logging (remove after testing)
+  console.log('Year Navigation Debug:', {
+    currentYear,
+    availableYears,
+    currentYearIndex,
+    previousYear,
+    nextYear
+  });
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
