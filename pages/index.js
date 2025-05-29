@@ -171,7 +171,7 @@ export default function HomePage({ years, yearCounts, homepageContent, error }) 
                     position: 'relative',
                     overflow: 'hidden',
                     boxShadow: '0 6px 24px rgba(0,0,0,0.7)',
-                    minHeight: '420px',
+                    minHeight: '320px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'flex-start',
@@ -192,7 +192,7 @@ export default function HomePage({ years, yearCounts, homepageContent, error }) 
                 >
                   <div style={{
                     width: '100%',
-                    height: '360px',
+                    aspectRatio: '1 / 1',
                     marginBottom: '0.5rem',
                     borderRadius: '0.75rem',
                     overflow: 'hidden',
