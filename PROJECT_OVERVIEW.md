@@ -32,6 +32,7 @@
 
 ## Latest Enhancements (January 2025)
 
+- **Storage Cleanup System:** Implemented automated cleanup tool to identify and remove unused ticket images and duplicates from Supabase Storage. Features smart detection of timestamp-prefixed duplicates and unused original files, with batch deletion and detailed reporting. Successfully freed ~55MB of storage space by removing 95 unused files (40 duplicates + 55 unused originals).
 - **Homepage Content Editor:** Major admin functionality addition allowing dynamic editing of the homepage opening paragraph. Created `homepage_content` database table with RLS policies, built rich text editor with live preview, and integrated seamless content updates without code deployment. Supports HTML formatting and provides real-time content management through the admin dashboard.
 - **Modern Dark Theme Design:** Complete UI overhaul with dark theme (#0f0f0f background) providing better image contrast and minimal modern aesthetic. Improved year box visibility, enhanced typography, interactive hover effects, and consistent styling across all pages.
 - **Complete Image Upload System:** Implemented bulk image upload with smart batching (<4MB per batch), duplicate handling via `upsert`, and comprehensive admin interface with progress tracking.
@@ -43,6 +44,14 @@
 - **Rollback Available:** Tagged stable version `v1.0-stable` available for rollback if needed.
 
 ## Current Status (January 2025) - Latest Features
+
+### ✅ **Storage Cleanup Tool** - COMPLETE & LIVE
+- **Automated Cleanup:** Admin Settings tab includes "Storage Cleanup" functionality
+- **Smart Detection:** Identifies duplicate images with timestamp prefixes and unused original files
+- **Safe Deletion:** Batch processing with confirmation dialogs and error handling
+- **Storage Optimization:** Successfully freed ~55MB of space (95 files: 40 duplicates + 55 unused)
+- **Admin Integration:** One-click cleanup directly from admin dashboard Settings tab
+- **Production Ready:** Live implementation with comprehensive logging and result feedback
 
 ### ✅ **Year Navigation Enhancement** - COMPLETE & LIVE
 - **Direct Year-to-Year Navigation:** "Next Year →" and "Previous Year ←" buttons on year pages

@@ -451,3 +451,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Previous] - 2024-12-27
 
 ### Migration to Supabase Auth 
+
+## [January 24, 2025] - Storage Cleanup System Implementation
+
+**✅ RESOLVED - Storage Optimization**
+- **Issue:** Supabase storage contained ~95 unused files (55MB) including timestamp-prefixed duplicates and unused original images
+- **Root Cause:** Image upload process created duplicate files with timestamp prefixes, plus unused files from testing/migration
+- **Analysis:** 
+  - 40 duplicate files with timestamp prefixes (37.76MB)
+  - 55 unused original files not referenced by any tickets (17.24MB)
+  - 1,349 properly used images (528MB)
+- **Solution:** 
+  - Created `/api/cleanup-unused-images` endpoint for safe batch deletion
+  - Added "Storage Cleanup" section to admin Settings tab
+  - Implemented smart detection of unused files and timestamp duplicates
+  - Added confirmation dialogs and detailed result reporting
+- **Technical Implementation:**
+  - Database query to identify referenced vs unreferenced image files
+  - Regex pattern matching for timestamp-prefixed duplicates
+  - Batch deletion (50 files per batch) with error handling
+  - Real-time UI feedback with success/error states
+- **Result:** Successfully freed ~55MB of storage space, improved storage efficiency
+- **Files Modified:** `pages/admin.jsx`, `pages/api/cleanup-unused-images.js`
+- **Status:** ✅ COMPLETE & DEPLOYED - Cleanup tool now available in admin dashboard
+
+## [January 23, 2025] - Homepage Image Upload Error Resolution 
