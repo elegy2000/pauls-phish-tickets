@@ -44,8 +44,9 @@ const ImageUploader = () => {
     const batches = [];
     let currentBatch = [];
     let currentBatchSize = 0;
-    const maxBatchSize = 3.5 * 1024 * 1024; // 3.5MB to stay well under Vercel's 4.5MB limit
+    const maxBatchSize = 2 * 1024 * 1024; // 2MB to be very conservative with Vercel limits
     const maxFileSize = 4 * 1024 * 1024; // 4MB per individual file
+    const maxFilesPerBatch = 3; // Maximum 3 files per batch to prevent timeouts
     const oversizedFiles = [];
 
     for (const file of files) {
@@ -58,8 +59,8 @@ const ImageUploader = () => {
         continue; // Skip this file
       }
 
-      // If adding this file would exceed the limit, start a new batch
-      if (currentBatchSize + file.size > maxBatchSize && currentBatch.length > 0) {
+      // Start a new batch if adding this file would exceed limits
+      if ((currentBatchSize + file.size > maxBatchSize || currentBatch.length >= maxFilesPerBatch) && currentBatch.length > 0) {
         batches.push(currentBatch);
         currentBatch = [file];
         currentBatchSize = file.size;
@@ -83,24 +84,36 @@ const ImageUploader = () => {
       formData.append('images', file);
     });
 
-    console.log(`Uploading batch ${batchNumber}/${totalBatches} with ${batch.length} files`);
+    const batchSize = batch.reduce((sum, file) => sum + file.size, 0);
+    const batchSizeMB = Math.round(batchSize / (1024 * 1024) * 10) / 10;
+    
+    console.log(`Uploading batch ${batchNumber}/${totalBatches} with ${batch.length} files (${batchSizeMB}MB)`);
 
     try {
       const response = await axios.post('/api/upload-images', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        timeout: 60000, // 60 second timeout per batch
+        timeout: 45000, // 45 second timeout (reduced from 60)
+        maxContentLength: 5 * 1024 * 1024, // 5MB max content
+        maxBodyLength: 5 * 1024 * 1024, // 5MB max body
       });
 
       return response.data;
     } catch (error) {
       console.error(`Batch ${batchNumber} upload error:`, error);
-      // Provide more detailed error information
-      if (error.response) {
-        throw new Error(`Server error (${error.response.status}): ${error.response.data?.message || error.message}`);
+      
+      // More specific error handling
+      if (error.code === 'ECONNABORTED') {
+        throw new Error('Upload timed out - try uploading fewer/smaller images at once');
+      } else if (error.response?.status === 413) {
+        throw new Error('Batch too large - try uploading fewer images at once');
+      } else if (error.response?.status >= 500) {
+        throw new Error(`Server error (${error.response.status}): ${error.response.data?.message || 'Internal server error'}`);
+      } else if (error.response?.status >= 400) {
+        throw new Error(`Client error (${error.response.status}): ${error.response.data?.message || error.message}`);
       } else if (error.request) {
-        throw new Error('Network error - request timed out or connection lost');
+        throw new Error('Network error - connection lost or timed out');
       } else {
         throw new Error(`Upload error: ${error.message}`);
       }
@@ -146,6 +159,13 @@ const ImageUploader = () => {
         const batch = batches[i];
         setUploadStatus(`Uploading batch ${i + 1} of ${totalBatches} (${batch.length} images)...`);
         
+        // Add delay between batches to prevent overwhelming the server
+        if (i > 0) {
+          setUploadStatus(`Waiting 2 seconds before batch ${i + 1}...`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          setUploadStatus(`Uploading batch ${i + 1} of ${totalBatches} (${batch.length} images)...`);
+        }
+        
         try {
           const result = await uploadBatch(batch, i + 1, totalBatches);
           if (result.success) {
@@ -156,6 +176,8 @@ const ImageUploader = () => {
             if (result.errors && result.errors.length > 0) {
               console.warn(`Batch ${i + 1} had ${result.errors.length} failures:`, result.errors);
               setUploadStatus(`Batch ${i + 1} completed with ${result.uploadedCount}/${result.totalCount} files uploaded. Continuing...`);
+            } else {
+              setUploadStatus(`Batch ${i + 1} completed successfully! All ${result.uploadedCount} files uploaded.`);
             }
           } else {
             // Handle complete batch failure
@@ -166,11 +188,13 @@ const ImageUploader = () => {
         } catch (batchError) {
           console.error(`Batch ${i + 1} failed:`, batchError);
           
-          // For network errors, suggest smaller batches
-          if (batchError.message.includes('Network error') || batchError.message.includes('timed out')) {
-            setError(`❌ Batch ${i + 1} failed due to network timeout.\n\n💡 Try uploading fewer images at once (5-10 at a time) or check your internet connection.\n\nSuccessfully uploaded ${allUploaded.length} images before this error.`);
+          // Provide specific guidance based on error type
+          if (batchError.message.includes('timed out') || batchError.message.includes('Network error')) {
+            setError(`❌ Batch ${i + 1} failed due to network timeout.\n\n💡 Solutions to try:\n• Upload 1-2 images at a time\n• Ensure files are under 1MB each\n• Check your internet connection\n• Try again in a few minutes\n\n✅ Successfully uploaded ${allUploaded.length} images before this error.`);
+          } else if (batchError.message.includes('too large')) {
+            setError(`❌ Batch ${i + 1} failed - files too large.\n\n💡 Solutions:\n• Resize images to under 1MB each\n• Upload fewer files at once (1-2 at a time)\n\n✅ Successfully uploaded ${allUploaded.length} images before this error.`);
           } else {
-            setError(`❌ Batch ${i + 1} failed: ${batchError.message}\n\nSuccessfully uploaded ${allUploaded.length} images before this error.`);
+            setError(`❌ Batch ${i + 1} failed: ${batchError.message}\n\n✅ Successfully uploaded ${allUploaded.length} images before this error.\n\n💡 Try uploading the remaining files in smaller batches.`);
           }
           setIsUploading(false);
           return;
@@ -323,9 +347,10 @@ const ImageUploader = () => {
         <p><strong>📋 Instructions:</strong></p>
         <ul>
           <li>Select multiple images (JPG, PNG, etc.)</li>
-          <li>Images will be uploaded in batches to avoid size limits</li>
+          <li><strong>Recommended: Under 1MB per image</strong> for best reliability</li>
           <li><strong>Maximum 4MB per image</strong> (Vercel hosting limitation)</li>
-          <li>Recommended: Under 1MB each for faster uploads</li>
+          <li>Images will be uploaded in small batches (max 3 files, 2MB per batch)</li>
+          <li>💡 For large uploads: Start with 5-10 images to test, then upload more</li>
         </ul>
       </div>
       
@@ -344,17 +369,21 @@ const ImageUploader = () => {
           <div className="file-grid">
             {selectedFiles.map((file, idx) => {
               const isOversized = file.size > 4 * 1024 * 1024; // 4MB limit
+              const isLarge = file.size > 1 * 1024 * 1024; // 1MB recommended limit
               const fileSizeKB = Math.round(file.size / 1024);
               const fileSizeMB = Math.round(file.size / (1024 * 1024) * 10) / 10;
               
               return (
-                <div key={idx} className={`file-item ${isOversized ? 'oversized' : ''}`}>
+                <div key={idx} className={`file-item ${isOversized ? 'oversized' : isLarge ? 'large' : ''}`}>
                   <span className="file-name">
-                    {isOversized && '⚠️ '}{file.name}
+                    {isOversized && '⚠️ '}
+                    {isLarge && !isOversized && '📊 '}
+                    {file.name}
                   </span>
-                  <span className={`file-size ${isOversized ? 'oversized-text' : ''}`}>
+                  <span className={`file-size ${isOversized ? 'oversized-text' : isLarge ? 'large-text' : ''}`}>
                     ({fileSizeKB < 1024 ? `${fileSizeKB}KB` : `${fileSizeMB}MB`})
                     {isOversized && ' - TOO LARGE'}
+                    {isLarge && !isOversized && ' - LARGE (may be slower)'}
                   </span>
                 </div>
               );
@@ -585,6 +614,13 @@ const ImageUploader = () => {
           border-radius: 4px;
           border: 1px solid #ef4444;
         }
+        .file-item.large {
+          background-color: #2a2417;
+          padding: 8px;
+          margin: 2px 0;
+          border-radius: 4px;
+          border: 1px solid #f59e0b;
+        }
         .file-item.invalid {
           background-color: #2a1a1a;
           padding: 8px;
@@ -603,6 +639,10 @@ const ImageUploader = () => {
         .file-size.oversized-text {
           color: #ef4444;
           font-weight: bold;
+        }
+        .file-size.large-text {
+          color: #f59e0b;
+          font-weight: 500;
         }
         .batch-info {
           color: #3b82f6;
