@@ -43,6 +43,12 @@ const AdminPage = () => {
   const [registerError, setRegisterError] = useState('');
   const [registerSuccess, setRegisterSuccess] = useState('');
   const [passwordStrength, setPasswordStrength] = useState('');
+  // Editing state for inline ticket editing
+  const [editingTicketId, setEditingTicketId] = useState(null);
+  const [editingTicket, setEditingTicket] = useState({});
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
+  const [editError, setEditError] = useState('');
+  const [editSuccess, setEditSuccess] = useState('');
 
   useEffect(() => {
     // Check if user is already authenticated
@@ -363,6 +369,122 @@ const AdminPage = () => {
     }
   };
 
+  // Handle starting inline edit mode
+  const handleEditTicket = (ticket) => {
+    setEditingTicketId(ticket.id);
+    setEditingTicket({
+      year: ticket.year,
+      date: ticket.date,
+      venue: ticket.venue,
+      city_state: ticket.city_state,
+      imageurl: ticket.imageurl || '',
+      net_link: ticket.net_link || ''
+    });
+    setEditError('');
+    setEditSuccess('');
+  };
+
+  // Handle canceling edit mode
+  const handleCancelEdit = () => {
+    setEditingTicketId(null);
+    setEditingTicket({});
+    setEditError('');
+    setEditSuccess('');
+  };
+
+  // Handle saving edited ticket
+  const handleSaveEdit = async () => {
+    try {
+      setEditError('');
+      setEditSuccess('');
+
+      // Validate required fields
+      if (!editingTicket.year || !editingTicket.date || !editingTicket.venue || !editingTicket.city_state) {
+        setEditError('All fields except Image URL and NFT Link are required');
+        return;
+      }
+
+      const response = await fetch('/api/update-ticket', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: editingTicketId,
+          ...editingTicket
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        // Update the local tickets state
+        setTickets(prevTickets => 
+          prevTickets.map(ticket => 
+            ticket.id === editingTicketId ? data.ticket : ticket
+          )
+        );
+        setEditSuccess('Ticket updated successfully!');
+        setTimeout(() => {
+          handleCancelEdit();
+        }, 1500);
+      } else {
+        setEditError(data.message || 'Failed to update ticket');
+      }
+    } catch (err) {
+      console.error('Error updating ticket:', err);
+      setEditError('Failed to update ticket. Please try again.');
+    }
+  };
+
+  // Handle editing field changes
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditingTicket(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Handle delete confirmation
+  const handleDeleteTicket = (ticketId) => {
+    setShowDeleteConfirm(ticketId);
+  };
+
+  // Handle confirming deletion
+  const handleConfirmDelete = async () => {
+    try {
+      const response = await fetch('/api/delete-ticket', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: showDeleteConfirm
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        // Remove the ticket from the local state
+        setTickets(prevTickets => 
+          prevTickets.filter(ticket => ticket.id !== showDeleteConfirm)
+        );
+        setShowDeleteConfirm(null);
+        setEditSuccess('Ticket deleted successfully!');
+        setTimeout(() => setEditSuccess(''), 3000);
+      } else {
+        alert(`Failed to delete ticket: ${data.message}`);
+      }
+    } catch (err) {
+      console.error('Error deleting ticket:', err);
+      alert('Failed to delete ticket. Please try again.');
+    }
+  };
+
+  // Handle canceling deletion
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(null);
+  };
+
   if (adminExists === false) {
     return (
       <div className="admin-register" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0f0f0f', color: '#fff' }}>
@@ -641,6 +763,11 @@ const AdminPage = () => {
                         Export to CSV
                       </button>
                     </div>
+                    {editSuccess && (
+                      <div className="success-message" style={{ color: '#10b981', marginBottom: '1rem', fontWeight: '500' }}>
+                        {editSuccess}
+                      </div>
+                    )}
                     <p>Total tickets: {tickets.length}</p>
                     <div className="table-wrapper">
                       <table className="tickets-table">
@@ -651,6 +778,7 @@ const AdminPage = () => {
                             <th>VENUE</th>
                             <th>LOCATION</th>
                             <th>IMAGE</th>
+                            <th>ACTIONS</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -710,19 +838,124 @@ const AdminPage = () => {
                               }
                             })();
                             
+                            const isEditing = editingTicketId === ticket.id;
+                            
                             return (
-                              <tr key={index}>
-                                <td>{ticket.year}</td>
-                                <td>{ticket.date}</td>
-                                <td>{ticket.venue}</td>
-                                <td>{ticket.city_state}</td>
-                                <td className="image-cell">
-                                  {availableImages.size === 0 ? (
-                                    <span style={{color: '#666'}}>...</span>
-                                  ) : hasImage ? (
-                                    <span className="checkmark">✓</span>
+                              <tr key={ticket.id} className={isEditing ? 'editing-row' : ''}>
+                                <td>
+                                  {isEditing ? (
+                                    <input
+                                      type="number"
+                                      name="year"
+                                      value={editingTicket.year}
+                                      onChange={handleEditInputChange}
+                                      className="edit-input"
+                                      min="1960"
+                                      max="2030"
+                                    />
                                   ) : (
-                                    <span className="no-image">-</span>
+                                    ticket.year
+                                  )}
+                                </td>
+                                <td>
+                                  {isEditing ? (
+                                    <input
+                                      type="date"
+                                      name="date"
+                                      value={editingTicket.date}
+                                      onChange={handleEditInputChange}
+                                      className="edit-input"
+                                    />
+                                  ) : (
+                                    ticket.date
+                                  )}
+                                </td>
+                                <td>
+                                  {isEditing ? (
+                                    <input
+                                      type="text"
+                                      name="venue"
+                                      value={editingTicket.venue}
+                                      onChange={handleEditInputChange}
+                                      className="edit-input"
+                                    />
+                                  ) : (
+                                    ticket.venue
+                                  )}
+                                </td>
+                                <td>
+                                  {isEditing ? (
+                                    <input
+                                      type="text"
+                                      name="city_state"
+                                      value={editingTicket.city_state}
+                                      onChange={handleEditInputChange}
+                                      className="edit-input"
+                                    />
+                                  ) : (
+                                    ticket.city_state
+                                  )}
+                                </td>
+                                <td className="image-cell">
+                                  {isEditing ? (
+                                    <input
+                                      type="text"
+                                      name="imageurl"
+                                      value={editingTicket.imageurl}
+                                      onChange={handleEditInputChange}
+                                      className="edit-input"
+                                      placeholder="Image URL (optional)"
+                                    />
+                                  ) : (
+                                    availableImages.size === 0 ? (
+                                      <span style={{color: '#666'}}>...</span>
+                                    ) : hasImage ? (
+                                      <span className="checkmark">✓</span>
+                                    ) : (
+                                      <span className="no-image">-</span>
+                                    )
+                                  )}
+                                </td>
+                                <td className="actions-cell">
+                                  {isEditing ? (
+                                    <div className="edit-actions">
+                                      <button
+                                        onClick={handleSaveEdit}
+                                        className="save-btn"
+                                        title="Save changes"
+                                      >
+                                        ✓
+                                      </button>
+                                      <button
+                                        onClick={handleCancelEdit}
+                                        className="cancel-btn"
+                                        title="Cancel editing"
+                                      >
+                                        ✕
+                                      </button>
+                                      {editError && (
+                                        <div className="edit-error" style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '0.25rem' }}>
+                                          {editError}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="row-actions">
+                                      <button
+                                        onClick={() => handleEditTicket(ticket)}
+                                        className="edit-btn"
+                                        title="Edit ticket"
+                                      >
+                                        ✏️
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteTicket(ticket.id)}
+                                        className="delete-btn"
+                                        title="Delete ticket"
+                                      >
+                                        🗑️
+                                      </button>
+                                    </div>
                                   )}
                                 </td>
                               </tr>
@@ -731,6 +964,30 @@ const AdminPage = () => {
                         </tbody>
                       </table>
                     </div>
+                    
+                    {/* Delete Confirmation Modal */}
+                    {showDeleteConfirm && (
+                      <div className="modal-overlay">
+                        <div className="modal-content">
+                          <h3>Confirm Deletion</h3>
+                          <p>Are you sure you want to delete this ticket? This action cannot be undone.</p>
+                          <div className="modal-actions">
+                            <button
+                              onClick={handleConfirmDelete}
+                              className="confirm-delete-btn"
+                            >
+                              Delete
+                            </button>
+                            <button
+                              onClick={handleCancelDelete}
+                              className="cancel-delete-btn"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -1186,6 +1443,180 @@ const AdminPage = () => {
           background-color: #2563eb;
           border-color: #2563eb;
           transform: translateY(-1px);
+        }
+
+        /* Editing interface styles */
+        .actions-cell {
+          text-align: center;
+          white-space: nowrap;
+        }
+
+        .row-actions {
+          display: flex;
+          gap: 8px;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .edit-btn, .delete-btn {
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-size: 16px;
+          padding: 4px 8px;
+          border-radius: 4px;
+          transition: all 0.2s ease;
+        }
+
+        .edit-btn:hover {
+          background-color: #2563eb;
+        }
+
+        .delete-btn:hover {
+          background-color: #dc3545;
+        }
+
+        .edit-actions {
+          display: flex;
+          gap: 8px;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .save-btn, .cancel-btn {
+          background: none;
+          border: 1px solid;
+          color: white;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: bold;
+          padding: 4px 8px;
+          border-radius: 4px;
+          transition: all 0.2s ease;
+          min-width: 30px;
+          height: 30px;
+        }
+
+        .save-btn {
+          border-color: #10b981;
+          color: #10b981;
+        }
+
+        .save-btn:hover {
+          background-color: #10b981;
+          color: white;
+        }
+
+        .cancel-btn {
+          border-color: #ef4444;
+          color: #ef4444;
+        }
+
+        .cancel-btn:hover {
+          background-color: #ef4444;
+          color: white;
+        }
+
+        .edit-input {
+          background-color: #2a2a2a;
+          border: 1px solid #404040;
+          border-radius: 4px;
+          color: #ffffff;
+          padding: 4px 8px;
+          font-size: 14px;
+          width: 100%;
+          min-width: 80px;
+        }
+
+        .edit-input:focus {
+          outline: none;
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .editing-row {
+          background-color: #222222;
+        }
+
+        .editing-row:hover {
+          background-color: #222222;
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.7);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+        }
+
+        .modal-content {
+          background-color: #1a1a1a;
+          border: 1px solid #2a2a2a;
+          border-radius: 12px;
+          padding: 24px;
+          max-width: 400px;
+          width: 90%;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-content h3 {
+          margin: 0 0 16px 0;
+          color: #ffffff;
+          font-size: 1.25rem;
+          font-weight: 600;
+        }
+
+        .modal-content p {
+          margin: 0 0 24px 0;
+          color: #a0a0a0;
+          line-height: 1.5;
+        }
+
+        .modal-actions {
+          display: flex;
+          gap: 12px;
+          justify-content: flex-end;
+        }
+
+        .confirm-delete-btn {
+          padding: 8px 16px;
+          background-color: #dc3545;
+          color: white;
+          border: 1px solid #dc3545;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: all 0.2s ease;
+        }
+
+        .confirm-delete-btn:hover {
+          background-color: #c82333;
+          border-color: #c82333;
+        }
+
+        .cancel-delete-btn {
+          padding: 8px 16px;
+          background-color: #6b7280;
+          color: white;
+          border: 1px solid #6b7280;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: all 0.2s ease;
+        }
+
+        .cancel-delete-btn:hover {
+          background-color: #4b5563;
+          border-color: #4b5563;
         }
       `}</style>
     </div>

@@ -32,6 +32,7 @@
 
 ## Latest Enhancements (January 2025)
 
+- **Homepage Content Editor:** Major admin functionality addition allowing dynamic editing of the homepage opening paragraph. Created `homepage_content` database table with RLS policies, built rich text editor with live preview, and integrated seamless content updates without code deployment. Supports HTML formatting and provides real-time content management through the admin dashboard.
 - **Modern Dark Theme Design:** Complete UI overhaul with dark theme (#0f0f0f background) providing better image contrast and minimal modern aesthetic. Improved year box visibility, enhanced typography, interactive hover effects, and consistent styling across all pages.
 - **Complete Image Upload System:** Implemented bulk image upload with smart batching (<4MB per batch), duplicate handling via `upsert`, and comprehensive admin interface with progress tracking.
 - **Oversized Image Protection:** Added pre-upload validation for files >4MB (Vercel limit) with clear warnings, visual indicators, and automatic skipping of oversized files.
