@@ -43,7 +43,18 @@ export default async function handler(req, res) {
       multiples: true,
     });
 
-    const [fields, files] = await form.parse(req);
+    // Use formidable v1.x callback API
+    const { fields, files } = await new Promise((resolve, reject) => {
+      form.parse(req, (err, fields, files) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ fields, files });
+        }
+      });
+    });
+    
+    console.log('Files object:', Object.keys(files));
     
     // Handle both single file and multiple files from formidable
     let yearImages = files.yearImages || [];
