@@ -147,4 +147,195 @@ Vercel's serverless functions are stateless and ephemeral, so persistent file st
 
 ---
 
-*This document provides a high-level overview of the project structure and architecture. For detailed progress tracking, issue resolution, and changelog, see CHANGELOG.md.* 
+*This document provides a high-level overview of the project structure and architecture. For detailed progress tracking, issue resolution, and changelog, see CHANGELOG.md.*
+
+---
+
+# 📚 USER GUIDE & PROJECT HANDOFF
+
+## 🚀 How to Use the Phish Ticket Stub Archive
+
+### **For End Users (Visitors)**
+
+**🌐 Live Site:** [https://www.phishticketstubs.com](https://www.phishticketstubs.com)
+
+1. **Browse by Year**: Click any year box on the homepage to view tickets from that year
+2. **Navigate Between Years**: Use "Previous Year ←" and "Next Year →" buttons on year pages
+3. **View Ticket Images**: Click any ticket stub thumbnail to see full-size image in lightbox
+4. **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
+
+### **For Administrators**
+
+**🔐 Admin Access:** Add `/admin` to the site URL and login with Supabase Auth credentials
+
+#### **Admin Dashboard Tabs:**
+
+1. **📊 Current Tickets**
+   - View all tickets in searchable/sortable table
+   - **Edit**: Click ✏️ button to modify ticket details inline
+   - **Delete**: Click 🗑️ button to remove individual tickets (with confirmation)
+   - **Image Status**: Green ✓ = has image, Red - = missing image, ⚠️ = filename set but image missing
+
+2. **📤 CSV Management**
+   - **Upload CSV**: Replace all tickets with new CSV data
+   - **Download CSV**: Export current ticket data as CSV file
+   - **Format**: `YEAR,DATE,VENUE,CITY/STATE,IMAGE_FILENAME,NET_LINK`
+
+3. **🖼️ Image Upload**
+   - **Ticket Images**: Bulk upload ticket stub images (matches by filename)
+   - **Year Images**: Upload/replace homepage year box images
+   - **Auto-batching**: Files >4MB automatically rejected, others batched for upload
+   - **Status Tracking**: Real-time upload progress and validation
+
+4. **➕ Add Single Ticket**
+   - Add individual tickets without CSV upload
+   - All fields validated before submission
+
+5. **📝 Content Editor**
+   - Edit homepage opening paragraph dynamically
+   - HTML formatting supported
+   - Live preview functionality
+
+6. **⚙️ Settings**
+   - **Change Password**: Update admin password with strength validation
+   - **Storage Cleanup**: Remove unused/duplicate images from Supabase Storage
+   - **Logout**: Secure session cleanup
+
+## 🏗️ Project Structure & Architecture
+
+### **Core Technologies**
+- **Frontend**: Next.js 14 with React (deployed on Vercel)
+- **Backend**: Supabase (PostgreSQL database + Storage)
+- **Authentication**: Supabase Auth (email/password)
+- **Deployment**: GitHub → Vercel (automatic CI/CD)
+- **Development**: Cursor IDE with MCP integrations
+
+### **File Structure**
+```
+📁 paul-phish-tickets/
+├── 📁 pages/                    # Next.js pages
+│   ├── index.js                 # Homepage with year grid
+│   ├── admin.jsx                # Admin dashboard
+│   ├── year/[year].js           # Individual year pages
+│   └── api/                     # API endpoints
+│       ├── add-ticket.js        # Add single ticket
+│       ├── update-ticket.js     # Edit ticket inline
+│       ├── delete-ticket.js     # Delete individual ticket
+│       ├── upload-images.js     # Bulk image upload
+│       ├── cleanup-unused-images.js # Storage cleanup
+│       ├── homepage-content.js  # Dynamic homepage content
+│       └── auth/                # Authentication endpoints
+├── 📁 components/               # React components
+├── 📁 styles/                   # CSS styling
+├── 📁 scripts/                  # Utility scripts (mostly legacy)
+├── 📄 CHANGELOG.md             # Detailed project history
+├── 📄 PROJECT_OVERVIEW.md      # This file
+└── 📄 .env.local               # Environment variables
+```
+
+### **Database Schema (Supabase)**
+```sql
+-- Main tickets table
+CREATE TABLE ticket_stubs (
+    id SERIAL PRIMARY KEY,
+    year INTEGER,
+    date DATE,
+    venue TEXT,
+    city_state TEXT,
+    imageurl TEXT,          -- Auto-generated from image_filename
+    image_filename TEXT,    -- Editable filename (e.g., "2022-09-04.jpg")
+    net_link TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Homepage content management
+CREATE TABLE homepage_content (
+    content_key TEXT PRIMARY KEY,
+    content_text TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### **Supabase Storage Buckets**
+- `ticket-images/`: Individual ticket stub images
+- `year-images/`: Homepage year box background images
+
+## 🔧 Development Setup
+
+### **Prerequisites**
+- Node.js 18+ and npm
+- GitHub account with repository access
+- Supabase project access
+- Vercel account (for deployment)
+
+### **Local Development**
+```bash
+# Clone repository
+git clone https://github.com/elegy2000/pauls-phish-tickets.git
+cd pauls-phish-tickets
+
+# Install dependencies
+npm install
+
+# Set up environment variables (.env.local)
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# Run development server
+npm run dev
+# Visit http://localhost:3000
+```
+
+### **Deployment Process**
+1. **Automatic**: Push to GitHub main branch triggers Vercel deployment
+2. **Manual**: Use Vercel dashboard to deploy specific commits
+3. **Environment**: Vercel automatically uses environment variables set in project settings
+
+## 🔐 Access & Credentials
+
+### **Admin Login**
+- **Email**: `windows.rift05@icloud.com`
+- **Password**: Set via Supabase Auth (changeable in admin Settings)
+
+### **Service Accounts**
+- **GitHub**: Repository access for code changes
+- **Supabase**: Database and storage management
+- **Vercel**: Hosting and deployment management
+
+## 🛠️ Maintenance & Troubleshooting
+
+### **Common Tasks**
+1. **Adding New Tickets**: Use admin CSV upload or single ticket form
+2. **Managing Images**: Upload via admin Image Upload tab
+3. **Content Updates**: Use Content Editor for homepage text
+4. **Storage Cleanup**: Run Storage Cleanup tool monthly to remove unused files
+
+### **Backup Strategy**
+- **Code**: Versioned in GitHub with full history
+- **Database**: Supabase automatic backups + manual CSV exports
+- **Images**: Stored in Supabase Storage with redundancy
+
+### **Rollback Options**
+- **Git Tags**: Stable versions tagged for easy rollback
+- **Database**: CSV export/import for data rollback
+- **Vercel**: Previous deployments available in dashboard
+
+## 📞 Support & Contact
+
+### **Technical Issues**
+1. Check CHANGELOG.md for known issues and solutions
+2. Review Vercel deployment logs for errors
+3. Check Supabase logs for database/storage issues
+4. GitHub Issues for code-related problems
+
+### **Project Status**
+- **Current Status**: ✅ Production-ready and fully functional
+- **Known Issues**: None critical (see CHANGELOG.md)
+- **Future Enhancements**: Optional Vercel MCP integration
+
+---
+
+**🎉 The Phish Ticket Stub Archive is complete and ready for long-term use!** 

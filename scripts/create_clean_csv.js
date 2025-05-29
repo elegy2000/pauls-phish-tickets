@@ -84,8 +84,7 @@ function isValidShow(show) {
 
 // Function to get image path
 function getImagePath(show) {
-    // For now, use default image
-    // TODO: Add logic to check for actual ticket stub images
+    // Default image path for legacy script - project now uses Supabase image management
     return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticket-images/default-ticket.jpg`;
 }
 

@@ -425,7 +425,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### To-Do / Planned
 
 - [ ] Get Vercel MPCs (Managed Project Configurations) to work with Cursor (Supabase works; only Vercel is not working)
-- [ ] Set up and verify custom domain on Vercel
+- [x] ✅ **COMPLETE** - Set up and verify custom domain on Vercel 
+  - **Live at**: https://www.phishticketstubs.com
+  - **Status**: Production custom domain fully configured and operational
 
 ## [Latest] - 2024-12-27
 
