@@ -4,6 +4,15 @@ import fs from 'fs';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Add debugging for environment variables
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error('Missing Supabase environment variables:', { 
+    hasUrl: !!supabaseUrl, 
+    hasKey: !!supabaseServiceKey 
+  });
+}
+
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export const config = {
@@ -17,6 +26,16 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Check environment variables early
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.error('Missing Supabase environment variables');
+    return res.status(500).json({
+      success: false,
+      message: 'Server configuration error',
+      error: 'Missing Supabase credentials'
+    });
+  }
+
   try {
     const form = formidable({
       maxFileSize: 4 * 1024 * 1024, // 4MB limit
@@ -25,7 +44,12 @@ export default async function handler(req, res) {
     });
 
     const [fields, files] = await form.parse(req);
-    const yearImages = files.yearImages || [];
+    
+    // Handle both single file and multiple files from formidable
+    let yearImages = files.yearImages || [];
+    if (!Array.isArray(yearImages)) {
+      yearImages = [yearImages]; // Convert single file to array
+    }
     
     console.log('Received year images for upload:', yearImages.length);
 
