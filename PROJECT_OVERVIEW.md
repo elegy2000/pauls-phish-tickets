@@ -41,8 +41,29 @@
 - **Consistent Admin UI:** Standardized all button styling across the admin interface with modern dark theme and enhanced user experience.
 - **Production Ready:** All features tested and deployed via GitHub/Vercel integration with full error handling and user feedback.
 - **Rollback Available:** Tagged stable version `v1.0-stable` available for rollback if needed.
-- **July 2024**
-  - **Year Page Thumbnail Zoom:** Ticket stub thumbnails on YEAR pages are now zoom-cropped by 20% (scale 1.2x) for improved visual consistency and to reduce the impact of white borders. Rollback tag: `yearpage-thumbnail-zoom`.
+
+## Current Status (January 2025) - Latest Features
+
+### ✅ **Ticket Editing Interface Enhancement** - COMPLETE & LIVE
+- **Inline Editing:** Click ✏️ button to modify ticket details directly in the table
+- **Individual Deletion:** Remove specific tickets with confirmation dialogs
+- **Granular Control:** No more need to reset entire CSV for single changes
+- **User-Friendly Interface:** Consistent with existing admin dashboard styling
+- **Real-time Updates:** Changes appear immediately without page refresh
+
+### ✅ **Image Name Column Enhancement** - COMPLETE & TESTED
+- **IMAGE NAME Column:** Shows editable filenames (e.g., "2022-09-04.jpg") for all 1,350 tickets
+- **Auto-Generation:** imageurl automatically creates when filename is entered
+- **Real-time Validation:** Live status indicators (✓ found, ⚠️ missing, - none)
+- **Smart Migration:** All existing tickets migrated from full URLs to clean filenames
+- **Future-Ready:** Automatic image linking when files are uploaded matching filenames
+- **Production Verified:** Working live with all existing ticket data
+
+### 🎯 **Next Upload Workflow**
+When images are uploaded, the system will automatically:
+1. Match uploaded filename to existing ticket `image_filename`
+2. Update status from ⚠️ to ✓ automatically
+3. No manual URL linking required
 
 ---
 
