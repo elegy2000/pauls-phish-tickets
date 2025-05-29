@@ -46,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - ✅ **Updated API endpoints to handle both image_filename and auto-generated imageurl**
   - ✅ **Inline editing supports image filename changes with live validation**
   - ✅ **Future-ready for automatic image linking when files are uploaded**
+  - ✅ **Data Migration: Populated image_filename from existing imageurl values (1350 tickets migrated)**
   - Implementation Details:
     - Created `image_filename` database column via migration
     - Auto-generates imageurl as: `${supabaseUrl}/storage/v1/object/public/ticket-images/${filename}`
@@ -55,6 +56,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Added responsive CSS styling for new column layout
     - Maintains backwards compatibility with existing tickets
     - Disabled imageurl field in editing mode (auto-generated)
+    - **Migration: Extracted filenames from existing URLs (1335 .jpg, 15 .png files)**
+    - **Validation: All existing image references now display proper filename and status**
   - Date: January 2025
   - Status: Complete and ready for production use
 
