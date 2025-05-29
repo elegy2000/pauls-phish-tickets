@@ -126,8 +126,11 @@ export default function YearPage({ year, initialTickets, availableYears, error: 
     }
 
     return (
-      <Link 
-        href={href}
+      <button
+        onClick={() => {
+          // Force full page reload to re-fetch data
+          window.location.href = href;
+        }}
         style={{
           display: 'inline-block',
           padding: '0.875rem 1.75rem',
@@ -139,7 +142,8 @@ export default function YearPage({ year, initialTickets, availableYears, error: 
           fontWeight: '500',
           fontSize: '0.95rem',
           transition: 'all 0.2s ease',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+          cursor: 'pointer'
         }}
         onMouseEnter={(e) => {
           e.target.style.backgroundColor = '#2a2a2a';
@@ -153,7 +157,7 @@ export default function YearPage({ year, initialTickets, availableYears, error: 
         }}
       >
         {children}
-      </Link>
+      </button>
     );
   };
 
