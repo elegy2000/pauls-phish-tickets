@@ -49,6 +49,11 @@ const AdminPage = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [editError, setEditError] = useState('');
   const [editSuccess, setEditSuccess] = useState('');
+  
+  // Image cleanup state
+  const [cleanupLoading, setCleanupLoading] = useState(false);
+  const [cleanupResult, setCleanupResult] = useState('');
+  const [cleanupError, setCleanupError] = useState('');
 
   useEffect(() => {
     // Check if user is already authenticated
@@ -514,6 +519,38 @@ const AdminPage = () => {
   // Handle canceling deletion
   const handleCancelDelete = () => {
     setShowDeleteConfirm(null);
+  };
+
+  const handleCleanupImages = async () => {
+    if (!confirm('This will permanently delete unused ticket images from storage. Are you sure?')) {
+      return;
+    }
+
+    setCleanupLoading(true);
+    setCleanupError('');
+    setCleanupResult('');
+
+    try {
+      const response = await fetch('/api/cleanup-unused-images', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setCleanupResult(`Successfully deleted ${data.deletedCount} unused files, freed ${data.savedSpace} of storage space. Breakdown: ${data.breakdown.duplicates} duplicates, ${data.breakdown.unused} unused files.`);
+      } else {
+        setCleanupError(data.error || 'Failed to cleanup images');
+      }
+    } catch (error) {
+      console.error('Cleanup error:', error);
+      setCleanupError('Failed to cleanup images. Please try again.');
+    } finally {
+      setCleanupLoading(false);
+    }
   };
 
   if (adminExists === false) {
@@ -1188,6 +1225,51 @@ const AdminPage = () => {
                       </p>
                     )}
                   </form>
+                </div>
+                
+                <div className="settings-section">
+                  <h3>Storage Cleanup</h3>
+                  <p style={{ color: '#a0a0a0', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                    Remove unused ticket images and duplicates to free up storage space. This will delete files that aren't referenced by any tickets.
+                  </p>
+                  <button 
+                    type="button" 
+                    onClick={handleCleanupImages}
+                    disabled={cleanupLoading}
+                    style={{
+                      backgroundColor: cleanupLoading ? '#666' : '#dc3545',
+                      cursor: cleanupLoading ? 'not-allowed' : 'pointer',
+                      opacity: cleanupLoading ? 0.7 : 1
+                    }}
+                  >
+                    {cleanupLoading ? 'Cleaning up...' : 'Cleanup Unused Images'}
+                  </button>
+                  {cleanupResult && (
+                    <div style={{ 
+                      color: '#10b981', 
+                      marginTop: '1rem', 
+                      fontSize: '0.875rem',
+                      padding: '0.75rem',
+                      backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                      borderRadius: '0.5rem',
+                      border: '1px solid rgba(16, 185, 129, 0.3)'
+                    }}>
+                      {cleanupResult}
+                    </div>
+                  )}
+                  {cleanupError && (
+                    <div style={{ 
+                      color: '#ef4444', 
+                      marginTop: '1rem', 
+                      fontSize: '0.875rem',
+                      padding: '0.75rem',
+                      backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                      borderRadius: '0.5rem',
+                      border: '1px solid rgba(239, 68, 68, 0.3)'
+                    }}>
+                      {cleanupError}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
