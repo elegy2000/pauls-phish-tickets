@@ -41,7 +41,7 @@ export async function getServerSideProps({ params }) {
     let availableYears = [];
     if (!yearError && yearData) {
       availableYears = [...new Set(yearData.map(row => row.year))]
-        .filter(y => y && y.trim()) // Remove any null/empty years
+        .filter(y => y && String(y).trim()) // Convert to string before trim to handle numbers
         .sort((a, b) => parseInt(a) - parseInt(b)); // Sort numerically
     }
 
