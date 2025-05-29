@@ -191,8 +191,8 @@ export default function HomePage({ years, yearCounts, homepageContent, error }) 
                   }}
                 >
                   <div style={{
-                    width: '100%',
-                    aspectRatio: '1 / 1',
+                    width: '280px',
+                    height: '280px',
                     marginBottom: '0.5rem',
                     borderRadius: '0.75rem',
                     overflow: 'hidden',
@@ -202,6 +202,7 @@ export default function HomePage({ years, yearCounts, homepageContent, error }) 
                     justifyContent: 'center',
                     border: '1px solid #222',
                     boxShadow: '0 2px 12px rgba(0,0,0,0.25)',
+                    alignSelf: 'center',
                   }}>
                     <img
                       src={yearImageUrl}
