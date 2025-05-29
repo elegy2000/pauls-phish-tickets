@@ -32,18 +32,31 @@ export async function getServerSideProps({ params }) {
       batchIndex++;
     }
 
-    // Fetch all available years for navigation
-    const { data: yearData, error: yearError } = await supabase
-      .from('ticket_stubs')
-      .select('year')
-      .order('year', { ascending: true });
-
-    let availableYears = [];
-    if (!yearError && yearData) {
-      availableYears = [...new Set(yearData.map(row => String(row.year)))] // Convert all to strings
-        .filter(y => y && y.trim()) // Filter out empty values
-        .sort((a, b) => parseInt(a) - parseInt(b)); // Sort numerically
+    // Fetch all available years for navigation - use batching to get ALL years
+    let allYearData = [];
+    let yearBatchIndex = 0;
+    const yearBatchSize = 1000;
+    
+    while (true) {
+      const { data: yearBatch, error: batchError } = await supabase
+        .from('ticket_stubs')
+        .select('year')
+        .range(yearBatchIndex * yearBatchSize, (yearBatchIndex + 1) * yearBatchSize - 1);
+      
+      if (batchError) {
+        console.error('Error fetching year batch:', batchError);
+        break;
+      }
+      
+      if (!yearBatch || yearBatch.length === 0) break;
+      allYearData = allYearData.concat(yearBatch);
+      if (yearBatch.length < yearBatchSize) break;
+      yearBatchIndex++;
     }
+    
+    const availableYears = [...new Set(allYearData.map(row => String(row.year)))]
+      .filter(y => y && y.trim())
+      .sort((a, b) => parseInt(a) - parseInt(b));
 
     return {
       props: {
