@@ -36,6 +36,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Status: Complete, live on production
 
 ### Latest Completed (January 2025)
+- [x] **Image Name Column Enhancement** - ✅ COMPLETE
+  - ✅ **Added "IMAGE NAME" column to Current Tickets table for editable filenames**
+  - ✅ **Auto-generation of imageurl from filename when entered (eliminates manual URL entry)**
+  - ✅ **Real-time validation showing ✓ (found), ⚠️ (missing), or - (none) for image status**
+  - ✅ **Enhanced "IMAGE" status column with color-coded indicators and tooltips**
+  - ✅ **Separation of concerns: filename for editing, URL for system use**
+  - ✅ **Added image_filename database column with proper migration**
+  - ✅ **Updated API endpoints to handle both image_filename and auto-generated imageurl**
+  - ✅ **Inline editing supports image filename changes with live validation**
+  - ✅ **Future-ready for automatic image linking when files are uploaded**
+  - Implementation Details:
+    - Created `image_filename` database column via migration
+    - Auto-generates imageurl as: `${supabaseUrl}/storage/v1/object/public/ticket-images/${filename}`
+    - Added `handleImageFilenameChange` function for filename validation and URL generation
+    - Enhanced `getImageStatus` function with real-time storage validation
+    - Updated both `add-ticket.js` and `update-ticket.js` APIs for new field
+    - Added responsive CSS styling for new column layout
+    - Maintains backwards compatibility with existing tickets
+    - Disabled imageurl field in editing mode (auto-generated)
+  - Date: January 2025
+  - Status: Complete and ready for production use
+
 - [x] **Current Tickets Interface Enhancement** - ✅ COMPLETE
   - ✅ **Added inline editing capabilities with click-to-edit functionality for ticket details**
   - ✅ **Added individual deletion with confirmation dialog to prevent accidental removals**

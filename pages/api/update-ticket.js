@@ -22,29 +22,24 @@ export default async function handler(req, res) {
     }
 
     if (!ticketData.year || !ticketData.date || !ticketData.venue || !ticketData.city_state) {
-      console.error('Validation failed:', { 
-        year: !!ticketData.year, 
-        date: !!ticketData.date,
-        venue: !!ticketData.venue,
-        city_state: !!ticketData.city_state 
-      });
-      return res.status(400).json({ success: false, message: 'Missing required fields' });
+      return res.status(400).json({ success: false, message: 'Year, date, venue, and city_state are required' });
     }
 
-    // Prepare ticket data for Supabase
-    const supabaseTicket = {
-      year: Number(ticketData.year),
+    // Prepare the update data with all possible fields
+    const updateData = {
+      year: parseInt(ticketData.year),
       date: ticketData.date,
       venue: ticketData.venue,
       city_state: ticketData.city_state,
-      imageurl: ticketData.imageurl || '',
-      net_link: ticketData.net_link || ''
+      image_filename: ticketData.image_filename || null,
+      imageurl: ticketData.imageurl || null,
+      net_link: ticketData.net_link || null
     };
 
     // Update in Supabase
     const { data, error } = await supabase
       .from('ticket_stubs')
-      .update(supabaseTicket)
+      .update(updateData)
       .eq('id', id)
       .select();
 

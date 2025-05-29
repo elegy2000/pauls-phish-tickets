@@ -39,8 +39,9 @@ export default async function handler(req, res) {
       date: ticket.date,
       venue: ticket.venue,
       city_state: ticket.city_state,
-      imageurl: ticket.imageFileName ? `${supabaseUrl}/storage/v1/object/public/ticket-images/${ticket.imageFileName.trim()}` : '',
-      net_link: ticket.net_link || ''
+      image_filename: ticket.image_filename ? ticket.image_filename.trim() : null,
+      imageurl: ticket.image_filename ? `${supabaseUrl}/storage/v1/object/public/ticket-images/${ticket.image_filename.trim()}` : null,
+      net_link: ticket.net_link || null
     };
 
     // Insert into Supabase

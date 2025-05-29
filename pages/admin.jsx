@@ -28,7 +28,7 @@ const AdminPage = () => {
     date: '',
     venue: '',
     city_state: '',
-    imageFileName: '',
+    image_filename: '',
     net_link: ''
   });
   const [email, setEmail] = useState('');
@@ -324,7 +324,7 @@ const AdminPage = () => {
           date: '',
           venue: '',
           city_state: '',
-          imageFileName: '',
+          image_filename: '',
           net_link: ''
         });
         
@@ -377,6 +377,7 @@ const AdminPage = () => {
       date: ticket.date,
       venue: ticket.venue,
       city_state: ticket.city_state,
+      image_filename: ticket.image_filename || '',
       imageurl: ticket.imageurl || '',
       net_link: ticket.net_link || ''
     });
@@ -392,6 +393,36 @@ const AdminPage = () => {
     setEditSuccess('');
   };
 
+  // Handle image filename changes with auto-generation of imageurl
+  const handleImageFilenameChange = (e) => {
+    const filename = e.target.value.trim();
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    
+    setEditingTicket(prev => ({
+      ...prev,
+      image_filename: filename,
+      imageurl: filename ? `${supabaseUrl}/storage/v1/object/public/ticket-images/${filename}` : ''
+    }));
+  };
+
+  // Check if image exists in storage
+  const getImageStatus = (ticket) => {
+    if (!ticket.image_filename || !ticket.image_filename.trim()) {
+      return { status: 'none', icon: '-', color: '#6b7280' };
+    }
+    
+    if (availableImages.size === 0) {
+      return { status: 'loading', icon: '...', color: '#6b7280' };
+    }
+    
+    const imageExists = availableImages.has(ticket.image_filename);
+    if (imageExists) {
+      return { status: 'found', icon: '✓', color: '#10b981' };
+    } else {
+      return { status: 'missing', icon: '⚠️', color: '#f59e0b' };
+    }
+  };
+
   // Handle saving edited ticket
   const handleSaveEdit = async () => {
     try {
@@ -400,7 +431,7 @@ const AdminPage = () => {
 
       // Validate required fields
       if (!editingTicket.year || !editingTicket.date || !editingTicket.venue || !editingTicket.city_state) {
-        setEditError('All fields except Image URL and NFT Link are required');
+        setEditError('All fields except Image Name and NFT Link are required');
         return;
       }
 
@@ -777,6 +808,7 @@ const AdminPage = () => {
                             <th>DATE</th>
                             <th>VENUE</th>
                             <th>LOCATION</th>
+                            <th>IMAGE NAME</th>
                             <th>IMAGE</th>
                             <th>ACTIONS</th>
                           </tr>
@@ -896,6 +928,34 @@ const AdminPage = () => {
                                     ticket.city_state
                                   )}
                                 </td>
+                                <td>
+                                  {isEditing ? (
+                                    <div className="image-filename-input">
+                                      <input
+                                        type="text"
+                                        name="image_filename"
+                                        value={editingTicket.image_filename}
+                                        onChange={handleImageFilenameChange}
+                                        className="edit-input"
+                                        placeholder="filename.jpg"
+                                      />
+                                      {editingTicket.image_filename && (
+                                        <span 
+                                          className="filename-status"
+                                          style={{ 
+                                            color: getImageStatus({ image_filename: editingTicket.image_filename }).color,
+                                            fontSize: '0.8rem',
+                                            marginLeft: '0.5rem'
+                                          }}
+                                        >
+                                          {getImageStatus({ image_filename: editingTicket.image_filename }).icon}
+                                        </span>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    ticket.image_filename || '-'
+                                  )}
+                                </td>
                                 <td className="image-cell">
                                   {isEditing ? (
                                     <input
@@ -904,16 +964,25 @@ const AdminPage = () => {
                                       value={editingTicket.imageurl}
                                       onChange={handleEditInputChange}
                                       className="edit-input"
-                                      placeholder="Image URL (optional)"
+                                      placeholder="Auto-generated from image name"
+                                      disabled
+                                      style={{ backgroundColor: '#2a2a2a', color: '#888' }}
                                     />
                                   ) : (
-                                    availableImages.size === 0 ? (
-                                      <span style={{color: '#666'}}>...</span>
-                                    ) : hasImage ? (
-                                      <span className="checkmark">✓</span>
-                                    ) : (
-                                      <span className="no-image">-</span>
-                                    )
+                                    (() => {
+                                      const status = getImageStatus(ticket);
+                                      return (
+                                        <span 
+                                          style={{ color: status.color, fontWeight: 'bold' }}
+                                          title={status.status === 'found' ? 'Image found in storage' : 
+                                                 status.status === 'missing' ? 'Image not found in storage' :
+                                                 status.status === 'loading' ? 'Loading image list...' : 
+                                                 'No image filename specified'}
+                                        >
+                                          {status.icon}
+                                        </span>
+                                      );
+                                    })()
                                   )}
                                 </td>
                                 <td className="actions-cell">
@@ -1042,12 +1111,12 @@ const AdminPage = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="imageFileName">Image file name (include ext.) (optional):</label>
+                    <label htmlFor="image_filename">Image file name (include ext.) (optional):</label>
                     <input 
                       type="text" 
-                      id="imageFileName" 
-                      name="imageFileName" 
-                      value={newTicket.imageFileName || ''}
+                      id="image_filename" 
+                      name="image_filename" 
+                      value={newTicket.image_filename || ''}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -1617,6 +1686,36 @@ const AdminPage = () => {
         .cancel-delete-btn:hover {
           background-color: #4b5563;
           border-color: #4b5563;
+        }
+
+        /* Image filename styles */
+        .image-filename-input {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .filename-status {
+          display: inline-flex;
+          align-items: center;
+          font-weight: bold;
+          font-size: 0.8rem;
+        }
+
+        /* Enhanced table column widths for new layout */
+        .tickets-table th:nth-child(5) { /* IMAGE NAME */
+          min-width: 140px;
+          max-width: 160px;
+        }
+
+        .tickets-table th:nth-child(6) { /* IMAGE STATUS */
+          min-width: 80px;
+          max-width: 100px;
+          text-align: center;
+        }
+
+        .tickets-table td:nth-child(6) { /* IMAGE STATUS */
+          text-align: center;
         }
       `}</style>
     </div>
