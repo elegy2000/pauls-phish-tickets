@@ -83,10 +83,13 @@ export default function YearPage({ year, initialTickets, availableYears, error: 
   // Debug logging (remove after testing)
   console.log('Year Navigation Debug:', {
     currentYear,
-    availableYears,
+    availableYears: availableYears.slice(), // Show full array
+    availableYearsLength: availableYears.length,
     currentYearIndex,
     previousYear,
-    nextYear
+    nextYear,
+    yearType: typeof currentYear,
+    availableYearTypes: availableYears.map(y => typeof y)
   });
 
   useEffect(() => {
