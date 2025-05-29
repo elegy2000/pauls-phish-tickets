@@ -31,10 +31,25 @@ export async function getServerSideProps({ params }) {
       if (tickets.length < batchSize) break;
       batchIndex++;
     }
+
+    // Fetch all available years for navigation
+    const { data: yearData, error: yearError } = await supabase
+      .from('ticket_stubs')
+      .select('year')
+      .order('year', { ascending: true });
+
+    let availableYears = [];
+    if (!yearError && yearData) {
+      availableYears = [...new Set(yearData.map(row => row.year))]
+        .filter(y => y && y.trim()) // Remove any null/empty years
+        .sort((a, b) => parseInt(a) - parseInt(b)); // Sort numerically
+    }
+
     return {
       props: {
         year,
         initialTickets: allTickets || [],
+        availableYears: availableYears || [],
         error: null
       }
     };
@@ -44,19 +59,25 @@ export async function getServerSideProps({ params }) {
       props: {
         year: params.year,
         initialTickets: [],
+        availableYears: [],
         error: 'Failed to load ticket data'
       }
     };
   }
 }
 
-export default function YearPage({ year, initialTickets, error: initialError }) {
+export default function YearPage({ year, initialTickets, availableYears, error: initialError }) {
   const router = useRouter();
   const [tickets, setTickets] = useState(initialTickets);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(initialError);
   const [windowWidth, setWindowWidth] = useState(1024);
   const [lightboxImage, setLightboxImage] = useState(null);
+
+  // Find next and previous years
+  const currentYearIndex = availableYears.indexOf(year);
+  const previousYear = currentYearIndex > 0 ? availableYears[currentYearIndex - 1] : null;
+  const nextYear = currentYearIndex < availableYears.length - 1 ? availableYears[currentYearIndex + 1] : null;
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -71,6 +92,61 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
     }
   }, []);
 
+  // Navigation button component
+  const YearNavButton = ({ href, children, disabled = false }) => {
+    if (disabled) {
+      return (
+        <div
+          style={{
+            display: 'inline-block',
+            padding: '0.875rem 1.75rem',
+            backgroundColor: '#111111',
+            color: '#555555',
+            border: '1px solid #222222',
+            borderRadius: '0.75rem',
+            fontWeight: '500',
+            fontSize: '0.95rem',
+            cursor: 'not-allowed',
+            opacity: 0.5
+          }}
+        >
+          {children}
+        </div>
+      );
+    }
+
+    return (
+      <Link 
+        href={href}
+        style={{
+          display: 'inline-block',
+          padding: '0.875rem 1.75rem',
+          backgroundColor: '#1a1a1a',
+          color: '#ffffff',
+          border: '1px solid #333333',
+          borderRadius: '0.75rem',
+          textDecoration: 'none',
+          fontWeight: '500',
+          fontSize: '0.95rem',
+          transition: 'all 0.2s ease',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.backgroundColor = '#2a2a2a';
+          e.target.style.borderColor = '#444444';
+          e.target.style.transform = 'translateY(-1px)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.backgroundColor = '#1a1a1a';
+          e.target.style.borderColor = '#333333';
+          e.target.style.transform = 'translateY(0)';
+        }}
+      >
+        {children}
+      </Link>
+    );
+  };
+
   if (error) {
     return (
       <div style={{ 
@@ -81,11 +157,86 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
       }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            marginBottom: '1.5rem',
+            flexWrap: 'wrap',
+            gap: '1rem'
+          }}>
+            <Link 
+              href="/"
+              style={{
+                display: 'inline-block',
+                padding: '0.875rem 1.75rem',
+                backgroundColor: '#1a1a1a',
+                color: '#ffffff',
+                border: '1px solid #333333',
+                borderRadius: '0.75rem',
+                textDecoration: 'none',
+                fontWeight: '500',
+                fontSize: '0.95rem',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#2a2a2a';
+                e.target.style.borderColor = '#444444';
+                e.target.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#1a1a1a';
+                e.target.style.borderColor = '#333333';
+                e.target.style.transform = 'translateY(0)';
+              }}
+            >
+              ← Back to Years
+            </Link>
+
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <YearNavButton 
+                href={previousYear ? `/year/${previousYear}` : '#'}
+                disabled={!previousYear}
+              >
+                ← Previous Year {previousYear && `(${previousYear})`}
+              </YearNavButton>
+              <YearNavButton 
+                href={nextYear ? `/year/${nextYear}` : '#'}
+                disabled={!nextYear}
+              >
+                Next Year {nextYear && `(${nextYear})`} →
+              </YearNavButton>
+            </div>
+          </div>
+          <p style={{ color: '#ef4444', fontSize: '1.1rem' }}>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ 
+      minHeight: '100vh', 
+      backgroundColor: '#0f0f0f',
+      color: '#ffffff',
+      padding: '2rem',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+    }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        {/* Top Navigation */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          marginBottom: '2rem',
+          flexWrap: 'wrap',
+          gap: '1rem'
+        }}>
           <Link 
             href="/"
             style={{
               display: 'inline-block',
-              marginBottom: '1.5rem',
               padding: '0.875rem 1.75rem',
               backgroundColor: '#1a1a1a',
               color: '#ffffff',
@@ -110,50 +261,22 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
           >
             ← Back to Years
           </Link>
-          <p style={{ color: '#ef4444', fontSize: '1.1rem' }}>{error}</p>
-        </div>
-      </div>
-    );
-  }
 
-  return (
-    <div style={{ 
-      minHeight: '100vh', 
-      backgroundColor: '#0f0f0f',
-      color: '#ffffff',
-      padding: '2rem',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-    }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <Link 
-          href="/"
-          style={{
-            display: 'inline-block',
-            marginBottom: '2rem',
-            padding: '0.875rem 1.75rem',
-            backgroundColor: '#1a1a1a',
-            color: '#ffffff',
-            border: '1px solid #333333',
-            borderRadius: '0.75rem',
-            textDecoration: 'none',
-            fontWeight: '500',
-            fontSize: '0.95rem',
-            transition: 'all 0.2s ease',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#2a2a2a';
-            e.target.style.borderColor = '#444444';
-            e.target.style.transform = 'translateY(-1px)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = '#1a1a1a';
-            e.target.style.borderColor = '#333333';
-            e.target.style.transform = 'translateY(0)';
-          }}
-        >
-          ← Back to Years
-        </Link>
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <YearNavButton 
+              href={previousYear ? `/year/${previousYear}` : '#'}
+              disabled={!previousYear}
+            >
+              ← Previous Year {previousYear && `(${previousYear})`}
+            </YearNavButton>
+            <YearNavButton 
+              href={nextYear ? `/year/${nextYear}` : '#'}
+              disabled={!nextYear}
+            >
+              Next Year {nextYear && `(${nextYear})`} →
+            </YearNavButton>
+          </div>
+        </div>
 
         <h1 style={{ 
           fontSize: '2.5rem', 
@@ -314,7 +437,15 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
           </div>
         )}
 
-        <div style={{ marginTop: '3rem' }}>
+        {/* Bottom Navigation */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          marginTop: '3rem',
+          flexWrap: 'wrap',
+          gap: '1rem'
+        }}>
           <Link 
             href="/"
             style={{
@@ -343,6 +474,21 @@ export default function YearPage({ year, initialTickets, error: initialError }) 
           >
             ← Back to Years
           </Link>
+
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <YearNavButton 
+              href={previousYear ? `/year/${previousYear}` : '#'}
+              disabled={!previousYear}
+            >
+              ← Previous Year {previousYear && `(${previousYear})`}
+            </YearNavButton>
+            <YearNavButton 
+              href={nextYear ? `/year/${nextYear}` : '#'}
+              disabled={!nextYear}
+            >
+              Next Year {nextYear && `(${nextYear})`} →
+            </YearNavButton>
+          </div>
         </div>
 
         {lightboxImage && (
