@@ -93,18 +93,6 @@ export default function YearPage({ year, initialTickets, availableYears, error: 
   const previousYear = currentYearIndex > 0 ? availableYears[currentYearIndex - 1] : null;
   const nextYear = currentYearIndex >= 0 && currentYearIndex < availableYears.length - 1 ? availableYears[currentYearIndex + 1] : null;
 
-  // Debug logging (remove after testing)
-  console.log('Year Navigation Debug:', {
-    currentYear,
-    availableYears: availableYears.slice(), // Show full array
-    availableYearsLength: availableYears.length,
-    currentYearIndex,
-    previousYear,
-    nextYear,
-    yearType: typeof currentYear,
-    availableYearTypes: availableYears.map(y => typeof y)
-  });
-
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setWindowWidth(window.innerWidth);
