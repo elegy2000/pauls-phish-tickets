@@ -106,6 +106,13 @@ export default function HomePage({ years, yearCounts, homepageContent, error }) 
     <>
       <Head>
         <title>Phish Ticket Stub Archive</title>
+        <meta name="description" content="Archive of Phish concert ticket stubs from throughout the band's career. Browse tickets by year and explore the unique art and memories of live music." />
+        <meta property="og:title" content="Phish Ticket Stub Archive" />
+        <meta property="og:description" content="Archive of Phish concert ticket stubs from throughout the band's career." />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Phish Ticket Stub Archive" />
+        <meta name="twitter:description" content="Archive of Phish concert ticket stubs from throughout the band's career." />
       </Head>
       <main style={{ 
         minHeight: '100vh', 
